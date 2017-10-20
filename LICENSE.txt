@@ -1,0 +1,10 @@
+### LICENSE.txt ###
+
+This document is licensed under the CC-BY-SA license.
+If you would like to know the contents of the license please check
+"https://creativecommons.org/licenses/by/4.0".
+
+本ドキュメントは CC-BY-SA ライセンスによって許諾されています。
+ライセンスの内容を知りたい方は
+http://creativecommons.org/licenses/by-sa/4.0/deed.ja
+でご確認ください。
