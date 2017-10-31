@@ -1,7 +1,7 @@
 .DS_Store
 *~
 *.aux
-tec.dvi
-tec.log
-tec.out
-tec.toc
+*.dvi
+*.log
+*.out
+*.toc
