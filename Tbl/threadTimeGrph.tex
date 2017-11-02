@@ -1,0 +1,38 @@
+\documentclass[dvipdfmx]{standalone}
+\usepackage{tikz}
+\usetikzlibrary{datavisualization}
+\begin{document}
+\begin{tikzpicture}
+  \datavisualization[
+    scientific axes, 
+%    school book axes, 
+    visualize as line/.list={real, user},
+    real={style={black, thin,  mark=x}, label in legend={text=Real}},
+    user={style={blue,  thick, mark=+}, label in legend={text=User}},
+    x axis={label=スレッド数, min value=0, max value=11, length=8cm,
+      ticks={step=1}, grid},
+    y axis={label=時間(秒), min value=0, max value=4, length=3cm, grid}
+  ]
+  data [set=real]{
+    x, y
+    1, 2.3377
+    2, 1.1327
+    3, 1.0347
+    4, 0.9643
+    5, 0.9603
+    10,0.9607
+  }
+  data [set=user]{
+    x, y
+    1, 2.3233
+    2, 2.2387
+    3, 3.0147
+    4, 3.6827
+    5, 3.7100
+    10,3.7217
+  };
+\end{tikzpicture}
+\end{document}
+
+  data[set=real, headline={x, y}, read from file=real.csv]
+  data[set=user, headline={x, y}, read from file=user.csv];

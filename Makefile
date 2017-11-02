@@ -1,9 +1,9 @@
 .SUFFIXES:
 .SUFFIXES: .tex .pdf
 
-PDFS = os.pdf
+PDFS = os.pdf chap3_Sld.pdf
 
-%.pdf : *.tex mySty.sty
+%.pdf : %.tex
 	platex $*.tex
 	platex $*.tex
 	dvipdfmx $*.dvi
@@ -11,6 +11,11 @@ PDFS = os.pdf
 
 all : ${PDFS}
 
+os.pdf : os.tex chap?.tex mySty.sty
+
+chap3_Sld.pdf : chap3_Sld.tex
+
+
 clean :
-	rm -f *.log *.aux *.dvi *.out *.toc *~
+	rm -f *.log *.aux *.dvi *.out *.toc *.vrb *.snm *.nav *~
 

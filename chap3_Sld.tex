@@ -1,0 +1,227 @@
+\documentclass[dvipdfmx]{beamer}
+
+% リスト環境
+\usepackage{listings,jlisting}
+%\usepackage{listings}
+\def\lstlistingname{リスト}
+\lstset{language=,
+  numbers=left,
+%  numbers=none,
+  basicstyle={\scriptsize\ttfamily},
+  columns=[l]{fullflexible},
+  keepspaces=true,
+%  frame=shadowbox,
+  frame=single,
+  commentstyle=\slshape
+}
+
+\newcommand{\fig}[2]{\begin{center}\includegraphics[#1]{Fig/#2}\end{center}}
+\newcommand{\tbl}[2]{\begin{center}\includegraphics[#1]{Tbl/#2}\end{center}}
+
+\begin{document}
+\title[OS]{オペレーティングシステム\\第３章 CPUの仮想化}
+%\date{November 1, 2017}
+
+\begin{frame}
+  \titlepage
+\end{frame}
+
+\begin{frame}
+  \frametitle
+  \tableofcontents
+\end{frame}
+
+\section{時分割多重}
+\begin{frame}
+  \frametitle{時分割多重によるCPUの仮想化}
+  \fig{scale=0.7}{virtualCPU-crop.pdf}
+  \begin{itemize}
+    \item 時分割多重：CPUが実行するプロセスを次々切換える。
+    \item ディスパッチ：プロセスにCPUを割り付ける。（実行開始）
+    \item ディスパッチャ：ディスパッチするプログラムのこと。
+  \end{itemize}
+\end{frame}
+
+\begin{frame}
+  \frametitle{CPUの構造（参考）}
+  \fig{scale=0.5}{cpuBlock-crop.pdf}
+\end{frame}
+
+\begin{frame}
+  \frametitle{プロセスの構造（参考）}
+  \fig{scale=0.5}{procOrganization-crop.pdf}
+\end{frame}
+
+\section{プロセスの状態}
+\begin{frame}
+  \frametitle{プロセスの状態遷移}
+  \fig{scale=0.6}{procState-crop.pdf}
+  \begin{itemize}
+    \item 基本的な三つの状態
+    \item 六つの状態遷移
+  \end{itemize}
+\end{frame}
+
+\section{プロセスの切換え}
+\begin{frame}
+  \frametitle{プロセスの切換え}
+  \fig{scale=0.4}{procSwitch-crop.pdf}
+\end{frame}
+
+\begin{frame}
+  \frametitle{オペレーティングシステムの構造（参考）}
+  \fig{scale=0.4}{osOrganization-crop.pdf}
+  \begin{itemize}
+    \item 割込みハンドラ
+    \item サービスモジュール
+    \item ディスパッチャ
+  \end{itemize}
+\end{frame}
+
+\begin{frame}
+  \frametitle{プロセスの切換えの例}
+  \fig{scale=0.35}{procSwitchInst-crop.pdf}
+\end{frame}
+
+\section{PCB（Process Control Block）}
+\begin{frame}
+  \frametitle{PCBの内容}
+\begin{itemize}
+\item 仮想CPU
+\item プロセス番号
+\item 状態（Running，Waiting，Ready等）
+\item 優先度
+\item 統計情報（CPU利用時間等）
+\item 次回のアラーム時刻
+\item 親プロセス
+\item 子プロセス一覧
+\item シグナルハンドリング
+\item 使用中のメモリ
+\item オープン中のファイル
+\item カレントディレクトリ
+\item プロセス所有者のユーザ番号
+\item PCBのリストを作るためのポインタ
+\end{itemize}
+\end{frame}
+
+\begin{frame}
+  \frametitle{PCBのリスト}
+  \fig{scale=0.4}{procQueue-crop.pdf}
+\end{frame}
+
+\section{仮想化の実例}
+\begin{frame}
+  \frametitle{TacOSのPCB}
+  \begin{itemize}
+    \item 仮想CPU（SP）
+    \item プロセス番号（pid）
+    \item 状態(stat）
+    \item 優先度（nice, enaice）
+    \item プロセステーブルのインデクス（idx）
+    \item イベント用カウンタとセマフォ(evtCnt，evtSem）
+    \item プロセスのアドレス空間（memBase，memLen）
+    \item プロセスの親子関係の情報（parent，exitStat）
+    \item オープン中のファイル一覧（fds[]）
+    \item PCBリストの管理（prev，next）
+    \item スタックオーバーフローの検知（magic）
+  \end{itemize}
+\end{frame}
+
+\begin{frame}[fragile]
+  \frametitle{TaCのPCB（前半）}
+  \lstinputlisting
+      [language={C},frame=topline]{Lst/pcb1.hmm}
+\end{frame}
+
+\begin{frame}[fragile]
+  \frametitle{TaCのPCB（後半）}
+  \lstinputlisting
+      [language={C},firstnumber=20,frame=bottomline]{Lst/pcb2.hmm}
+\end{frame}
+
+\begin{frame}
+  \frametitle{TacOSのメモリ配置}
+  \fig{scale=0.4}{tacosMemMap-crop.pdf}
+\end{frame}
+
+\begin{frame}
+  \frametitle{TacOSのプロセス切換えプログラム}
+  \begin{itemize}
+    \item {\tt yield}
+    \item {\tt dispatch}
+    \item 実行可能列
+      \fig{scale=0.5}{tacosReadyQueue-crop.pdf}
+  \end{itemize}
+\end{frame}
+
+\begin{frame}[fragile]
+  \frametitle{プロセス切換えプログラム（yield()）}
+  \lstinputlisting
+      [language=,frame=topline]{Lst/dispatch1.s}
+%      [language=,lastline=24,frame=topline]{Lst/dispatch.s}
+\end{frame}
+
+\begin{frame}[fragile]
+  \frametitle{プロセスの切換えプログラム（dispatch()）}
+  \lstinputlisting
+      [language=,firstnumber=24,frame=bottomline]{Lst/dispatch2.s}
+%      [language=,firstline=24,firstnumber=24,frame=bottomline]{Lst/dispatch.s}
+\end{frame}
+
+\section{スレッド（Thread）}
+\begin{frame}
+  \frametitle{マルチプログラミングを用いないWebサーバ}
+  \fig{scale=0.6}{singleProcSingleClient-crop.pdf}
+\end{frame}
+
+\begin{frame}
+  \frametitle{マルチプログラミングを用いないWebサーバ}
+  \fig{scale=0.6}{singleProcMultiClient-crop.pdf}
+\end{frame}
+
+\begin{frame}
+  \frametitle{マルチプログラミングを用いるWebサーバ}
+  \fig{scale=0.6}{multiProc-crop.pdf}
+\end{frame}
+
+\begin{frame}
+  \frametitle{マルチプログラミングを用いるWebサーバ}
+  \fig{scale=0.6}{multiThread-crop.pdf}
+\end{frame}
+
+\begin{frame}
+  \frametitle{ユーザスレッドとカーネルスレッド}
+  \fig{scale=0.5}{kernelThread-crop.pdf}
+\end{frame}
+
+\begin{frame}
+  \frametitle{ユーザスレッドとカーネルスレッド}
+  \fig{scale=0.5}{userThread-crop.pdf}
+\end{frame}
+
+\begin{frame}
+  \frametitle{M個のスレッドで手分けをして合計を計算する様子}
+  \fig{scale=0.6}{threadedSum-crop.pdf}
+\end{frame}
+
+\begin{frame}[fragile]
+  \frametitle{M個のスレッドで合計を計算する（前半）}
+  \lstinputlisting
+      [language={C},frame=topline]{Lst/threadTest1.c}
+\end{frame}
+
+\begin{frame}[fragile]
+  \frametitle{M個のスレッドで合計を計算する（後半）}
+  \lstinputlisting
+      [language={C},firstnumber=22,frame=bottomline]{Lst/threadTest2.c}
+\end{frame}
+
+\begin{frame}[fragile]
+  \frametitle{M個のスレッドで合計を計算する（後半）}
+  \tbl{scale=0.9}{threadTimeTbl.pdf}
+  \tbl{scale=0.8}{threadTimeGrph.pdf}
+  ２コアのMacBook Proで計測\\
+  （Hyper-Threadingのお陰で２コアと４コアの中間的な振舞）
+\end{frame}
+
+\end{document}

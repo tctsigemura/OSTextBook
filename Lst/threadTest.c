@@ -9,8 +9,7 @@ int a[M*N];                                       // このデータの合計を
 int total[M];                                     // 各スレッドの求めた部分和
 typedef struct { int no, min, max; } Args;        // スレッドに渡す引数の型定義
 
-// 自スレッドの担当部分のデータの合計を求める
-void *thread(void *arg) {
+void *thread(void *arg) {         // 自スレッドの担当部分のデータの合計を求める
   Args *args = arg;                               // m番目のスレッド
   int sum = 0;                                    // 合計を求める変数
   for (int i=args->min; i<args->max; i++) {       // a[N*m ... (N+1)*m] の
@@ -20,7 +19,7 @@ void *thread(void *arg) {
   return NULL;                                    // スレッドを正常終了する
 }
 
-int main() {
+int main() {                      // mainスレッドの実行はここから始まる
   // 擬似的なデータを生成する
   for (int i=0; i<M*N; i++) {                     // 配列 a　を初期化
     a[i] = i+1;
@@ -34,7 +33,7 @@ int main() {
     pthread_attr_init(&attr[m]);                  //   アトリビュート初期化
     pthread_create(&tid[m], &attr[m], thread, p); //   スレッドを生成しスタート
   }
-  // 各スレッドの求めた小計を合算する
+  // 各スレッド終了を待ち，求めた小計を合算する
   int sum = 0;
   for (int m=0; m<M; m++) {                       // 各スレッドについて
     pthread_join(tid[m], NULL);                   //   終了を待ち

@@ -1,0 +1,20 @@
+\documentclass[dvipdfmx]{standalone}
+\begin{document}
+\tt\footnotesize
+\begin{tabular}{r | r r r r r r}
+\multicolumn{1}{c}{}&\multicolumn{6}{c}{スレッド数(M)・データ件数(M*N)}\\
+\multicolumn{1}{c|}{M}&\multicolumn{1}{c}{1}&\multicolumn{1}{c}{2}&
+\multicolumn{1}{c}{3}&\multicolumn{1}{c}{4}&\multicolumn{1}{c}{5}&
+\multicolumn{1}{c}{10}\\
+\multicolumn{1}{c|}{N}&\multicolumn{1}{c}{10,000}&\multicolumn{1}{c}{5,000}&
+\multicolumn{1}{c}{3,333}&\multicolumn{1}{c}{2,500}&\multicolumn{1}{c}{2,000}&
+\multicolumn{1}{c}{1,000}\\
+\multicolumn{1}{c|}{M*N}&\multicolumn{1}{c}{10,000}&\multicolumn{1}{c}{10,000}&
+\multicolumn{1}{c}{9,999}&\multicolumn{1}{c}{10,000}&
+\multicolumn{1}{c}{10,000}&\multicolumn{1}{c}{10,000}\\
+\hline
+経過時間(s)        & 2.338 & 1.133 & 1.034 & 0.964 & 0.960 & 0.961 \\
+ユーザCPU時間(s)   & 2.323 & 2.239 & 3.015 & 3.683 & 3.710 & 3.722 \\
+システムCPU時間(s) & 0.007 & 0.005 & 0.006 & 0.007 & 0.006 & 0.007 \\
+\end{tabular}~
+\end{document}
