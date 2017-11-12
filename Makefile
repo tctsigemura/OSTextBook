@@ -1,7 +1,7 @@
 .SUFFIXES:
 .SUFFIXES: .tex .pdf
 
-PDFS = os.pdf chap3_Sld.pdf
+PDFS = os.pdf chap3_Sld.pdf chap4_Sld.pdf
 
 %.pdf : %.tex
 	platex $*.tex

@@ -1,0 +1,18 @@
+\documentclass[dvipdfmx]{standalone}
+\usepackage{myGanttChart}
+\begin{document}
+\tt\begin{tikzpicture}[node distance=-0.5pt]
+  \node [gray box=1] (p1) {\(P_{1}\)};
+  \node [gray box=4, right=of p1] (p2) {\(P_{2}\)};
+  \node [gray box=1, right=of p2] (p3) {\(P_{1}\)};
+  \node [gray box=3, right=of p3] (p4) {\(P_{3}\)};
+  \node [gray box=4, right=of p4] (p5) {\(P_{1}\)};
+
+  \node [annotation] at (p1.south west) {0};
+  \node [annotation] at (p1.south east) {10};
+  \node [annotation] at (p2.south east) {50};
+  \node [annotation] at (p3.south east) {60};
+  \node [annotation] at (p4.south east) {90};
+  \node [annotation] at (p5.south east) {130};
+\end{tikzpicture}
+\end{document}

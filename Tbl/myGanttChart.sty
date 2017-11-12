@@ -1,0 +1,18 @@
+\ProvidesPackage{myGanttChart}
+\usepackage{tikz}
+\usetikzlibrary{positioning}
+\tikzset{
+  gray box/.style={
+    line width=1pt,
+    fill=gray!20,
+%    draw=gray,
+    draw=black,
+%    minimum width={2*#1ex},
+    minimum width={6*#1ex},
+%    minimum height={2em},
+    minimum height={3em},
+  },
+  annotation/.style={
+    anchor=north,
+  }
+}

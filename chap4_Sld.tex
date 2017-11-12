@@ -1,0 +1,213 @@
+\documentclass[dvipdfmx]{beamer}
+
+% リスト環境
+\usepackage{listings,jlisting}
+%\usepackage{listings}
+\def\lstlistingname{リスト}
+\lstset{language=,
+  numbers=left,
+%  numbers=none,
+  basicstyle={\scriptsize\ttfamily},
+  columns=[l]{fullflexible},
+  keepspaces=true,
+%  frame=shadowbox,
+  frame=single,
+  commentstyle=\slshape
+}
+
+\newcommand{\fig}[2]{\begin{center}\includegraphics[#1]{Fig/#2}\end{center}}
+\newcommand{\tbl}[2]{\begin{center}\includegraphics[#1]{Tbl/#2}\end{center}}
+
+\begin{document}
+\title[OS]{オペレーティングシステム\\第４章 スケジューリング}
+%\date{November 1, 2017}
+
+\begin{frame}
+  \titlepage
+\end{frame}
+
+\begin{frame}
+  \frametitle
+  \tableofcontents
+\end{frame}
+
+\section{評価基準}
+\begin{frame}
+  \frametitle{評価基準}
+  \begin{itemize}
+    \item スループット（Throughput）
+    \item ターンアラウンド時間（Turnaround time）
+    \item レスポンス時間（Response time）
+    \item 締め切り（Deadline）
+    \item その他（公平性，省エネ，予測性など）
+  \end{itemize}
+\end{frame}
+
+\section{システムごとの目標}
+\begin{frame}
+  \frametitle{スケジューリングの目標}
+  \tbl{scale=0.9}{schedulingObjective.pdf}
+\end{frame}
+
+\section{プロセスの振舞}
+\begin{frame}
+  \frametitle{CPUバウンドプロセス}
+  \fig{scale=0.7}{cpuBound-crop.pdf}
+  \begin{itemize}
+    \item 動画圧縮の例
+    \item I/Oバウンドプロセス（エクセル）
+  \end{itemize}
+\end{frame}
+
+\begin{frame}
+  \frametitle{I/Oバウンドプロセス}
+  \fig{scale=0.7}{ioBound-crop.pdf}
+  \begin{itemize}
+    \item スプレッドシートの例
+  \end{itemize}
+\end{frame}
+
+\section{スケジューリング方式}
+\subsection{FCFS}
+\begin{frame}
+  \frametitle{FCFSスケジューリング（１）}
+  \small\begin{tabular}{c c c}
+    プロセス & 到着時刻 & CPUバースト時間(ms) \\
+    \hline
+    $P_1$    & 0 & 100 \\
+    $P_2$    & 0 & 20 \\
+    $P_3$    & 0 & 10 \\
+  \end{tabular}
+  \tbl{scale=0.8}{fcfs1.pdf}
+  \begin{itemize}
+    \item $P_1$，$P_2$，$P_3$の順に実行
+    \item 平均ターンアラウンド時間（$(100+120+130) / 3 = 117$ ms）
+  \end{itemize}
+\end{frame}
+
+\begin{frame}
+  \frametitle{FCFSスケジューリング（２）}
+  \small\begin{tabular}{c c c}
+    プロセス & 到着時刻 & CPUバースト時間(ms) \\
+    \hline
+    $P_1$    & 0 & 100 \\
+    $P_2$    & 0 & 20 \\
+    $P_3$    & 0 & 10 \\
+  \end{tabular}
+  \tbl{scale=0.8}{fcfs2.pdf}
+  \begin{itemize}
+    \item $P_2$，$P_3$，$P_1$の順に実行
+    \item 平均ターンアラウンド時間（$(20+30+130) / 3 = 60$ ms）
+  \end{itemize}
+\end{frame}
+
+\subsection{SJF}
+\begin{frame}
+  \frametitle{SJFスケジューリング}
+  \small\begin{tabular}{c c c}
+    プロセス & 到着時刻 & CPUバースト時間(ms) \\
+    \hline
+    $P_1$    & 0 & 100 \\
+    $P_2$    & 0 & 20 \\
+    $P_3$    & 0 & 10 \\
+  \end{tabular}
+  \tbl{scale=0.8}{sjf1.pdf}
+  \begin{itemize}
+    \item 平均ターンアラウンド時間（$(10+30+130) / 3 = 57$ ms）
+  \end{itemize}
+\end{frame}
+
+\subsection{SRTF}
+\begin{frame}
+  \frametitle{SJFスケジューリング（比較のため）}
+  \small\begin{tabular}{c c c}
+    プロセス & 到着時刻 & CPUバースト時間(ms) \\
+    \hline
+    $P_1$    & 0  & 60 \\
+    $P_2$    & 10 & 40 \\
+    $P_3$    & 60 & 30 \\
+  \end{tabular}
+  \tbl{scale=0.8}{sjf2.pdf}
+  \begin{itemize}
+    \item SJFはプリエンプションなし
+    \item 平均ターンアラウンド時間（$((60-0)+(90-10)+(130-60))/3=70$ ms）
+  \end{itemize}
+\end{frame}
+
+\begin{frame}
+  \frametitle{SRTFスケジューリング}
+  \small\begin{tabular}{c c c}
+    プロセス & 到着時刻 & CPUバースト時間(ms) \\
+    \hline
+    $P_1$    & 0  & 60 \\
+    $P_2$    & 10 & 40 \\
+    $P_3$    & 60 & 30 \\
+  \end{tabular}
+  \tbl{scale=0.8}{srtf1.pdf}
+  \begin{itemize}
+    \item SRTFはプリエンプションあり
+    \item 平均ターンアラウンド時間（$((130-0)+(50-10)+(90-60))/3=67$ ms）
+  \end{itemize}
+\end{frame}
+
+\subsection{RR}
+\begin{frame}
+  \frametitle{RRスケジューリング（１）}
+  \small\begin{tabular}{c c c}
+    プロセス & 到着時刻 & CPUバースト時間(ms) \\
+    \hline
+    $P_1$    & 0  & 60 \\
+    $P_2$    & 10 & 40 \\
+    $P_3$    & 60 & 30 \\
+  \end{tabular}
+  \tbl{scale=0.8}{rr1.pdf}
+  \begin{itemize}
+    \item クォンタムタイム＝10ms
+    \item 平均ターンアラウンド時間（$((120-0)+(90-10)+(130-60))/3=90$）
+  \end{itemize}
+\end{frame}
+
+\begin{frame}
+  \frametitle{RRスケジューリング（２）}
+  \small\begin{tabular}{c c c}
+    プロセス & 到着時刻 & CPUバースト時間(ms) \\
+    \hline
+    $P_1$    & 0  & 60 \\
+    $P_2$    & 10 & 40 \\
+    $P_3$    & 60 & 30 \\
+  \end{tabular}
+  \tbl{scale=0.8}{rr2.pdf}
+  \begin{itemize}
+    \item クォンタムタイム＝50ms
+    \item 平均ターンアラウンド時間（$((100-0)+(90-10)+(130-60))/3=83$ ms）
+  \end{itemize}
+\end{frame}
+
+\subsection{優先度順}
+\begin{frame}
+  \frametitle{優先度順スケジューリング}
+  \begin{itemize}
+    \item 静的・動的
+    \item スタベーション
+    \item エージング
+  \end{itemize}
+\end{frame}
+
+
+\subsection{FB}
+\begin{frame}
+  \frametitle{FBスケジューリング}
+  \fig{scale=0.4}{multilevelFeedbackQueue-crop.pdf}
+  \begin{itemize}
+    \item エージング
+  \end{itemize}
+\end{frame}
+
+\subsection{TacOSのスケジューラ}
+\begin{frame}[fragile]
+  \frametitle{TacOSのスケジューラ}
+  \lstinputlisting
+      [language={C}]{Lst/sch.cmm}
+\end{frame}
+
+\end{document}

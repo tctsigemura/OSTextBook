@@ -1,0 +1,34 @@
+\documentclass[dvipdfmx]{standalone}
+\usepackage{myGanttChart}
+\begin{document}
+\tt\begin{tikzpicture}[node distance=-0.5pt]
+  \node [gray box=1] (p1) {\(P_{1}\)};
+  \node [gray box=1, right=of p1] (p2) {\(P_{2}\)};
+  \node [gray box=1, right=of p2] (p3) {\(P_{1}\)};
+  \node [gray box=1, right=of p3] (p4) {\(P_{2}\)};
+  \node [gray box=1, right=of p4] (p5) {\(P_{1}\)};
+  \node [gray box=1, right=of p5] (p6) {\(P_{2}\)};
+  \node [gray box=1, right=of p6] (p7) {\(P_{1}\)};
+  \node [gray box=1, right=of p7] (p8) {\(P_{3}\)};
+  \node [gray box=1, right=of p8] (p9) {\(P_{2}\)};
+  \node [gray box=1, right=of p9] (p10) {\(P_{1}\)};
+  \node [gray box=1, right=of p10] (p11) {\(P_{3}\)};
+  \node [gray box=1, right=of p11] (p12) {\(P_{1}\)};
+  \node [gray box=1, right=of p12] (p13) {\(P_{3}\)};
+
+  \node [annotation] at (p1.south west) {0};
+  \node [annotation] at (p1.south east) {10};
+  \node [annotation] at (p2.south east) {20};
+  \node [annotation] at (p3.south east) {30};
+  \node [annotation] at (p4.south east) {40};
+  \node [annotation] at (p5.south east) {50};
+  \node [annotation] at (p6.south east) {60};
+  \node [annotation] at (p7.south east) {70};
+  \node [annotation] at (p8.south east) {80};
+  \node [annotation] at (p9.south east) {90};
+  \node [annotation] at (p10.south east) {100};
+  \node [annotation] at (p11.south east) {110};
+  \node [annotation] at (p12.south east) {120};
+  \node [annotation] at (p13.south east) {130};
+\end{tikzpicture}
+\end{document}
