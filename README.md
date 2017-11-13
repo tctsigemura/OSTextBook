@@ -11,7 +11,9 @@ OS Textbook
 
 第３章　CPUの仮想化
 
-第４章　...
+第４章　CPUスケジューリング
+
+第５章　...
 
 ![ライセンス](https://i.creativecommons.org/l/by-sa/4.0/88x31.png "クリエイティブ・コモンズ・ライセンス")
 
