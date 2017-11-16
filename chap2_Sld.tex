@@ -1,22 +1,5 @@
 \documentclass[dvipdfmx]{beamer}
-
-% リスト環境
-\usepackage{listings,jlisting}
-%\usepackage{listings}
-\def\lstlistingname{リスト}
-\lstset{language=,
-  numbers=left,
-%  numbers=none,
-  basicstyle={\scriptsize\ttfamily},
-  columns=[l]{fullflexible},
-  keepspaces=true,
-%  frame=shadowbox,
-  frame=single,
-  commentstyle=\slshape
-}
-
-\newcommand{\fig}[2]{\begin{center}\includegraphics[#1]{Fig/#2}\end{center}}
-\newcommand{\tbl}[2]{\begin{center}\includegraphics[#1]{Tbl/#2}\end{center}}
+\usepackage{mySld}
 
 \begin{document}
 \title[OS]{オペレーティングシステム\\第２章 前提知識}
@@ -26,19 +9,19 @@
   \titlepage
 \end{frame}
 
-\begin{frame}
-  \frametitle
-  \tableofcontents
-\end{frame}
+%\begin{frame}
+%  \frametitle
+%  \tableofcontents
+%\end{frame}
 
 \section{コンピュータのハードウェア構成}
 \begin{frame}
   \frametitle{ハードウェア構成}
   \fig{scale=0.41}{hardBlock-crop.pdf}
   \begin{itemize}
-    \item CPU，メモリ，タイマー，グラフィックアダプタ
-    \item SATAホストコントローラ，USBコントローラ
-    \item ネットワークアダプタ，バス
+    \item SMP（Symmetric Multiprocessing）
+    \item CPU，メモリ，タイマー，アダプタ，コントローラ，バス
+    \item DMA（Direct Memory Access），I/O完了割込み
   \end{itemize}
 \end{frame}
 
@@ -49,6 +32,7 @@
   \begin{itemize}
     \item PSW（Program Status Word）
     \item CPUレジスタ
+    \item 割り込み（Interrupt）
   \end{itemize}
 \end{frame}
 
@@ -93,12 +77,27 @@
 \begin{frame}
   \frametitle{Type 2 ハイパーバイザ}
   \fig{scale=0.6}{type2Hypervisor-crop.pdf}
+  \begin{itemize}
+  \item ホスト・オペレーティングシステム
+  \item ゲスト・オペレーティングシステム
+  \item VMware Workstation， VirtualBox
+  \end{itemize}
 \end{frame}
 
 \begin{frame}
   \frametitle{Type 1 ハイパーバイザ}
   \fig{scale=0.6}{type1Hypervisor-crop.pdf}
+  \begin{itemize}
+  \item メインフレーム： IBM z/VM
+  \item PCサーバ： VMware vSphere， Xen， Hyper-V
+  \end{itemize}
 \end{frame}
 
-
+\begin{frame}
+  \frametitle{仮想アプライアンス}
+  \begin{itemize}
+  \item 仮想マシンのディスクイメージの配布
+  \item ソフトウェアの新しい流通手法
+  \end{itemize}
+\end{frame}
 \end{document}

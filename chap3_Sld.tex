@@ -1,35 +1,18 @@
 \documentclass[dvipdfmx]{beamer}
-
-% リスト環境
-\usepackage{listings,jlisting}
-%\usepackage{listings}
-\def\lstlistingname{リスト}
-\lstset{language=,
-  numbers=left,
-%  numbers=none,
-  basicstyle={\scriptsize\ttfamily},
-  columns=[l]{fullflexible},
-  keepspaces=true,
-%  frame=shadowbox,
-  frame=single,
-  commentstyle=\slshape
-}
-
-\newcommand{\fig}[2]{\begin{center}\includegraphics[#1]{Fig/#2}\end{center}}
-\newcommand{\tbl}[2]{\begin{center}\includegraphics[#1]{Tbl/#2}\end{center}}
+\usepackage{mySld}
 
 \begin{document}
 \title[OS]{オペレーティングシステム\\第３章 CPUの仮想化}
-%\date{November 1, 2017}
+\date{}
 
 \begin{frame}
   \titlepage
 \end{frame}
 
-\begin{frame}
-  \frametitle
-  \tableofcontents
-\end{frame}
+%\begin{frame}
+%  \frametitle
+%  \tableofcontents
+%\end{frame}
 
 \section{時分割多重}
 \begin{frame}
@@ -44,7 +27,7 @@
 
 \begin{frame}
   \frametitle{CPUの構造（参考）}
-  \fig{scale=0.5}{cpuBlock-crop.pdf}
+  \fig{scale=0.6}{cpuBlock-crop.pdf}
 \end{frame}
 
 \begin{frame}
@@ -65,7 +48,7 @@
 \section{プロセスの切換え}
 \begin{frame}
   \frametitle{プロセスの切換え}
-  \fig{scale=0.4}{procSwitch-crop.pdf}
+  \fig{scale=0.33}{procSwitch-crop.pdf}
 \end{frame}
 
 \begin{frame}
@@ -80,7 +63,7 @@
 
 \begin{frame}
   \frametitle{プロセスの切換えの例}
-  \fig{scale=0.35}{procSwitchInst-crop.pdf}
+  \fig{scale=0.33}{procSwitchInst-crop.pdf}
 \end{frame}
 
 \section{PCB（Process Control Block）}
@@ -145,7 +128,7 @@
 \end{frame}
 
 \begin{frame}
-  \frametitle{TacOSのプロセス切換えプログラム}
+  \frametitle{TacOSの実行可能列}
   \begin{itemize}
     \item {\tt yield}
     \item {\tt dispatch}
@@ -218,10 +201,10 @@
 
 \begin{frame}[fragile]
   \frametitle{M個のスレッドで合計を計算する（後半）}
-  \tbl{scale=0.9}{threadTimeTbl.pdf}
+  \tbl{scale=0.7}{threadTimeTbl.pdf}
   \tbl{scale=0.8}{threadTimeGrph.pdf}
-  ２コアのMacBook Proで計測\\
-  （Hyper-Threadingのお陰で２コアと４コアの中間的な振舞）
+  ６コアのMac Proで計測\\
+  （Hyper-Threadingのお陰で６コアと１２コアの中間的な振舞）
 \end{frame}
 
 \end{document}

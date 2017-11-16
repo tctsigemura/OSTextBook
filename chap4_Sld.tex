@@ -1,35 +1,18 @@
 \documentclass[dvipdfmx]{beamer}
-
-% リスト環境
-\usepackage{listings,jlisting}
-%\usepackage{listings}
-\def\lstlistingname{リスト}
-\lstset{language=,
-  numbers=left,
-%  numbers=none,
-  basicstyle={\scriptsize\ttfamily},
-  columns=[l]{fullflexible},
-  keepspaces=true,
-%  frame=shadowbox,
-  frame=single,
-  commentstyle=\slshape
-}
-
-\newcommand{\fig}[2]{\begin{center}\includegraphics[#1]{Fig/#2}\end{center}}
-\newcommand{\tbl}[2]{\begin{center}\includegraphics[#1]{Tbl/#2}\end{center}}
+\usepackage{mySld}
 
 \begin{document}
 \title[OS]{オペレーティングシステム\\第４章 スケジューリング}
-%\date{November 1, 2017}
+\date{}
 
 \begin{frame}
   \titlepage
 \end{frame}
 
-\begin{frame}
-  \frametitle
-  \tableofcontents
-\end{frame}
+%\begin{frame}
+%  \frametitle
+%  \tableofcontents
+%\end{frame}
 
 \section{評価基準}
 \begin{frame}
@@ -46,7 +29,7 @@
 \section{システムごとの目標}
 \begin{frame}
   \frametitle{スケジューリングの目標}
-  \tbl{scale=0.9}{schedulingObjective.pdf}
+  \tbl{scale=1.0}{schedulingObjective.pdf}
 \end{frame}
 
 \section{プロセスの振舞}
@@ -130,7 +113,8 @@
   \tbl{scale=0.8}{sjf2.pdf}
   \begin{itemize}
     \item SJFはプリエンプションなし
-    \item 平均ターンアラウンド時間（$((60-0)+(90-10)+(130-60))/3=70$ ms）
+    \item 平均ターンアラウンド時間\\
+      （$((60-0)+(90-10)+(130-60))/3=70$ ms）
   \end{itemize}
 \end{frame}
 
@@ -146,7 +130,8 @@
   \tbl{scale=0.8}{srtf1.pdf}
   \begin{itemize}
     \item SRTFはプリエンプションあり
-    \item 平均ターンアラウンド時間（$((130-0)+(50-10)+(90-60))/3=67$ ms）
+    \item 平均ターンアラウンド時間\\
+      （$((130-0)+(50-10)+(90-60))/3=67$ ms）
   \end{itemize}
 \end{frame}
 
@@ -163,7 +148,8 @@
   \tbl{scale=0.8}{rr1.pdf}
   \begin{itemize}
     \item クォンタムタイム＝10ms
-    \item 平均ターンアラウンド時間（$((120-0)+(90-10)+(130-60))/3=90$）
+    \item 平均ターンアラウンド時間\\
+      （$((120-0)+(90-10)+(130-60))/3=90$）
   \end{itemize}
 \end{frame}
 
@@ -179,7 +165,8 @@
   \tbl{scale=0.8}{rr2.pdf}
   \begin{itemize}
     \item クォンタムタイム＝50ms
-    \item 平均ターンアラウンド時間（$((100-0)+(90-10)+(130-60))/3=83$ ms）
+    \item 平均ターンアラウンド時間\\
+      （$((100-0)+(90-10)+(130-60))/3=83$ ms）
   \end{itemize}
 \end{frame}
 
@@ -208,6 +195,16 @@
   \frametitle{TacOSのスケジューラ}
   \lstinputlisting
       [language={C}]{Lst/sch.cmm}
+\end{frame}
+
+\begin{frame}
+  \frametitle{TacOSの実行可能列（参考）}
+  \begin{itemize}
+    \item {\tt yield}
+    \item {\tt dispatch}
+    \item 実行可能列
+      \fig{scale=0.5}{tacosReadyQueue-crop.pdf}
+  \end{itemize}
 \end{frame}
 
 \end{document}

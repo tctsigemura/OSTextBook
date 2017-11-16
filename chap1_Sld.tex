@@ -1,22 +1,5 @@
 \documentclass[dvipdfmx]{beamer}
-
-% リスト環境
-\usepackage{listings,jlisting}
-%\usepackage{listings}
-\def\lstlistingname{リスト}
-\lstset{language=,
-  numbers=left,
-%  numbers=none,
-  basicstyle={\scriptsize\ttfamily},
-  columns=[l]{fullflexible},
-  keepspaces=true,
-%  frame=shadowbox,
-  frame=single,
-  commentstyle=\slshape
-}
-
-\newcommand{\fig}[2]{\begin{center}\includegraphics[#1]{Fig/#2}\end{center}}
-\newcommand{\tbl}[2]{\begin{center}\includegraphics[#1]{Tbl/#2}\end{center}}
+\usepackage{mySld}
 
 \begin{document}
 \title[OS]{オペレーティングシステム\\第１章 オペレーティングシステムとは}
@@ -26,10 +9,10 @@
   \titlepage
 \end{frame}
 
-\begin{frame}
-  \frametitle
-  \tableofcontents
-\end{frame}
+%\begin{frame}
+%  \frametitle
+%  \tableofcontents
+%\end{frame}
 
 \section{オペレーティングシステムの役割}
 \subsection{拡張マシンとしてのオペレーティングシステム}
@@ -82,7 +65,7 @@
 \begin{frame}
   \frametitle{第２世代（バッチ処理，その２）}
   \fig{scale=0.15}{punchcard.jpg}
-  \fig{scale=0.4}{job-crop.pdf}
+  \fig{scale=0.37}{job-crop.pdf}
   \begin{itemize}
     \item 紙カード
     \item JOBの構成
@@ -123,11 +106,9 @@
   \frametitle{第３世代（タイムシェアリング : TSS）}
   \fig{scale=0.5}{timesharing-crop.pdf}
   \fig{scale=0.15}{724px-Televideo925Terminal.jpeg}
-  \begin{center}
-    {\tiny 写真：
+  \centerline{\tiny 写真：
       \url{http://commons.wikimedia.org/wiki/File:Televideo925Terminal.jpg}
 （パブリックドメイン）}
-  \end{center}
   \begin{itemize}
     \item TSS（Time Sharing System）
     \item ターミナル
@@ -136,14 +117,12 @@
 
 \begin{frame}
   \frametitle{次の世代に向けて（DynaBook）}
-  \fig{scale=0.3}{Smalltalk-76.png}
+  \fig{scale=0.28}{Smalltalk-76.png}
   \begin{center}
-    {\tiny 写真：
-      ウィキメディア /
-      SUMIM.ST /\\
-      AltoやNoteTakerで動作した
-      アラン・ケイ達の暫定Dynabook環境(Smalltalk-76、同-78の頃) /
-      CC-BY-SA 4.0}
+  {\tiny 写真： ウィキメディア /  SUMIM.ST / \\
+    AltoやNoteTakerで動作した
+    アラン・ケイ達の暫定Dynabook環境(Smalltalk-76、同-78の頃) /
+    CC-BY-SA 4.0}
   \end{center}
   \begin{itemize}
     \item GUI，マウス，パーソナルコンピュータ
@@ -188,7 +167,7 @@
 
 \begin{frame}
   \frametitle{オペレーティングシステムの系統図}
-  \fig{scale=0.33}{tree-crop.pdf}
+  \fig{scale=0.32}{tree-crop.pdf}
 \end{frame}
 
 \end{document}

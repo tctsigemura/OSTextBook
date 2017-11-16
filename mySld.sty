@@ -1,0 +1,36 @@
+% スライド用のスタイルファイル
+\ProvidesPackage{mySld}
+
+% bemer のテーマ選択
+\mode<presentation> {
+  \usetheme{Madrid}
+  %\usetheme{Warsaw}
+  %%\usetheme{Frankfurt}
+  %\usetheme{Berlin}
+  %\usetheme{Darmstadt}
+  %\usefonttheme[onlysmall]{structurebold}
+  \usefonttheme{structurebold}
+  % default, professionalfonts, serif, structurebold,
+  % structureitalicserif, structuresmallcapsserif
+  % or ...
+  %\setbeamercovered{transparent}
+  % or whatever (possibly just delete it)
+}
+
+% リスト環境
+\usepackage{listings,jlisting}
+%\usepackage{listings}
+\def\lstlistingname{リスト}
+\lstset{language=,
+  numbers=left,
+%  numbers=none,
+  basicstyle={\scriptsize\ttfamily},
+  columns=[l]{fullflexible},
+  keepspaces=true,
+%  frame=shadowbox,
+  frame=single,
+  commentstyle=\slshape
+}
+
+\newcommand{\fig}[2]{\begin{center}\includegraphics[#1]{Fig/#2}\end{center}}
+\newcommand{\tbl}[2]{\begin{center}\includegraphics[#1]{Tbl/#2}\end{center}}
