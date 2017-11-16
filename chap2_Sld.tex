@@ -1,0 +1,104 @@
+\documentclass[dvipdfmx]{beamer}
+
+% リスト環境
+\usepackage{listings,jlisting}
+%\usepackage{listings}
+\def\lstlistingname{リスト}
+\lstset{language=,
+  numbers=left,
+%  numbers=none,
+  basicstyle={\scriptsize\ttfamily},
+  columns=[l]{fullflexible},
+  keepspaces=true,
+%  frame=shadowbox,
+  frame=single,
+  commentstyle=\slshape
+}
+
+\newcommand{\fig}[2]{\begin{center}\includegraphics[#1]{Fig/#2}\end{center}}
+\newcommand{\tbl}[2]{\begin{center}\includegraphics[#1]{Tbl/#2}\end{center}}
+
+\begin{document}
+\title[OS]{オペレーティングシステム\\第２章 前提知識}
+\date{}
+
+\begin{frame}
+  \titlepage
+\end{frame}
+
+\begin{frame}
+  \frametitle
+  \tableofcontents
+\end{frame}
+
+\section{コンピュータのハードウェア構成}
+\begin{frame}
+  \frametitle{ハードウェア構成}
+  \fig{scale=0.41}{hardBlock-crop.pdf}
+  \begin{itemize}
+    \item CPU，メモリ，タイマー，グラフィックアダプタ
+    \item SATAホストコントローラ，USBコントローラ
+    \item ネットワークアダプタ，バス
+  \end{itemize}
+\end{frame}
+
+\section{CPUの構成}
+\begin{frame}
+  \frametitle{CPUの構成}
+  \fig{scale=0.5}{cpuBlock-crop.pdf}
+  \begin{itemize}
+    \item PSW（Program Status Word）
+    \item CPUレジスタ
+  \end{itemize}
+\end{frame}
+
+\section{最近のコンピュータの実際の構成}
+\begin{frame}
+  \frametitle{デスクトップ・パーソナルコンピュータ}
+  \fig{scale=0.5}{intelDesktop-crop.pdf}
+  \begin{itemize}
+    \item CPU
+    \item コア（Core）
+  \end{itemize}
+\end{frame}
+
+\begin{frame}
+  \frametitle{サーバコンピュータ}
+  \fig{scale=0.4}{intelServer-crop.pdf}
+\end{frame}
+
+\section{オペレーティングシステムの構造}
+\begin{frame}
+  \frametitle{オペレーティングシステムの構造}
+  \fig{scale=0.49}{osOrganization-crop.pdf}
+\end{frame}
+
+\begin{frame}
+  \frametitle{プロセスの構造}
+  \fig{scale=0.5}{procOrganization-crop.pdf}
+\end{frame}
+
+\section{カーネルの構成方式}
+\begin{frame}
+  \frametitle{単層カーネル（モノリシック・カーネル）}
+  \fig{scale=0.49}{osOrganization-crop.pdf}
+\end{frame}
+
+\begin{frame}
+  \frametitle{マイクロカーネル（micro-kernel）}
+  \fig{scale=0.5}{microkernel-crop.pdf}
+\end{frame}
+
+\section{もう一つの仮想マシン}
+\begin{frame}
+  \frametitle{Type 2 ハイパーバイザ}
+  \fig{scale=0.6}{type2Hypervisor-crop.pdf}
+\end{frame}
+
+\begin{frame}
+  \frametitle{Type 1 ハイパーバイザ}
+  \fig{scale=0.6}{type1Hypervisor-crop.pdf}
+\end{frame}
+
+
+\end{document}

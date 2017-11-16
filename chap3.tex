@@ -18,10 +18,11 @@ CPUを仮想化するためには時分割多重が用いられる．
 実CPUが短時間（例えば10ms）に次々と実行するプロセスを切換えていくことで，
 複数のプロセスが夫々に専用のCPUを持ち並行して実行されているように見せかける．
 
-その際，切換える直前のCPUのコンテキストをプロセスの仮想CPU領域に保存する．
+まず，現在のプロセス実行中の実CPUのコンテキストを，プロセスの仮想CPU領域に保存する．
 次に，新しく実行するプロセスの仮想CPU領域から実CPUにコンテキストを読込み，
 新しいプロセスの実行を再開する．
-実CPUにコンテキストを読込んで実行を再開することを{\bf ディスパッチ}と言う．
+一つのプロセスから別のプロセスに切換える処理を{\bf コンテキストスイッチ}と呼ぶ．
+また，実CPUにコンテキストを読込んで実行を再開することを{\bf ディスパッチ}，
 ディスパッチを行うプログラムを{\bf ディスパッチャ}と呼ぶ．
 \figref{osOrganization}にもディスパッチャは描かれていた．
 
@@ -32,7 +33,7 @@ CPUを仮想化するためには時分割多重が用いられる．
 プロセスは，
 キーボード等の入出力装置からの入力を待つ状態になったり，
 時間が経過するのを待つ状態になったりする．
-{\bf 待ち}状態のプロセスにはCPUを割当てる必要がない．
+{\bf 待ち（Waiting）状態}のプロセスにはCPUを割当てる必要がない．
 このようにプロセスは幾つかの状態を持っている．
 プロセスの状態はUNIXではpsコマンドで確認できる．
 プロセスを模式的に示した\figref{procOrganization}では，
@@ -54,40 +55,40 @@ Z（Zombi）の六つであることが分かる．}．
 図に示された三つの状態を説明する．
 
 \begin{itemize}
-\item Ready（実行可能） \\
+\item {\bf Ready（実行可能）} \\
 CPUを割当てれば実行を開始できる状態のことである．
 プロセスはCPUが割当てられるのを待っている．
-\item Running（実行中） \\
+\item {\bf Running（実行中）} \\
 CPUが割当てられ実行している状態のことである．
 CPUの数より多くのプロセスが同時にRunningになることはできない．
-\item Wating（待ち） \\
+\item {\bf Waiting（待ち）} \\
 シグナルの到着や入出力の完了等の事象を待っている状態である．
 プロセスは実行することができない．
 \end{itemize}
 
-\myfigure{btp}{scale=0.7}{procState-crop.pdf}{プロセスの状態遷移}{procState}
+\myfigure{btp}{scale=0.66}{procState-crop.pdf}{プロセスの状態遷移}{procState}
 
 \subsection{状態遷移}
 \figref{procState}に示された六つの状態遷移の意味は以下の通りである．
 
 \begin{enumerate}
-\item Create（生成） \\
+\item {\bf Create（生成）} \\
 新しいプロセスが生成されるとReady状態になる．
 親プロセスが\|fork()|システムコール（UNIXの場合）や
 \|CreateProcess()|システムコール（Windowsの場合）を実行すると，
 新しい子プロセスが生成される．
 
-\item Dispatch（派遣） \\
+\item {\bf Dispatch（派遣）} \\
 Ready状態のプロセスは，
 自分の順番が来たらCPUが割当てられRunning状態に遷移し実行を開始する．
 
-\item Preemption（横取り） \\
+\item {\bf Preemption（横取り）} \\
 Running状態のプロセスは，
 決められた時間（クオンタムタイム）を使い切ったとき，
 より優先度の高いプロセスがReady状態になったとき等に，
 CPUを取り上げられてReady状態に遷移する．
 
-\item Block（事象待ち） \\
+\item {\bf Block（事象待ち）} \\
 Running状態のプロセスが，
 システムコールを発行して自らWaiting状態に遷移することがある．
 例えば入出力システムコール
@@ -97,17 +98,17 @@ Running状態のプロセスが，
 また，他のプロセスからシグナルを受信した場合も，
 Waiting状態に遷移することがある．
 更に，仮想記憶の機能を持つオペレーティングシステムでは，
-プロセスが読み書きしようとした領域がメモリ上に存在しないときこの遷移が起こり，
+プロセスが読み書きしようとした領域がメモリ上に存在しない時もこの遷移が起こり，
 メモリ領域を確保するための処理がカーネル内部で始まる．
 
-\item Complete（事象完了） \\
+\item {\bf Complete（事象完了）} \\
 Waiting状態のプロセスは，
 入出力の完了やシグナルの発生等の事象（イベント）が発生すると
 Ready状態に遷移する．
 Waiting状態のプロセスは停止しているのでプロセスが事象を発生することはない．
 事象はプロセスの外部からもたらされる．
 
-\item Exit（終了） \\
+\item {\bf Exit（終了）} \\
 プロセスが自ら\|exit()|システムコール（UNIXの場合）や
 \|ExitProcess()|システムコール（Windowsの場合）を用いて終了する場合，
 プロセスがシグナルを受ける等して終了させられる場合に，
@@ -118,7 +119,7 @@ Waiting状態のプロセスは停止しているのでプロセスが事象を�
 
 \section{プロセスの切換え}
 Running状態のプロセスがBlock遷移またはPreemption遷移しCPUを取り上げられると，
-他のプロセスがCPUを割付けられDispatch遷移し実行される．
+他のReady状態のプロセスがCPUを割付けられDispatch遷移し実行される．
 
 \subsection{切換えの原因}
 Running状態のプロセスが状態遷移を起こす原因を以下にまとめ直す．
@@ -200,7 +201,7 @@ RETI命令は単一の命令でPSW（PCとフラグ）を一度にスタック�
 \figref{procSwitch}の下半分，
 プロセスBからプロセスAへ実行が移る手順も上と同様である．
 
-\myfigure{btp}{scale=0.5}{procSwitch-crop.pdf}{プロセスの切換え}{procSwitch}
+\myfigure{btp}{scale=0.6}{procSwitch-crop.pdf}{プロセスの切換え}{procSwitch}
 
 \subsection{切換えの例}
 計算に長い時間を要する二つのプロセスだけがある時，
@@ -208,7 +209,7 @@ RETI命令は単一の命令でPSW（PCとフラグ）を一度にスタック�
 交互に実行される様子を\figref{procSwitchInst}に示す．
 以下に手順を説明する．
 
-\myfigure{btp}{scale=0.5}{procSwitchInst-crop.pdf}
+\myfigure{btp}{scale=0.6}{procSwitchInst-crop.pdf}
 {プロセスの切換えの例}{procSwitchInst}
 
 \begin{enumerate}
@@ -294,8 +295,8 @@ PCBはプロセス毎に用意される最も重要なカーネルのデータ�
 PCBはカーネル内のプロセステーブルに格納される．
 
 \subsection{PCBの内容}
-\figref{procOrganization}に示した模式的なプロセスの構造図の
-「仮想CPU」と「プロセス情報」を合わせたものがPCBに相当する．
+PCBは，\figref{procOrganization}に示した模式的なプロセスの構造図の
+「仮想CPU」と「プロセス情報」を合わせたものに相当する．
 PCBには以下のような情報が格納される．
 
 \begin{itemize}
@@ -324,7 +325,7 @@ PCBはプロセスを表現するデータ構造である．
 その様子を\figref{procQueue}に示す．
 図は，数値が小さいほど優先度が高い意味になっている．
 
-\myfigure{btp}{scale=0.5}{procQueue-crop.pdf}{PCBのリスト}{procQueue}
+\myfigure{btp}{scale=0.55}{procQueue-crop.pdf}{PCBのリスト}{procQueue}
 
 Ready状態のプロセスだけでなく，
 Running状態のプロセスや，
@@ -456,7 +457,7 @@ TacOSはPCBを初期化する際に\|magic|に\|0xabcd|を格納する．
 まず「物理メモリ空間」の配置について，
 次に「PCBとカーネルスタック」について説明する．
 
-\myfigure{btp}{scale=0.5}{tacosMemMap-crop.pdf}
+\myfigure{btp}{scale=0.6}{tacosMemMap-crop.pdf}
 {TacOSのメモリ配置}{tacosMemMap}
 
 \begin{enumerate}
@@ -526,13 +527,12 @@ TacOSは，\figref{tacosMemMap}(b)に示すように，
 カーネル内の\|yield()|を呼出した位置になる．
 次に\figref{tacosDispatcher}の内容を解説する．
 
-\myfigure{btp}{scale=0.5}{tacosReadyQueue-crop.pdf}
+\myfigure{btp}{scale=0.6}{tacosReadyQueue-crop.pdf}
 {TacOSの実行可能列}{tacosReadyQueue}
 
 \begin{description}
-\item[2行] プロセスを切換える時にカーネル内で呼出される
-\|yield()|関数の入口である．
-このルーチンは現在のプロセスのコンテキストを保存しCPUを解放する．
+\item[2行] プロセスを切換える時にカーネル内で呼出される\|yield()|関数の入口である．
+\|yield()|関数は，現在プロセスのカーネルモード・コンテキストを保存しCPUを解放する．
 
 \item[3〜16行] プロセスのカーネルモードのコンテキストを
 スタックに保存する処理である．
@@ -633,9 +633,13 @@ UNIXでは\|select()|システムコールがこの機能を持つ．
 
 \begin{myfig}{btp}{マルチプログラミングを用いないWebサーバ}
 {singleProcSingleThread}
-\myincludegraphics{singleProcSingleClient-crop.pdf}{scale=0.5}
-~~~~
-\myincludegraphics{singleProcMultiClient-crop.pdf}{scale=0.5}
+\begin{center}
+\myincludegraphics{singleProcSingleClient-crop.pdf}{scale=0.6}
+
+\vspace{0.8cm}
+
+\myincludegraphics{singleProcMultiClient-crop.pdf}{scale=0.6}
+\end{center}
 \end{myfig}
 
 \item マルチプロセス \\
@@ -671,21 +675,25 @@ Webサーバプロセスは，
 \end{itemize}
 
 \begin{myfig}{btp}{マルチプログラミングを用いるWebサーバ}{multiProc}
-\myincludegraphics{multiProc-crop.pdf}{scale=0.5}
-~~~~
-\myincludegraphics{multiThread-crop.pdf}{scale=0.5}
+\myincludegraphics{multiProc-crop.pdf}{scale=0.6}
+
+\vspace{0.8cm}
+
+\myincludegraphics{multiThread-crop.pdf}{scale=0.6}
 \end{myfig}
 
 \subsection{スレッドの形式}
-読者は，スレッドをカーネルが実現すると暗黙のうちに考えていたかも知れない．
+読者は，「スレッドはカーネルが実現する」と暗黙のうちに考えていたかも知れない．
 しかし，ユーザプログラム（ライブラリ）内でスレッドを実現することもある．
 カーネルが実現するスレッドを{\bf カーネルスレッド}，
 ユーザプログラム内で実現するスレッドを{\bf ユーザスレッド}と呼ぶ．
 
 \begin{myfig}{btp}{ユーザスレッドとカーネルスレッド}{threadOrganization}
-\myincludegraphics{kernelThread-crop.pdf}{scale=0.5}
-~~~~
-\myincludegraphics{userThread-crop.pdf}{scale=0.5}
+\myincludegraphics{kernelThread-crop.pdf}{scale=0.6}
+
+\vspace{0.8cm}
+
+\myincludegraphics{userThread-crop.pdf}{scale=0.6}
 \end{myfig}
 
 \begin{itemize}
@@ -709,7 +717,7 @@ CPUが複数ある時，カーネルスレッドであれば，
 以下に述べるように，両者を組合せた三つのスレッドモデルが使用される．
 
 \begin{enumerate}
-\item Many-to-One Model \\
+\item {\bf Many-to-One Model} \\
 複数（Many）のユーザスレッドを
 一つ（One）のカーネルスレッドで実行するモデルである．
 \figref{threadOrganization}(b)に相当する．
@@ -720,7 +728,7 @@ CPUが複数ある時，カーネルスレッドであれば，
 また，何れかのスレッドがシステムコールでブロックすると，
 全てのスレッドが停止してしまう問題がある．
 
-\item One-to-One Model \\
+\item {\bf One-to-One Model} \\
 全てのスレッドがカーネルスレッドのモデルである．
 \figref{threadOrganization}(a)に相当する．
 プロセス内にカーネルが管理する仮想CPUが複数あるので，
@@ -729,7 +737,7 @@ CPUが複数ある時，カーネルスレッドであれば，
 処理は重くなる．
 また，システムによっては生成できるスレッド数に制限がある．
 
-\item Many-to-Many Model \\
+\item {\bf Many-to-Many Model} \\
 複数の（Many）のユーザスレッドを
 複数の（Many）のカーネルスレッドで実行するモデルである．
 カーネルスレッドの数をユーザスレッドの数より多くすることはない．
@@ -743,14 +751,15 @@ CPUが複数ある時，カーネルスレッドであれば，
 小計は配列totalに格納する．
 最後にmainスレッドがtotalの合計を求めると全体の合計sumが計算できる．
 
-\myfigure{btp}{scale=0.5}{threadedSum-crop.pdf}
+\myfigure{btp}{scale=0.66}{threadedSum-crop.pdf}
 {M個のスレッドで手分けして合計を計算する様子}{threadedSum}
 
 \subsubsection{POSIXスレッドによる実装}
 このアイデアをPOSIXスレッド\footnote{
 POSIXスレッドはUNIX系のオペレーティングシステムで使用できる．
 }を用いたC言語プログラムにしたものを\figref{threadTest}\footnote{
-このプログラムは macOS High Sierra で動作確認をした．}に示す．
+このプログラムは macOS High Sierra で動作確認をした．
+}に示す．
 
 \begin{figure}[btp]
 \lstinputlisting{Lst/threadTest.c}
@@ -768,60 +777,69 @@ POSIXスレッドはUNIX系のオペレーティングシステムで使用で�
 33行の\|pthread_attr_init()|は引数の\|pthread_attr_t|型変数を
 デフォルトのアトリビュート値で初期化する．
 34行の\|pthread_create()|がスレッドを生成する関数である．
-新しいスレッドの実行は引数で指定された関数\|thread()|から始まる．
-\|pthread_create()|の引数\|p|は\|thread()|関数の\|arg|に実行開始時に渡される．
+新しいスレッドの実行は引数で指定された\|thread()|関数から始まる．
+\|pthread_create()|の引数\|p|は，
+\|thread()|関数が実行を開始する時に\|arg|引数に渡される．
 
 39行の\|pthread_join()|はスレッドの終了を待つ関数である．
 スレッドの終了が確認できたら，40行で小計を\|sum|に足し込んでいる．
 
-\subsubsection{実行時間の測定結果}
-\figref{threadTest}のプログラムの実行時間の測定結果を
-\tabref{threadTimeTbl}に示す\footnote{
+\subsubsection{実行時間の計測結果}
+\figref{threadTest}のプログラムの実行時間の計測結果を\tabref{threadTimeTbl}に，
+グラフにしたものを\figref{threadTimeGrph}に示す
+\footnote{
+実行時間の計測にはOS X の {\tt time} コマンドを用いた．
+}
+\footnote{
 実行時間が短すぎて比較し難いので，
-プログラムの14行から18行を10万回繰り返すように改造した上で計測した．}
+プログラムの14行から17行を10万回繰り返すように改造した上で計測した．}
 \footnote{
 計測に使用したコンピュータは
-macOS High Sierra をインストールした
-MacBook Pro（Retaina, 13-inch, Mid 2014, 2.8GHz Inte Core i5）である．
+OS X Yosemite をインストールした
+Mac Pro（Late 2013, 3.5GHz 6-Core Intel Xeon E5）である．
+%macOS High Sierra をインストールした
+%MacBook Pro（Retaina, 13-inch, Mid 2014, 2.8GHz Intel Core i5）である．
 C言語コンパイラは
 Apple LLVM version 7.0.0（clang-700.0.72）を使用した．
 }．
-また，グラフにしたものを\figref{threadTimeGrph}に示す．
 
 \begin{mytable}{btp}{スレッド数による実行時間比較}{threadTimeTbl}
-\includegraphics[scale=1.0]{Tbl/threadTimeTbl.pdf}
+\includegraphics[scale=0.9]{Tbl/threadTimeTbl.pdf}
 \end{mytable}
 
 \begin{myfig}{btp}{スレッド数による実行時間の変化}{threadTimeGrph}
-\includegraphics[scale=0.9]{Tbl/threadTimeGrph.pdf}
+\includegraphics[scale=1.0]{Tbl/threadTimeGrph.pdf}
 \end{myfig}
 
 スレッド数が１の時は，経過時間（Real）とユーザCPU時間（User）が，
 ほぼ，同じになる．
-一つのCPUが全力で合計を計算した結果である．
+一つのコア\footnote{従来のCPUのこと．}が全力で合計を計算した結果である．
 
-スレッド数が1から2に増えた時は経過時間が半分になった．
-合計の計算時間に対応するユーザCPU時間は一定である．
-使用したコンピュータが持つ二つのコア\footnote{従来のCPUのこと．}が
-必要なユーザ時間を手分けして実行するので，
-経過時間は半分で済む．
-二つのスレッドが真に並列実行された．
+スレッド数が1〜6の間は，経過時間がスレッド数に反比例して短くなる．
+合計の計算時間に対応するユーザCPU時間は，ほぼ一定である．
+使用したコンピュータが持つ六つのコアが，
+最大で六つのスレッドに割当てられ，
+真に並列実行された結果である．
 
-スレッドの数が2〜4に増加する間は経過時間が少し短くなる．
+スレッドの数が6〜10に増加する間，経過時間は，ほぼ一定である．
 しかしユーザCPU時間が増加している．
-必要な計算時間は一定のはずなので，
-長いCPU時間を必要とするのはCPUの性能が悪化したためと考えられる．
+必要な計算量は一定のはずなのに長いCPU時間を必要とするので，
+コアの性能が悪化したように見える．
 
-CPUの性能が悪くなったように見えるのは，
+コアの性能が悪くなったように見えるのは，
 ハイパースレッディング・テクノロジー\cite{hyperThreading}により，
-コアの数が倍（四個）あるように見せかけているためである．
+コアの数が倍（12個）あるように見せかけているためである．
 ハイパースレッディング・テクノロジーは，
 単一スレッドを実行する場合は遊んでしまうコア内のユニットを，
 二つのスレッドを同時に実行することで効率よく使用する技術である．
-見かけ上コアの数が二倍になるが合計の性能は二倍には達しないので，
-コアあたりの性能が下がったように見える．
+見かけ上コアの数が二倍になるが，合計の性能は二倍には達しないので，
+コアあたりの性能が下がったように見える\footnote{
+この計測結果からは，
+ハイパースレッディング・テクノロジーは，
+性能の改善に余り寄与していないように見える．
+}．
 
-スレッド数を4以上にすると，
-（見かけ上の）四つのコア全てが常時使用されるので，
-経過時間，ユーザ時間の合計のどちらも一定になる．
+%スレッド数を12以上にすると，
+%（見かけ上の）コア全てが常時使用されるので，
+%経過時間，ユーザ時間の合計のどちらも一定になる．
 

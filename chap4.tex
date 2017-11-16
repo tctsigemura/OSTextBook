@@ -2,8 +2,7 @@
 プロセス（スレッド）の実行順序を決めることをスケジューリングと呼ぶ\footnote{
 プロセスとスレッドの両方にあてはまることが多いので，
 この章ではプロセスのスケジューリングを前提に議論する．}．
-システム内で最も貴重な資源であるCPUの割当てを決める，
-オペレーティングシステムにとって重要な機能である．
+システム内で最も貴重な資源であるCPUの割当てを決める重要な機能である．
 
 \section{評価基準}
 スケジューリングの良し悪しを判断する評価基準には次のようなものがある．
@@ -35,8 +34,7 @@
 できる限り時間を守らなければならない場合を
 {\bf ソフトリアルタイム（Soft real time）}と呼ぶ．
 オペレーティングシステムは，
-制御用プロセスが締め切りを守ることができるようなスケジューリングを
-行う必要がある．
+制御用プロセスが締め切りを守ることができるスケジューリングを行う必要がある．
 
 \item[その他]
 システムの使用方法などにより様々な評価基準が考えられる．
@@ -84,9 +82,9 @@
 
 \item 組込み制御用のコンピュータの場合，
 {\bf 締め切り}までに処理を完了することが重要である．
-例えば，時速50km\footnote{
+例えば，時速50kmで走行するエレベータ\footnote{
 高層ビルのエレベータの中にはもっと高速なものもある．
-}で走行するエレベータの制御コンピュータが，
+}の制御コンピュータが，
 1秒遅刻してブレーキを掛けたらどうなるだろうか．
 時速50kmは秒速13mなので，エレベータは13m行き過ぎて停まることになる．
 最上階，または，最下階を目指しているとき13m行き過ぎると
@@ -125,12 +123,12 @@ I/Oが使用される期間を{\bf I/Oバースト（I/O burst）}と呼ぶ．
 CPUバウンドプロセスは長いCPUバーストと短いI/Oバーストを持つ．
 
 \begin{myfig}{btp}{CPUバウンドとI/Oバウンドプロセス}{cpuIoBound}
-\myincludegraphics{cpuBound-crop.pdf}{scale=0.7}
+\myincludegraphics{cpuBound-crop.pdf}{scale=0.66}
 %~~~~
 
 \vspace{0.8cm}
 
-\myincludegraphics{ioBound-crop.pdf}{scale=0.7}
+\myincludegraphics{ioBound-crop.pdf}{scale=0.66}
 \end{myfig}
 
 \subsection{I/Oバウンドプロセス}
@@ -150,7 +148,7 @@ CPUバウンドプロセスは長いCPUバーストと短いI/Oバーストを�
 
 \subsection{First-Come, First-Served（FCFS）スケジューリング}
 Ready状態になった順（到着順）に実行する方式である．
-Run状態になったらブロックするまで実行を継続する．
+Running状態になったらブロックするまで実行を継続する．
 プリエンプションはしない．
 以下の例ではCPUバースト一回分の期間しか示さないが，
 実際は，\figref{cpuIoBound}に示すようにCPUバースが繰り返し発生する．
@@ -215,7 +213,7 @@ $(T_1+(T_1+T_2)+(T_1+T_2+T_3))/3=T_1+T_2*2/3+T_1/3$となるり，
 
 この図より平均ターンアラウンド時間を求めると
 $(10+30+130)/3 = 57$ ms となり，これまでで最短である．
-しかし，次回のCPUバースト時間を知ることは一般には不可能であるので，
+しかし，次回のCPUバースト時間を知ることは一般には不可能なので，
 SJF方式は現実的な方式ではない．
 次回のCPUバースト時間を予測することで擬似的なSJF方式を実現する．
 
@@ -285,7 +283,7 @@ $P_1$はプリエンプションし$P_2$が先に実行される．
 $P_3$が到着した時も同様である．
 平均ターンアラウンド時間を計算すると，
 $((130-0)+(50-10)+(90-60))/3=67$ ms となり，
-SJFと比較して改善されている．
+SJFよりも改善されている．
 
 \subsection{Round-Robin（RR）スケジューリング}
 {\bf タイムシェアリングシステム(TSS)}で使用された方式である．
@@ -362,6 +360,9 @@ CPUを割り付ける際は，
 優先度の高い実行可能列から順に調べ，
 最初に見つかった空ではない実行可能列を使用する．
 
+\myfigure{btp}{scale=0.6}{multilevelFeedbackQueue-crop.pdf}
+{Multilevel Feedback Queue}{multilevelFeedbackQueue}
+
 プロセスの優先度は動的に変化する方式を用いる．
 CPUバウンドなプロセスの優先度は急激に引き下げられ，
 プロセスは下位の実行可能列に移動する．
@@ -369,9 +370,6 @@ CPUバウンドなプロセスの優先度は急激に引き下げられ，
 優先度が引き上げられ，上位の実行可能列に移動する．
 実行中のプロセスより上位の実行可能列にプロセスが登録されると
 プリエンプションが発生し，実行中のプロセスはCPUを取り上げられる．
-
-\myfigure{btp}{scale=0.5}{multilevelFeedbackQueue-crop.pdf}
-{Multilevel Feedback Queue}{multilevelFeedbackQueue}
 
 \section{TacOSのスケジューラ}
 実行可能になったプロセスをスケジューリングするプログラムを{\bf スケジューラ}と呼ぶ．
@@ -381,8 +379,14 @@ TacOSのスケジューラのソースプログラムを\figref{tacosSch}に示�
 \url{https://github.com/tctsigemura/TacOS/blob/master/os/kernel/kernel.cmm}
 の一部である．}．
 TacOSの実行可能列は，
-PCBの番兵付きの重連結環状リストとして表現する
+PCBの番兵付き重連結環状リストとして表現する
 （\figref{tacosReadyQueue}参照）．
+
+\begin{figure}[btp]
+\lstinputlisting{Lst/sch.cmm}
+\caption{TacOSのスケジューラ・ソースプログラム}
+\label{fig:tacosSch}
+\end{figure}
 
 \begin{description}
 \item[1〜7行] 関数\|insProc()|は，
@@ -403,16 +407,10 @@ Idleの\|enice|は最大値に設定されているので15行のループは必
 
 現在の実装では，\|enice|はプロセス生成時に\|nice|と同じ値に設定され，
 その後は変化しない．
-TacOSは{\bf 静的優先度}を用いる{\bf 優先度順スケジューリング方式}を用いている．
+TacOSは{\bf 静的優先度}を用いる{\bf 優先度順スケジューリング方式}を用いていることになる．
 将来，\|enice|の値を動的に変化させるように変更すれば，
 {\bf 動的優先度}方式になる．
 
 \|setPri()|関数はPSWの割込み許可フラグを操作するために使用している．
 詳しくは後の章で説明する．
 \end{description}
-
-\begin{figure}[btp]
-\lstinputlisting{Lst/sch.cmm}
-\caption{TacOSのスケジューラ・ソースプログラム}
-\label{fig:tacosSch}
-\end{figure}

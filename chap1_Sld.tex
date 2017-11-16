@@ -1,0 +1,194 @@
+\documentclass[dvipdfmx]{beamer}
+
+% リスト環境
+\usepackage{listings,jlisting}
+%\usepackage{listings}
+\def\lstlistingname{リスト}
+\lstset{language=,
+  numbers=left,
+%  numbers=none,
+  basicstyle={\scriptsize\ttfamily},
+  columns=[l]{fullflexible},
+  keepspaces=true,
+%  frame=shadowbox,
+  frame=single,
+  commentstyle=\slshape
+}
+
+\newcommand{\fig}[2]{\begin{center}\includegraphics[#1]{Fig/#2}\end{center}}
+\newcommand{\tbl}[2]{\begin{center}\includegraphics[#1]{Tbl/#2}\end{center}}
+
+\begin{document}
+\title[OS]{オペレーティングシステム\\第１章 オペレーティングシステムとは}
+\date{}
+
+\begin{frame}
+  \titlepage
+\end{frame}
+
+\begin{frame}
+  \frametitle
+  \tableofcontents
+\end{frame}
+
+\section{オペレーティングシステムの役割}
+\subsection{拡張マシンとしてのオペレーティングシステム}
+\begin{frame}
+  \frametitle{拡張マシンとしてのオペレーティングシステム}
+  \fig{scale=0.6}{abstruction-crop.pdf}
+  \begin{itemize}
+    \item 抽象化（ファイル，プロセス）
+    \item 拡張マシン（システムコール）
+  \end{itemize}
+\end{frame}
+
+\subsection{ハードウェア管理プログラムとしてのオペレーティングシステム}
+\begin{frame}
+  \frametitle{ハードウェア管理プログラムとしての\\オペレーティングシステム}
+  \fig{scale=0.5}{system-crop.pdf}
+  \begin{itemize}
+    \item 仮想化
+    \item 時分割多重による仮想化
+    \item 空間分割多重による仮想化
+  \end{itemize}
+\end{frame}
+
+\section{オペレーティングシステムの歴史}
+\subsection{第１世代（1945〜1955，黎明期）}
+\begin{frame}
+  \frametitle{第１世代}
+  \begin{itemize}
+    \item 真空管
+    \item オペレーティングシステムなし
+    \item 巨大TeC状態？
+  \end{itemize}
+\end{frame}
+
+\subsection{第２世代（1955〜1965，トランジスタ）}
+\begin{frame}
+  \frametitle{第２世代（バッチ処理，その１）}
+  \fig{scale=0.4}{batch-crop.pdf}
+  \begin{itemize}
+    \item メインフレーム
+    \item バッチ，バッチ処理
+    \item バッチモニタ
+    \item JOB制御言語（JCL :  Job Control Language）
+    \item 実行モード
+    \item システムコール
+    \item 記憶保護
+  \end{itemize}
+\end{frame}
+
+\begin{frame}
+  \frametitle{第２世代（バッチ処理，その２）}
+  \fig{scale=0.15}{punchcard.jpg}
+  \fig{scale=0.4}{job-crop.pdf}
+  \begin{itemize}
+    \item 紙カード
+    \item JOBの構成
+  \end{itemize}
+\end{frame}
+
+\subsection{第３世代（1966〜1980，ICとマルチプログラミング）}
+\begin{frame}
+  \frametitle{第３世代（メインフレーム）}
+  \fig{scale=0.2}
+      {Bundesarchiv_B_145_Bild-F038812-0014,_Wolfsburg,_VW_Autowerk.jpg}
+      {\tiny
+        \begin{center}
+        フォルクスワーゲンで使われる System/360 \\
+        ウィキメディア /
+        Bundesarchiv, B 145 Bild-F038812-0014 /
+        Schaack, Lothar / CC-BY-SA 3.0 de
+        \end{center}
+      }
+  \begin{itemize}
+    \item IBM System/360，シリーズ化
+    \item 仮想記憶
+  \end{itemize}
+\end{frame}
+
+\begin{frame}
+  \frametitle{第３世代（マルチプログラミング）}
+  \fig{scale=0.7}{multiprogramming-crop.pdf}
+  \begin{itemize}
+    \item OS/360
+    \item MULTICS（MULTiplexed Information and Computing Service）
+    \item UNIX（ユニックス）
+    \item DynaBook
+  \end{itemize}
+\end{frame}
+
+\begin{frame}
+  \frametitle{第３世代（タイムシェアリング : TSS）}
+  \fig{scale=0.5}{timesharing-crop.pdf}
+  \fig{scale=0.15}{724px-Televideo925Terminal.jpeg}
+  \begin{center}
+    {\tiny 写真：
+      \url{http://commons.wikimedia.org/wiki/File:Televideo925Terminal.jpg}
+（パブリックドメイン）}
+  \end{center}
+  \begin{itemize}
+    \item TSS（Time Sharing System）
+    \item ターミナル
+  \end{itemize}
+\end{frame}
+
+\begin{frame}
+  \frametitle{次の世代に向けて（DynaBook）}
+  \fig{scale=0.3}{Smalltalk-76.png}
+  \begin{center}
+    {\tiny 写真：
+      ウィキメディア /
+      SUMIM.ST /\\
+      AltoやNoteTakerで動作した
+      アラン・ケイ達の暫定Dynabook環境(Smalltalk-76、同-78の頃) /
+      CC-BY-SA 4.0}
+  \end{center}
+  \begin{itemize}
+    \item GUI，マウス，パーソナルコンピュータ
+  \end{itemize}
+\end{frame}
+
+\subsection{第４世代（1980〜，PCの時代）}
+\begin{frame}
+  \frametitle{IBM PC}
+  \fig{scale=0.2}
+   {Bundesarchiv_B_145_Bild-F077948-0006,_Jugend-Computerschule_mit_IBM-PC.jpg}
+      {\tiny
+        \begin{center}
+          写真： IBM PC \\
+          ウィキメディア /
+          Bundesarchiv, B 145 Bild-F077948-0006 /
+          Engelbert Reineke / CC-BY-SA 3.0 de
+        \end{center}
+      }
+  \begin{itemize}
+    \item 16bit，32bit，64bit
+    \item IBM PC（MS-DOS，Windows）
+    \item 互換機
+  \end{itemize}
+\end{frame}
+
+\begin{frame}
+  \frametitle{Apple Macintosh}
+  \fig{scale=0.2}{Macintosh_128k_transparency.png}
+      {\tiny
+        \begin{center}
+          写真： 初代Macintosh \\
+          ウィキメディア / w:User:Grm wnr / 
+          File:Macintosh 128k transparency.png /GFDL
+        \end{center}
+      }
+  \begin{itemize}
+    \item 16bit，32bit，64bit
+    \item Macintosh（MacOS， MacOS X， OS X， macOS）
+  \end{itemize}
+\end{frame}
+
+\begin{frame}
+  \frametitle{オペレーティングシステムの系統図}
+  \fig{scale=0.33}{tree-crop.pdf}
+\end{frame}
+
+\end{document}

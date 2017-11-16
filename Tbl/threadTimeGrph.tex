@@ -9,10 +9,43 @@
     visualize as line/.list={real, user},
     real={style={black, thin,  mark=x}, label in legend={text=Real}},
     user={style={blue,  thick, mark=+}, label in legend={text=User}},
-    x axis={label=スレッド数, min value=0, max value=11, length=8cm,
+    x axis={label=スレッド数, min value=1, max value=10, length=8cm,
       ticks={step=1}, grid},
-    y axis={label=時間(秒), min value=0, max value=4, length=3cm, grid}
+    y axis={label=時間(秒), min value=0, max value=3, length=3cm, grid}
   ]
+  data [set=real]{
+    x, y
+    1, 1.881
+    2, 0.98
+    3, 0.657
+    4, 0.493
+    5, 0.406
+    6, 0.339
+    7, 0.335
+    8, 0.332
+    9, 0.319
+    10,0.312
+  }
+  data [set=user]{
+    x, y
+    1, 1.879
+    2, 1.953
+    3, 1.959
+    4, 1.958
+    5, 2.009
+    6, 2.011
+    7, 2.244
+    8, 2.462
+    9, 2.679
+    10,2.846
+  };
+\end{tikzpicture}
+\end{document}
+
+%  data[set=real, headline={x, y}, read from file=real.csv]
+%  data[set=user, headline={x, y}, read from file=user.csv];
+
+% MacBook Pro の場合
   data [set=real]{
     x, y
     1, 2.3377
@@ -31,8 +64,3 @@
     5, 3.7100
     10,3.7217
   };
-\end{tikzpicture}
-\end{document}
-
-%  data[set=real, headline={x, y}, read from file=real.csv]
-%  data[set=user, headline={x, y}, read from file=user.csv];
