@@ -1,7 +1,7 @@
 .SUFFIXES:
 .SUFFIXES: .tex .pdf
 
-PDFS = presentation.pdf
+PDFS = 
 
 %.pdf : *.tex
 	platex $*.tex
