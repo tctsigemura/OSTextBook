@@ -1,0 +1,6 @@
+#define SEM_MAX 30        // セマフォは最大 30 個
+
+struct Sem {              // セマフォを表す構造体
+  int cnt;                // カウンタ
+  PCB queue;              // 待ち行列
+};

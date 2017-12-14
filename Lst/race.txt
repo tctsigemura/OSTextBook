@@ -1,0 +1,16 @@
+				// スレッド間の共有変数
+				receipt DS	1    // 入金（３万円）
+				payment	DS	1    // 引き落とし（２万円）
+				account	DS	1    // 残高（１０万円）
+
+// 入金管理スレッド				   // 引き落とし管理スレッド
+
+// 会社から給料（３万円）を受領し		     // カード会社から引き落としを
+// receipt に金額を格納した．			   // 受信し payment に金額を格納した．
+
+// 口座 account に足し込む			   // 口座 account から差し引く
+(1)   LD	G0,account			   (a)   LD	G0,account
+(2)   ADD	G0,receipt			   (b)   SUB	G0,payment
+(3)   ST	G0,account			   (c)   ST	G0,account
+
+// 次の処理に進む				   // 次の処理に進む

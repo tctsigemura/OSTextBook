@@ -30,6 +30,7 @@ CPUを仮想化するためには時分割多重が用いられる．
 {時分割多重によるCPUの仮想化}{virtualCPU}
 
 \section{プロセスの状態}
+\label{procState}
 プロセスは，
 キーボード等の入出力装置からの入力を待つ状態になったり，
 時間が経過するのを待つ状態になったりする．
@@ -342,14 +343,14 @@ Waiting状態のプロセスは，
 PCBが「実行可能なプロセスの待ち行列」に移動する．
 この移動ルールは\figref{procState}の状態遷移と一致している．
 
-\section{CPU仮想化の実例}
+\section{TacOSのCPU仮想化}
 実例としてTacOS\footnote{TacOSの詳細は
 \url{https://github.com/tctsigemura/TacOS}
 を参照のこと．}の例を紹介する．
 TacOSはマルチプロセスのオペレーティングシステムである．
 以下ではCPUの時分割多重に必要なプロセス切換え機構を紹介する．
 
-\subsection{TacOSのPCB}
+\subsection{PCB}
 PCBはプロセス切換え機構にとっても最も重要なデータ構造である．
 TacOSのPCBは\figref{tacosPCB}に示す\|PCB|構造体として定義されている\footnote{
 \figref{tacosPCB}はTacOSのソースコード
@@ -380,7 +381,7 @@ RunningとReadyの二つを兼用している．
 \|P_RUN|状態になる．
 実行中も\|P_RUN|状態のまま変更しない．
 
-\item \|P_SLEEP| \\
+\item \|P_WAIT| \\
 Waiting状態のことである．
 
 \item \|P_ZOMBIE| \\
@@ -451,7 +452,7 @@ TacOSはPCBを初期化する際に\|magic|に\|0xabcd|を格納する．
 カーネルスタックのオーバーフローを検知することができる．
 \end{itemize}
 
-\subsection{TacOSのメモリ配置}
+\subsection{メモリ配置}
 \figref{tacosMemMap}にTacOS実行時のメモリマップを示す．
 図は二つのプロセスが実行中の例である．
 まず「物理メモリ空間」の配置について，
@@ -497,7 +498,7 @@ PCBとカーネルスタックはプロセスの生成時に隣接して領域�
 スタックが伸びすぎPCBを破壊したことを検知するために使用する．
 \end{enumerate}
 
-\subsection{TacOSのプロセス切換えプログラム}
+\subsection{プロセス切換えプログラム}
 \figref{tacosDispatcher}にTacOSのプロセス切換えプログラムを示す
 \footnote{\figref{tacosDispatcher}はTacOSのソースコード
 \url{https://github.com/tctsigemura/TacOS/blob/master/os/kernel/dispatcher.s}

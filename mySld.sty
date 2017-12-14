@@ -1,6 +1,9 @@
 % スライド用のスタイルファイル
 \ProvidesPackage{mySld}
 
+\usepackage{color}
+\def\|{\verb|} %|
+
 % bemer のテーマ選択
 \mode<presentation> {
   \usetheme{Madrid}
@@ -22,8 +25,8 @@
 %\usepackage{listings}
 \def\lstlistingname{リスト}
 \lstset{language=,
-  numbers=left,
-%  numbers=none,
+%  numbers=left,
+  numbers=none,
   basicstyle={\scriptsize\ttfamily},
   columns=[l]{fullflexible},
   keepspaces=true,
@@ -34,3 +37,4 @@
 
 \newcommand{\fig}[2]{\begin{center}\includegraphics[#1]{Fig/#2}\end{center}}
 \newcommand{\tbl}[2]{\begin{center}\includegraphics[#1]{Tbl/#2}\end{center}}
+\newcommand{\gant}[2]{\begin{center}\includegraphics[#1]{GanntChart/#2}\end{center}}

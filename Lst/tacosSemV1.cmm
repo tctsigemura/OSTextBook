@@ -1,0 +1,19 @@
+// ディスパッチを発生しないセマフォのV操作
+boolean iSemV(int sd) {
+  if (sd<0 || SEM_MAX<=sd || !semInUse[sd]) {       // 不正なセマフォ番号
+    panic("iSemV(%d)", sd);
+  }
+  boolean ret = false;                              // 起床するプロセスなし
+  Sem s = semTbl[sd];                               // 操作するセマフォ
+  PCB q = s.queue;                                  // 待ち行列の番兵
+  PCB p = q.next;                                   // 待ち行列の先頭プロセス
+  if(p==q) {                                        // 待ちプロセスが無いなら
+    s.cnt = s.cnt + 1;                              //   カウンタを足す
+  } else {                                          // 待ちプロセスがあるなら
+    delProc(p);                                     //   待ち行列から外す
+    p.stat = P_RUN;                                 //   実行可能に変更
+    schProc(p);                                     //   実行可能列に登録
+    ret = true;                                     //  起床するプロセスあり
+  }
+  return ret;                                       // 実行可能列に変化があった
+}
