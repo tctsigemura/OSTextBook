@@ -1,4 +1,5 @@
 \chapter{プロセス同期}
+\label{synchronaization}
 これまで見てきたように，
 複数のプロセス（スレッド）が並行して実行される．
 複数の並行して実行されるプロセス（スレッド）が，決して競合することなく，
@@ -282,8 +283,11 @@ C言語なら構造体を用いてセマフォ型を宣言する．
 \myincludegraphics{semaphore.png}{scale=0.4}
 \end{myfig}
 
-セマフォ型の変数は内部にカウンタ\footnote{カウンタの値は0以上の整数値である．}を持ち，
-また，プロセスの待ち行列を作ることができる．
+セマフォ型の変数は内部にカウンタ\footnote{
+腕木信号機の進行・停止のように二つの状態しか取らないものをバイナリセマフォと呼ぶ．
+ここで取り上げるカウンタを持つものはカウンティングセマフォと呼ぶ．
+カウンタの値は0以上の整数値である．
+}を持ち，また，プロセスの待ち行列を作ることができる．
 セマフォ型（\|Sempahore|）の変数には，
 {\bf P操作（{\it Proberen}:try）}と{\bf V操作（{\it Verhogen}:raise）}を
 行うことができる．
@@ -293,6 +297,7 @@ C言語なら構造体を用いてセマフォ型を宣言する．
 セマフォはプロセス（スレッド）の状態を{\bf 待ち(Waiting）状態}に変える．
 {\bf ビジーウェイティング（Busy Waiting）では無い}のでCPUを無駄遣いすることはない．
 
+\begin{quote}
 \begin{description}
 \item[P操作（P(S)）] %クリティカルセクションのエントリーセクション等で使用できる．
 セマフォ（S）の値が1以上ならセマフォの値を1減らす．
@@ -305,6 +310,7 @@ C言語なら構造体を用いてセマフォ型を宣言する．
 待っているプロセス（スレッド）が無い場合は，セマフォ（S）の値を1増やす．
 アルゴリズムをC言語風に記述したものを\figref{semPV}(b)に示す．
 \end{description}
+\end{quote}
 
 \begin{myfig}{btp}{セマフォのアルゴリズム}{semPV}
 \small\begin{center}
@@ -357,6 +363,7 @@ C言語なら構造体を用いてセマフォ型を宣言する．
 \lstinputlisting{Lst/semProducerConsumer.c}
 \end{myfig}
 
+\begin{quote}
 \begin{description}
 \item [リングバッファとセマフォ]
 1行の\|buffer|は大きさ\|N|のリングバッファである．
@@ -395,6 +402,7 @@ C言語なら構造体を用いてセマフォ型を宣言する．
 20行で空きスロット数\|emptySem|の値を増加させる．
 21行で読み出したデータを使用する．
 \end{description}
+\end{quote}
 
 \subsubsection{複数生産者と複数消費者の問題（Producer-Consumer problem）}
 前の問題で，
@@ -409,6 +417,7 @@ C言語なら構造体を用いてセマフォ型を宣言する．
 \lstinputlisting{Lst/semMultiProducerConsumer.c}
 \end{myfig}
 
+\begin{quote}
 \begin{description}
 \item [リングバッファとセマフォ]
 1行から3行に変更はない．
@@ -426,8 +435,8 @@ C言語なら構造体を用いてセマフォ型を宣言する．
 \item [消費者スレッド]
 次回読み出し位置を表す\|out|変数について，
 生産者スレッドと同様な相互排除機構を追加してある．
-
 \end{description}
+\end{quote}
 
 \subsubsection{リーダ・ライタ問題（Readers-Writers Problem）}
 共有データに対して，
@@ -445,6 +454,7 @@ C言語なら構造体を用いてセマフォ型を宣言する．
 \lstinputlisting{Lst/semReaderWriter.c}
 \end{myfig}
 
+\begin{quote}
 \begin{description}
 \item [共有データとセマフォ]
 1行の\|records|が共有データである．
@@ -480,8 +490,8 @@ C言語なら構造体を用いてセマフォ型を宣言する．
 このようなロックを{\bf 共有ロック（shred lock）}と呼ぶ．
 25行で最後に読み出しを終えるリーダを判断し，
 最後のリーダだけが代表して\|rwSem|のロックを解除する．
-
 \end{description}
+\end{quote}
 
 リーダ・ライタ問題は，
 共有ロックと排他ロックを使用する問題の例になっている．
@@ -529,6 +539,7 @@ P操作やV操作を行う関数の引数がセマフォ番号になる．
 \figref{tacosReadyQueue}に示した実行可能列と同様である．
 次に，\figref{tacosSemaphore}で表している三つのセマフォについて説明する．
 
+\begin{quote}
 \begin{description}
 \item [Sem構造体（\#0）]
 セマフォ一覧（\|semTbl|）の第0行に登録されている．
@@ -548,6 +559,7 @@ V操作の結果，値が2になっている状態を表している．
 使用中なので\|semInUse|の対応する要素はTrueになっている．
 値が1以上の時は，待ち行列が必ず空になる．
 \end{description}
+\end{quote}
 
 \subsection{セマフォ使用例}
 \figref{tacosSemUse}にTacOSでのセマフォの架空の使用例を示す．
@@ -557,6 +569,7 @@ V操作の結果，値が2になっている状態を表している．
 \lstinputlisting{Lst/tacosSemUse.cmm}
 \end{myfig}
 
+\begin{quote}
 \begin{description}
 \item [共有変数と相互排除用のセマフォ]
 以前の例ではセマフォを\|Semaphore|型の変数として扱っていた．
@@ -576,6 +589,7 @@ TacOSで使用できるP操作関数は\|semP()|，
 V操作関数は\|semV()|である．
 10行，12行，18行，20行のようにセマフォ番号を引数に使用する．
 \end{description}
+\end{quote}
 
 \subsection{セマフォ割当}
 \figref{tacosNewSem}にTacOSカーネル内のセマフォ割当と解放ルーチンを示す\footnote{図は
@@ -586,6 +600,7 @@ V操作関数は\|semV()|である．
 \lstinputlisting{Lst/tacosNewSem.cmm}
 \end{myfig}
 
+\begin{quote}
 \begin{description}
 \item [データ構造]
 1行の\|semTbl|，2行の\|semInUse|は，
@@ -635,6 +650,7 @@ TaCはシングルプロセッサシステムなので，
 単一のストア機械語命令で終了するので割込み禁止にする必要はない\footnote{
 CPUが機械語命令の途中で割込みを受け付けることはない．}．
 \end{description}
+\end{quote}
 
 \subsection{P操作ルーチン}
 \figref{tacosSemP}にTacOSのP操作ルーチンを示す\footnote{図は
@@ -646,6 +662,7 @@ P操作ルールーチンは\|semP()|関数のことである．
 \lstinputlisting{Lst/tacosSemP.cmm}
 \end{myfig}
 
+\begin{quote}
 \begin{description}
 \item [割込み禁止による相互排除]
 \|semP()|関数も，\|semInUse|や，\|semTbl|の配下のSem構造体，
@@ -687,6 +704,7 @@ PCB構造体等の共有データをアクセスするので相互排除を必�
 \|insProc()|は\figref{tacosSch}で定義されたプロセス行列の操作関数である．
 \|yield()|関数は\figref{tacosDispatcher}に示したプロセス切換えプログラムである．
 \end{description}
+\end{quote}
 
 \subsection{V操作ルーチン}
 \figref{tacosSemV}にTacOSのV操作ルーチンを示す\footnote{図は
@@ -705,6 +723,7 @@ V操作によって実行可能になったプロセスの優先度が
 \lstinputlisting{Lst/tacosSemV.cmm}
 \end{myfig}
 
+\begin{quote}
 \begin{description}
 \item [割込み禁止による相互排除]
 \|iSemV()|関数や\|semV()|関数も相互排除を必要とする．
@@ -743,6 +762,7 @@ V操作により実行可能列に新しいプロセスが追加された場合
 実行可能列に現在のプロセスより優先度の高いものがあった場合，
 プロセスの切換えが起こる．
 \end{description}
+\end{quote}
 
 TacOSのプロセス同期機構は全てセマフォに基づいて構成される．
 例えば，メッセージ通信機構もセマフォを利用して構築されている．

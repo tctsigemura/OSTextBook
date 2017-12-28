@@ -531,6 +531,7 @@ TacOSは，\figref{tacosMemMap}(b)に示すように，
 \myfigure{btp}{scale=0.6}{tacosReadyQueue-crop.pdf}
 {TacOSの実行可能列}{tacosReadyQueue}
 
+\begin{quote}
 \begin{description}
 \item[2行] プロセスを切換える時にカーネル内で呼出される\|yield()|関数の入口である．
 \|yield()|関数は，現在プロセスのカーネルモード・コンテキストを保存しCPUを解放する．
@@ -577,6 +578,7 @@ PCBの\|magic|フィールドの値をチェックし\|0xabcd|以外の値にな
 プロセス生成時は例外的に，
 このRETIで実行モードを切換えてユーザプログラムの実行を開始するからである．
 \end{description}
+\end{quote}
 
 \begin{figure}[btp]
 \lstinputlisting{Lst/dispatch.s}
