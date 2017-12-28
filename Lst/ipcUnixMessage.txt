@@ -1,0 +1,36 @@
+メッセージ通信に関係するシステムコールとデータ構造
+メッセージ構造体（以下の構造体を自分で宣言して使用する）
+struct msgbuf {
+    long mtype;       // メッセージの型
+    char mtext[N];    // メッセージの本体（Nバイト）
+};
+
+メッセージキューのIDを返す．
+int msgget(key_t key, int msgflg);（システムコール）
+  返り値 : メッセージキューID
+  key    : キー（ftok()で作成したもの）
+  msgflg : IPC_CREAT等のフラグとアクセス許可ビット
+
+メッセージキューにメッセージを送信する（システムコール）
+int msgsnd(int msqid, const void *msgp, size_t msgsz, int msgflg);
+  返り値 : 0=正常，-1=エラー
+  msqid  : メッセージキューID
+  msgp   : メッセージ構造体のポインタ
+  msgsz  : メッセージ本体のバイト数
+  msgflg : IPC_NOWAIT等のフラグ
+
+メッセージキューからメッセージを受信する（システムコール）
+int msgrcv(int msqid, const void *msgp, size_t msgsz, long msgtyp, int msgflg);
+  返り値 : -1=エラー、受信したメッセージの本体バイト数
+  msqid  : メッセージキューID
+  msgp   : メッセージ構造体のポインタ
+  msgsz  : メッセージ本体の最大バイト数
+  msgtyp : 受信するメッセージの型
+  msgflg : IPC_NOWAIT等のフラグ
+
+メッセージキューの制御（システムコール）
+int msgctl(int msqid, int cmd, struct msgid_ds *buf);
+  返り値 : -1=エラー、0<=コマンドにより異なる
+  msqid  : メッセージキューID
+  cmd    : 削除（IPC_RMID）等のコマンド
+  buf    : コマンドのパラメータ

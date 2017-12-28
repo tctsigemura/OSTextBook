@@ -1,0 +1,11 @@
+[Terminal No.1]                          | [Terminal No.2]
+$ ./ipcUnixShearedMemoryServer           |
+sheared memory:initialization...         | $ ./ipcUnixShearedMemoryClient
+sheared memory:initialization...         | Enter a string: abcdefg
+sheared memory:abcdefg                   |
+sheared memory:abcdefg                   | $ ./ipcUnixShearedMemoryClient
+sheared memory:abcdefg                   | Enter a string: 1234567
+sheared memory:1234567                   | $ ./ipcUnixShearedMemoryClient
+sheared memory:1234567                   | Enter a string: end
+sheared memory:end                       |
+$                                        | $

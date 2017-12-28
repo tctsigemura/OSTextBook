@@ -1,0 +1,7 @@
+[Terminal No.1]                       | [Terminal No.2]
+$ ./ipcUnixMessageWriter              | $ ./ipcUnixMessageReader
+Enter lines of text, ^D to quit:      | ready to receive messages.
+abcdefg                               | 1:abcdefg
+1234567                               | 1:1234567
+^D                                    | msgrcv: Identifier removed
+$                                     | $

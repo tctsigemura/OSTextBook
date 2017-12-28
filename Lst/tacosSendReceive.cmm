@@ -1,0 +1,15 @@
+// サーバ用の待ち受けルーチン
+public Link receive(int num) {
+  Link l = linkTbl[num];
+  if (l.server != curProc) panic("receive");        // 登録されたサーバではない
+  semP(l.s1);                                       // サーバをブロック
+  return l;
+}
+
+// サーバ用の送信ルーチン
+public void send(int num, int res) {
+  Link l = linkTbl[num];
+  if (l.server != curProc) panic("send");           // 登録されたサーバではない
+  l.op = res;                                       // 処理結果を書込む
+  semV(l.s3);                                       // クライアントを起こす
+}
