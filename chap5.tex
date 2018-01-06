@@ -32,6 +32,7 @@
 二つのスレッドが競って\|account|変数の更新をすることになる．
 処理前は\|account|変数に口座の残高10万円が記録されていたとする．
 
+\begin{quote}
 \begin{enumerate}
 \item (1)→(2)→(3)→(a)→(b)→(c)の順で実行された場合 \\
 \|account|変数の値は11万円になり正しい結果になる．
@@ -49,6 +50,7 @@
 二つのCPUが並列にスレッドを実行した場合である．
 \|account|変数の値は8万円になる．
 \end{enumerate}
+\end{quote}
 
 以上のように，
 スレッドの実行順序等により計算結果が間違ってしまうことがある．
@@ -72,14 +74,16 @@
 クリティカルセクションの競合問題を効率よく解決するためには，
 次の三つの条件を満たす必要がある．
 
+\begin{quote}
 \begin{enumerate}
 \item 二つ以上のプロセス（スレッド）が同時にクリティカルセクションに入らない．
 \item クリティカルセクションに入っているプロセス（スレッド）がない時は，
 待たされることなくクリティカルセクションに入ることができる．
 \item クリティカルセクションに入るために永遠に待たされることがない．
 \end{enumerate}
+\end{quote}
 
-\section{相互排他（mutual exclusion）}
+\section{相互排他（Mutual Exclusion）}
 複数のプロセス（スレッド）が同時にクリティカルセクションに
 入らないように制御することである．
 {\bf 排他制御}または{\bf 相互排除}とも呼ばれる．
@@ -145,13 +149,15 @@ CPUが割込みを受付けない\footnote{
 このようなシステムでは，
 以下の機械語命令を相互排他の目的に使用できる．
 
-\subsubsection{TS（Test and Set）命令}
+\begin{itemize}
+\item {\bf TS（Test and Set）命令} \\
 TS命令は「(1) メモリの値をCPUレジスタにロード」し，
 「(2) 1を同じメモリアドレスに書き込む」命令である．
 この二つを他のCPUのメモリアクセスに割込まれることなく，
 {\bf アトミック（atomic）}に実行する．
 TS命令（\|TS R,M|）の動作は，例えば次のようになる．
 
+\begin{quote}
 \begin{enumerate}
 \item バスをロックする
 \item $R \leftarrow [M]$
@@ -159,6 +165,7 @@ TS命令（\|TS R,M|）の動作は，例えば次のようになる．
 \item $[M] \leftarrow 1$
 \item バスのロックを解除する
 \end{enumerate}
+\end{quote}
 
 TS命令は，他のCPUがメモリをアクセスしないように，まずバスをロックする．
 次に，メモリの指定番地から値をCPUレジスタにロードする．
@@ -187,10 +194,11 @@ TS命令を用いる場合もクリティカルセクションは割込み禁止
 この方式も，
 特権命令DI，EIを使用するのでカーネル内でしか利用できない．
 
-\subsubsection{SW（Swap）命令}
+\item {\bf SW（Swap）命令} \\
 SW（Swap）命令もSMPシステムでの相互排除に使用できる．
 「SW  R, M」は以下を{\bf アトミック（atomic）}に実行する．
 
+\begin{quote}
 \begin{enumerate}
 \item バスをロックする
 \item $T \leftarrow [M]$
@@ -198,6 +206,7 @@ SW（Swap）命令もSMPシステムでの相互排除に使用できる．
 \item $R \leftarrow T$
 \item バスのロックを解除する
 \end{enumerate}
+\end{quote}
 
 ここで $T$ はCPU内部の一時的なレジスタ
 （$T$ レジスタの存在はプログラムから見えない）である．
@@ -208,10 +217,11 @@ SW（Swap）命令もSMPシステムでの相互排除に使用できる．
 \lstinputlisting[numbers=none]{Lst/swap.s}
 \end{myfig}
 
-\subsubsection{CAS（Compare And Swap）命令}
+\item {\bf CAS（Compare And Swap）命令}\\
 CAS（Compare And Swap）命令もSMPシステムでの相互排除に使用できる．
 例えば「CAS  R0, R1, M」は，以下を{\bf アトミック（atomic）}に実行する．
 
+\begin{quote}
 \begin{enumerate}
 \item バスをロックする
 \item $T \leftarrow [M]$
@@ -219,6 +229,7 @@ CAS（Compare And Swap）命令もSMPシステムでの相互排除に使用で�
       {\tt \} else \{} $R0 \leftarrow T;~  z \leftarrow 0;$ {\tt \}}
 \item バスのロックを解除する
 \end{enumerate}
+\end{quote}
 
 CAS命令を用いたエントリーセクション，
 エグジットセクションの作り方も，
@@ -239,6 +250,7 @@ CAS命令を用いて書換えた例を\figref{cas}に示す．
 他のプロセスが共有資源にアクセスしないように，
 何らかのロックを掛けていた．
 この方式はロックを掛けずに「結果を書き込む時点で判断」している．
+\end{itemize}
 
 \subsection{フラグを用いる方式}
 アルゴリズムを工夫しソフトウェアだけで相互排他を実現する方式である．
@@ -252,11 +264,13 @@ CAS命令を用いて書換えた例を\figref{cas}に示す．
 
 このアルゴリズムの特徴は次の通りである．
 
+\begin{quote}
 \begin{enumerate}
 \item マルチプロセッサシステムでも使用できる．
 \item ２プロセス（スレッド）以上に拡張可能だが複雑になる．
 \item 最近のプロセッサと相性が悪い．（out-of-order実行）
 \end{enumerate}
+\end{quote}
 
 \section{セマフォ（Semaphore）}
 これまでに紹介してきた相互排他は，
@@ -270,7 +284,7 @@ CAS命令を用いて書換えた例を\figref{cas}に示す．
 プロセス同期機構である{\bf セマフォ}を紹介する．
 なお，これまでに紹介してきた相互排他は，セマフォを実現するためにも使用される．
 
-\subsection{セマフォの概要}
+\subsection{概要}
 {\bf セマフォ（Semaphore：腕木式信号機）}は，
 1965年に E. W. Dijkstra が提案したデータ型\footnote{
 C言語なら構造体を用いてセマフォ型を宣言する．
@@ -279,13 +293,12 @@ C言語なら構造体を用いてセマフォ型を宣言する．
 語源となった腕木式信号機は，
 鉄道で使用される\figref{semaphore}のような信号機である．
 
-\begin{myfig}{btp}{腕木式信号機}{semaphore}
-\myincludegraphics{semaphore-crop.pdf}{scale=0.4}
-\end{myfig}
+\myfigure{btp}{scale=0.4}{Fig/semaphore-crop.pdf}{腕木式信号機}{semaphore}
 
 セマフォ型の変数は内部にカウンタ\footnote{
-腕木信号機の進行・停止のように二つの状態しか取らないものをバイナリセマフォと呼ぶ．
-ここで取り上げるカウンタを持つものはカウンティングセマフォと呼ぶ．
+腕木信号機の進行・停止のように二つの状態しか取らないものを
+{\bf バイナリセマフォと}呼ぶ．
+ここで取り上げるカウンタを持つものは{\bf カウンティングセマフォ}と呼ぶ．
 カウンタの値は0以上の整数値である．
 }を持ち，また，プロセスの待ち行列を作ることができる．
 セマフォ型（\|Sempahore|）の変数には，
@@ -299,7 +312,8 @@ C言語なら構造体を用いてセマフォ型を宣言する．
 
 \begin{quote}
 \begin{description}
-\item[P操作（P(S)）] %クリティカルセクションのエントリーセクション等で使用できる．
+\item[P操作（P(S)）]
+%クリティカルセクションのエントリーセクション等で使用できる．
 セマフォ（S）の値が1以上ならセマフォの値を1減らす．
 値が0ならプロセス（スレッド）を待ち（Waiting）状態にし，
 セマフォの待ち行列に追加する．
@@ -325,10 +339,7 @@ C言語なら構造体を用いてセマフォ型を宣言する．
 \end{center}
 \end{myfig}
 
-\subsection{セマフォの使用例}
-セマフォを用いてプロセス間の同期問題の解を示すことができる．
-
-\subsubsection{相互排除問題}
+\subsection{相互排除問題の解}
 初期値が1のセマフォを用いて相互排除問題の解を示すことができる．
 前出の架空の銀行口座管理プロセスの例を，
 セマフォを用いて解決したものを\figref{semMutex}に示す．
@@ -350,7 +361,7 @@ C言語なら構造体を用いてセマフォ型を宣言する．
 8行か16行で\|accSem|にV操作を行ったら，
 後のスレッドがクリティカルセクションに入ることができる．
 
-\subsubsection{生産者と消費者の問題（Producer-Consumer problem）}
+\subsection{生産者と消費者の問題（Producer-Consumer Problem）の解}
 生産者プログラム（スレッド）はデータを生産し有限な長さの
 {\bf リングバッファ（ring buffer）}に書き込む．
 消費者プログラム（スレッド）はリングバッファからデータを読み出し消費する．
@@ -404,7 +415,7 @@ C言語なら構造体を用いてセマフォ型を宣言する．
 \end{description}
 \end{quote}
 
-\subsubsection{複数生産者と複数消費者の問題（Producer-Consumer problem）}
+\subsection{複数生産者と複数消費者の問題（Producer-Consumer Problem）の解}
 前の問題で，
 関数\|producerThread()|，\|consumerThread()|それぞれについて，
 複数のスレッドが存在する場合を考える．
@@ -438,7 +449,7 @@ C言語なら構造体を用いてセマフォ型を宣言する．
 \end{description}
 \end{quote}
 
-\subsubsection{リーダ・ライタ問題（Readers-Writers Problem）}
+\subsection{リーダ・ライタ問題（Readers-Writers Problem）の解}
 共有データに対して，
 読み出し{\bf だけ}するリーダプロセス（スレッド）と，
 読み出し書き込みの両方を行うライタプロセス（スレッド）の
@@ -510,8 +521,8 @@ C言語なら構造体を用いてセマフォ型を宣言する．
 TacOSではプロセス同期の基本機構としてセマフォを用いる．
 セマフォ機構はTacOSのマイクロカーネルが提供する．
 
-\subsection{セマフォデータ構造}
-TacOSのセマフォは\figref{sem}に示す構造体である\footnote{図は
+\subsection{データ構造}
+TacOSのセマフォは\figref{sem}に示す構造体である\footnote{
 \url{https://github.com/tctsigemura/TacOS/blob/master/os/kernel/process.h}
 の一部である．}．
 
@@ -528,9 +539,8 @@ TacOSのセマフォ関連データの構造を示す．
 セマフォは一覧のインデクス（セマフォ番号）で識別するので，
 P操作やV操作を行う関数の引数がセマフォ番号になる．
 
-\begin{myfig}{btp}{TacOSのセマフォ関連データ構造}{tacosSemaphore}
-\myincludegraphics{tacosSemaphore-crop.pdf}{scale=0.6}
-\end{myfig}
+\myfigure{btp}{scale=0.6}{Fig/tacosSemaphore-crop.pdf}
+{TacOSのセマフォ関連データ構造}{tacosSemaphore}
 
 セマフォ構造体（\|Sem|構造体型）は，
 セマフォの値（\|cnt|）とプロセスの待ち行列（\|queue|）を持っている．
@@ -561,7 +571,7 @@ V操作の結果，値が2になっている状態を表している．
 \end{description}
 \end{quote}
 
-\subsection{セマフォ使用例}
+\subsection{使用例}
 \figref{tacosSemUse}にTacOSでのセマフォの架空の使用例を示す．
 これは，\figref{semMutex}の例をTacOS用に書き換えたものである．
 
@@ -591,8 +601,9 @@ V操作関数は\|semV()|である．
 \end{description}
 \end{quote}
 
-\subsection{セマフォ割当}
-\figref{tacosNewSem}にTacOSカーネル内のセマフォ割当と解放ルーチンを示す\footnote{図は
+\subsection{割当}
+\figref{tacosNewSem}に
+TacOSカーネル内のセマフォ割当と解放ルーチンを示す\footnote{
 \url{https://github.com/tctsigemura/TacOS/blob/master/os/kernel/kernel.cmm}
 の一部である．}．
 
@@ -653,7 +664,7 @@ CPUが機械語命令の途中で割込みを受け付けることはない．}�
 \end{quote}
 
 \subsection{P操作ルーチン}
-\figref{tacosSemP}にTacOSのP操作ルーチンを示す\footnote{図は
+\figref{tacosSemP}にTacOSのP操作ルーチンを示す\footnote{
 \url{https://github.com/tctsigemura/TacOS/blob/master/os/kernel/kernel.cmm}
 の一部である．}．
 P操作ルールーチンは\|semP()|関数のことである．
@@ -707,7 +718,7 @@ PCB構造体等の共有データをアクセスするので相互排除を必�
 \end{quote}
 
 \subsection{V操作ルーチン}
-\figref{tacosSemV}にTacOSのV操作ルーチンを示す\footnote{図は
+\figref{tacosSemV}にTacOSのV操作ルーチンを示す\footnote{
 \url{https://github.com/tctsigemura/TacOS/blob/master/os/kernel/kernel.cmm}
 の一部である．}．
 TacOSのV操作ルーチンは\|iSemV()|と\|semV()|の二種類がある．
@@ -770,7 +781,7 @@ TacOSのプロセス同期機構は全てセマフォに基づいて構成され
 \subsection{setPri()関数}
 \label{setPri}
 割り込み禁止による相互排除で使用した\|setPri()|関数のソースプログラムを
-\figref{tacosSetPri}に示す\footnote{図は
+\figref{tacosSetPri}に示す\footnote{
 \url{https://github.com/tctsigemura/TacOS/blob/master/os/util/crt0.s}
 の一部である．}．
 \|setPri()|関数はCPUのPSWのフラグを参照・操作し，

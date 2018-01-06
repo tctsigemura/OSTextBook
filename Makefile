@@ -12,7 +12,7 @@ PDFS = os.pdf chap1_Sld.pdf chap2_Sld.pdf chap3_Sld.pdf chap4_Sld.pdf \
 
 all : ${PDFS}
 
-os.pdf : os.tex chap?.tex mySty.sty
+os.pdf : os.tex chap?.tex app?.tex mySty.sty
 
 chap1_Sld.pdf : chap1_Sld.tex mySld.sty
 

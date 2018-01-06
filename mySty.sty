@@ -21,12 +21,24 @@
 \usepackage{pxjahyper}
 
 %------------------------------------------------------------------------------
+% この文書独特のキーワード等
+\newcommand{\inode}{{\tt i-node}}
+\newcommand{\cmm}{{\tt C--}}
+
+%------------------------------------------------------------------------------
+% 便利マクロ
+\newcommand{\lw}[1]{\smash{\lower2.0ex\hbox{#1}}}
+\newcommand{\figref}[1]{図~\ref{fig:#1}}
+\newcommand{\tabref}[1]{表~\ref{tab:#1}}
+\newcommand{\bs}{{\tt\char'134}}  % バックスラッシュを表示するコマンド
+\def\|{\verb|} %|
+
+%------------------------------------------------------------------------------
 % 図コマンド
-\newcommand{\myincludegraphics}[2]{\includegraphics[#2]{Fig/#1}}
 \newcommand{\myfigure}[5]{
 \begin{figure}[#1]
 \begin{center}
-\myincludegraphics{#3}{#2}
+\includegraphics[#2]{#3}
 \caption{#4}
 \label{fig:#5}
 \end{center}
@@ -48,18 +60,6 @@
 {\begin{table}[#1]\begin{center}
 \caption{#2}\vspace{0.2cm}\label{tab:#3}}
 {\end{center}\end{table}}
-
-%------------------------------------------------------------------------------
-% 便利マクロ
-\newcommand{\lw}[1]{\smash{\lower2.0ex\hbox{#1}}}
-\newcommand{\figref}[1]{図~\ref{fig:#1}}
-\newcommand{\tabref}[1]{表~\ref{tab:#1}}
-\def\|{\verb|} %|
-\newcommand{\bs}{{\tt\char'134}}  % バックスラッシュを表示するコマンド
-
-%------------------------------------------------------------------------------
-% この文書独特のキーワード等
-\newcommand{\inode}{{\tt i-node}}
 
 %------------------------------------------------------------------------------
 % リスト環境

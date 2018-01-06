@@ -72,7 +72,7 @@ OSはハードウェアの機能を{\bf 抽象化}した便利な拡張マシン
 オペレーティングシステムによって機能が拡張されたことを示す．
 ハードウェアを含む円全体が拡張マシンを表している．
 
-\myfigure{btp}{scale=0.66}{abstruction-crop.pdf}{抽象化}{abstruction}
+\myfigure{btp}{scale=0.66}{Fig/abstruction-crop.pdf}{抽象化}{abstruction}
 
 \subsection{ハードウェア管理プログラムとしてのオペレーティングシステム}
 
@@ -89,7 +89,7 @@ OSはハードウェアの機能を{\bf 抽象化}した便利な拡張マシン
 メモリはアドレスで区切って複数のプロセスが共有する
 （{\bf 空間分割多重}による{\bf 仮想化}）．
 
-\myfigure{btp}{scale=0.66}{system-crop.pdf}{コンピュータシステムの構成}{system}
+\myfigure{btp}{scale=0.66}{Fig/system-crop.pdf}{コンピュータシステムの構成}{system}
 
 \section{オペレーティングシステムの歴史}
 
@@ -125,9 +125,9 @@ OSは存在せずプログラマはまさにTeCと同様なプログラミング
 ジョブが終了するとバッチモニタに制御が戻り次のジョブが自動的に実行される．
 バッチモニタが発展してやがてOSになる．
 
-\myfigure{btp}{scale=0.5}{batch-crop.pdf}{バッチ処理}{batch}
+\myfigure{btp}{scale=0.5}{Fig/batch-crop.pdf}{バッチ処理}{batch}
 
-\myfigure{btp}{scale=0.3}{punchcard.jpg}{紙カード}{punchcard}
+\myfigure{btp}{scale=0.3}{Photo/punchcard.jpg}{紙カード}{punchcard}
 
 この方式でうまく処理できるように，次のような発明があった．
 
@@ -140,7 +140,7 @@ JCLコマンドはジョブ途中の紙カードに記載する．
 FORTRAN言語で記述したプログラムを実行し，
 後半にあるデータを処理するジョブの例になっている．
 
-\myfigure{btp}{scale=0.5}{job-crop.pdf}{ジョブの構成}{job}
+\myfigure{btp}{scale=0.5}{Fig/job-crop.pdf}{ジョブの構成}{job}
 
 \item {\bf 実行モード} \\
 ユーザプログラム（ジョブ）のバグでバッチモニタが破壊されないようにするために，
@@ -191,9 +191,8 @@ System/360のオペレーティングシステムは，
 OS/360の子孫であるz/OSが現代でも使用されている\cite{os360}．
 
 \begin{myfig}{btp}{フォルクスワーゲンで使われているSystem/360}{system360}
-\myincludegraphics
-{Bundesarchiv_B_145_Bild-F038812-0014,_Wolfsburg,_VW_Autowerk.jpg}
-{scale=0.25}\\
+\includegraphics[scale=0.25]
+{Photo/Bundesarchiv_B_145_Bild-F038812-0014,_Wolfsburg,_VW_Autowerk.jpg}\\
 {\small
 ウィキメディア /
 Bundesarchiv, B 145 Bild-F038812-0014 / Schaack, Lothar / CC-BY-SA 3.0 de}
@@ -215,7 +214,7 @@ OS/360を含む第３世代のオペレーティングシステムが
 入出力待ち等で実行できなくなったら他のプログラムを実行する．
 高価なCPUが入出力待ちで停止する可能性を低くすることができた．
 
-\myfigure{btp}{scale=0.66}{multiprogramming-crop.pdf}
+\myfigure{btp}{scale=0.66}{Fig/multiprogramming-crop.pdf}
 {マルチプログラミングシステム}{multiprogramming}
 
 \item {\bf タイムシェアリング（TSS：Time Sharing System）} \\
@@ -228,11 +227,11 @@ OS/360を含む第３世代のオペレーティングシステムが
 なお，ターミナルは\figref{terminal}のような，
 キーボードと表示装置だけを備えた安価な装置である．
 
-\myfigure{btp}{scale=0.66}{timesharing-crop.pdf}
+\myfigure{btp}{scale=0.66}{Fig/timesharing-crop.pdf}
 {タイムシェアリングシステム}{timesharing}
 
 \begin{myfig}{btp}{ターミナル}{terminal}
-\myincludegraphics{724px-Televideo925Terminal.jpeg}{scale=0.25}\\
+\includegraphics[scale=0.25]{Photo/724px-Televideo925Terminal.jpeg}\\
 {\small 写真：
 \url{http://commons.wikimedia.org/wiki/File:Televideo925Terminal.jpg}
 （パブリックドメイン）}
@@ -265,9 +264,9 @@ MULTICSプロジェクトから抜けたベル研のKen Thompsonらにより開�
 \figref{tree}に示すように，
 現代のオペレーティングシステムの多くがUNIXを起源にしている．
 子孫ではないものもUNIXの影響を強く受けている．
-LINUXはUNIX互換のオペレーティングシステムを作ろうとして
+LinuxはUNIX互換のオペレーティングシステムを作ろうとして
 開発が始まった\cite{linux}．
-Androidの中身はLINUXである\cite{android}．
+Androidの中身はLinuxである\cite{android}．
 z/OSはUNIX互換環境を備えている\cite{zos}．
 WindowsにもUNIX互換環境（POSIXサブシステム）を
 利用可能なものがある\cite{windows}．
@@ -286,8 +285,7 @@ LISA開発きっかけになったと言われている\cite{dynabook}．
 \begin{myfig}{btp}
 {Alto（Alto エミュレータ）のスクリーンショット}
 {smalltalk}
-\myincludegraphics
-{Smalltalk-76.png}{scale=0.5}\\
+\includegraphics[scale=0.5]{Photo/Smalltalk-76.png}\\
 {\small
 ウィキメディア /
 SUMIM.ST /\\
@@ -328,9 +326,8 @@ Microsoft社のMS-DOS（MicroSoft Disk Operating System）\cite{msdos}である�
 バージョンアップが繰り返された．
 
 \begin{myfig}{btp}{IBM PC}{ibmpc}
-\myincludegraphics
-{Bundesarchiv_B_145_Bild-F077948-0006,_Jugend-Computerschule_mit_IBM-PC.jpg}
-{scale=0.35}\\
+\includegraphics[scale=0.35]
+{Photo/Bundesarchiv_B_145_Bild-F077948-0006,_Jugend-Computerschule_mit_IBM-PC.jpg}\\
 {\small
 ウィキメディア /
 Bundesarchiv, B 145 Bild-F077948-0006 / Engelbert Reineke / CC-BY-SA 3.0 de}
@@ -343,7 +340,7 @@ MachintoshのOSであるMacOSはLISAを経てDynaBook\cite{key72, key72J}の
 当初のMacOSはMacOS 9\cite{classicmacos}まで改良が続けられた．
 
 \begin{myfig}{btp}{初代Macintosh}{macintosh}
-\myincludegraphics{Macintosh_128k_transparency.png}{scale=0.25}\\
+\includegraphics[scale=0.25]{Photo/Macintosh_128k_transparency.png}\\
 {\small
 ウィキメディア / w:User:Grm wnr / File:Macintosh 128k transparency.png /GFDL}
 \end{myfig}
@@ -361,17 +358,17 @@ MachintoshのOSであるMacOSはLISAを経てDynaBook\cite{key72, key72J}の
 従来ワークステーションやミニコンで使用されていた
 UNIXを安価なパーソナルコンピュータ（特にIBM PC互換機）で
 動くようにする人たちが現れ，
-オープンソースソフトウェアとしてLINUXやFreeBSD等の開発が始まった．
+オープンソースソフトウェアとしてLinuxやFreeBSD等の開発が始まった．
 また，もともとパーソナルコンピュータ用のWindowsやMac OSも
 32bitマイクロプロセッサの機能を使いこなす
 本格的なオペレーティングシステムに生まれ変わった．
 
 \begin{itemize}
-\item LINUX \\
-1991年に開発が始まったLINUXはUNIX互換のオペレーティングシステムを
+\item Linux \\
+1991年に開発が始まったLinuxはUNIX互換のオペレーティングシステムを
 パーソナルコンピュータ（IBM PC互換機）用に
 独自に作成したものである\cite{linux}．
-LINUXは改良され続け，
+Linuxは改良され続け，
 現在ではパーソナルコンピュータだけでなく，
 スーパーコンピュータ「京」のオペレーティングシステム\cite{kei}から，
 スマートフォンのオペレーティングシステムであるAndroid\cite{android}，
@@ -430,7 +427,7 @@ TCP/IPを実装した4.2BSDが1984年に公開された\cite{bsd}．
 以来，4.2BSDの子孫はインターネットに対応している．
 1988年に公開されたSystem V R4はBSD起原のTCP/IPの実装を含んでいた\cite{svr4}．
 これの子孫もインターネットに対応している．
-LINUXも1.0の頃にはTCP/IPの実装を含んでいた\cite{linux1}．
+Linuxも1.0の頃にはTCP/IPの実装を含んでいた\cite{linux1}．
 WindowsはWindows 95からTCP/IPを標準装備している\cite{windows}．
 MacOSはMacOS 8が発表されるまでにはインターネット対応がされていた
 \cite{classicmacos}．
@@ -442,7 +439,7 @@ MacOSはMacOS 8が発表されるまでにはインターネット対応がさ�
 「インターネット世代のオペレーティングシステム」と言うことができる．
 
 \begin{myfig}{btp}{オペレーティングシステムの系統図}{tree}
-\myincludegraphics{tree-crop.pdf}{scale=0.6} \\
+\includegraphics[scale=0.6]{Fig/tree-crop.pdf}\\
 {\small
 系統図は\cite{os360,
 mvs,

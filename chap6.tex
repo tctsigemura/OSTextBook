@@ -23,7 +23,7 @@
 プロセス１とプロセス２は同じ物理メモリ（共有メモリ）を，
 それぞれの仮想メモリ空間に貼り付けている．
 
-\myfigure{btp}{scale=0.6}{ipcShearedMemory-crop.pdf}{共有メモリ}
+\myfigure{btp}{scale=0.6}{Fig/ipcShearedMemory-crop.pdf}{共有メモリ}
 {ipcShearedMemory}
 
 メモリ管理のハードウェア（Memory Management Unit : MMU）\footnote{
@@ -80,11 +80,13 @@ UNIXの共有メモリ関連のシステムコールとライブラリ関数を
 クライアントプログラムの例を
 \figref{ipcUnixShearedMemoryClient}に示す．
 
-\begin{myfig}{btp}{メモリ共有プログラムの例（サーバ側）}{ipcUnixShearedMemoryServer}
+\begin{myfig}{btp}{UNIXの共有メモリサーバ例}
+{ipcUnixShearedMemoryServer}
 \lstinputlisting{Lst/ipcUnixShearedMemoryServer.c}
 \end{myfig}
 
-\begin{myfig}{btp}{メモリ共有プログラムの例（クライアント側）}{ipcUnixShearedMemoryClient}
+\begin{myfig}{btp}{UNIXの共有メモリクライアント例}
+{ipcUnixShearedMemoryClient}
 \lstinputlisting{Lst/ipcUnixShearedMemoryClient.c}
 \end{myfig}
 
@@ -112,7 +114,7 @@ UNIXの共有メモリ関連のシステムコールとライブラリ関数を
 左のターミナルで実行中のサーバプログラムは，
 共有メモリの内容を定期的に表示する．
 
-\begin{myfig}{btp}{メモリ共有プログラムの実行例}{ipcUnixShearedMemoryTest}
+\begin{myfig}{btp}{UNIXのメモリ共有プログラム実行例}{ipcUnixShearedMemoryTest}
 \lstinputlisting[numbers=none]{Lst/ipcUnixShearedMemoryTest.txt}
 \end{myfig}
 
@@ -133,7 +135,8 @@ UNIXの共有メモリ関連のシステムコールとライブラリ関数を
 プロセス２は{\tt receive()}システムコールを用いて
 プロセス１からメッセージを受取る．
 
-\myfigure{btp}{scale=0.6}{ipcMessagePassing-crop.pdf}{メッセージ通信}{ipcMessagePassing}
+\myfigure{btp}{scale=0.6}{Fig/ipcMessagePassing-crop.pdf}
+{メッセージ通信}{ipcMessagePassing}
 
 メッセージ通信は，
 データを送る度にシステムコールを使用するのでオーバーヘッドが大きいが，
@@ -148,7 +151,7 @@ UNIXの共有メモリ関連のシステムコールとライブラリ関数を
 相手プロセスを直接指定する方式である．
 \figref{ipcDirect}は直接指定方式を表している．
 
-\myfigure{btp}{scale=0.6}{ipcDirect-crop.pdf}{直接指定方式}{ipcDirect}
+\myfigure{btp}{scale=0.6}{Fig/ipcDirect-crop.pdf}{直接指定方式}{ipcDirect}
 
 {\tt send()}，{\tt receive()}システムコールの引数は，
 {\bf 相手プロセス}と{\bf メッセージ}になる．
@@ -162,7 +165,7 @@ UNIXの共有メモリ関連のシステムコールとライブラリ関数を
 通信先としてリンクの名前を用いる方式である．
 \figref{ipcIndirect}は間接指定方式を表している．
 
-\myfigure{btp}{scale=0.6}{ipcIndirect-crop.pdf}{間接指定方式}{ipcIndirect}
+\myfigure{btp}{scale=0.6}{Fig/ipcIndirect-crop.pdf}{間接指定方式}{ipcIndirect}
 
 {\tt send()}，{\tt receive()}システムコールの引数は，
 {\bf リンク}と{\bf メッセージ}になる．
@@ -287,7 +290,7 @@ macOSのオンラインマニュアルには，
 メッセージ本体の長さは{\tt MAXMSG}に定義している．
 以下のプログラムは，メッセージ長をこの値に固定した例になっている．
 
-\begin{myfig}{btp}{メッセージ通信プログラムの例（メッセージ構造体）}
+\begin{myfig}{btp}{UNIXのメッセージ通信プログラム例（メッセージ構造体）}
 {ipcUnixMessageH}
 \lstinputlisting{Lst/ipcUnixMessage.h}
 \end{myfig}
@@ -298,7 +301,7 @@ macOSのオンラインマニュアルには，
 メッセージキューに送信する．
 タグの役割を持つ{\tt mtype}は常に1にしている．
 
-\begin{myfig}{btp}{メッセージ通信プログラムの例（メッセージ送信側）}
+\begin{myfig}{btp}{UNIXのメッセージ通信プログラム例（メッセージ送信側）}
 {ipcUnixMessageWriter}
 \lstinputlisting{Lst/ipcUnixMessageWriter.c}
 \end{myfig}
@@ -313,7 +316,7 @@ macOSのオンラインマニュアルには，
 送信側のプログラムがメッセージキューを削除すると
 22行でエラーが発生し24行で終了する．
 
-\begin{myfig}{btp}{メッセージ通信プログラムの例（メッセージ受信側）}
+\begin{myfig}{btp}{UNIXのメッセージ通信プログラム例（メッセージ受信側）}
 {ipcUnixMessageReader}
 \lstinputlisting{Lst/ipcUnixMessageReader.c}
 \end{myfig}
@@ -332,7 +335,7 @@ macOSのオンラインマニュアルには，
 右のターミナルには
 受信したメッセージの{\tt mtype}と{\tt mtext}の内容が表示される．
 
-\begin{myfig}{btp}{メッセージ通信プログラムの実行例}{ipcUnixMessageTest}
+\begin{myfig}{btp}{UNIXのメッセージ通信プログラム実行例}{ipcUnixMessageTest}
 \lstinputlisting[numbers=none]{Lst/ipcUnixMessageTest.txt}
 \end{myfig}
 
@@ -346,7 +349,7 @@ TacOSのメッセージ通信は，
 \figref{tacosMessage}にTacOSのメッセージ通信の様子を示す．
 メッセージ通信の手順は次のようになる．
 
-\myfigure{btp}{scale=0.6}{tacosMessage-crop.pdf}{TacOSのメッセージ通信}
+\myfigure{btp}{scale=0.6}{Fig/tacosMessage-crop.pdf}{TacOSのメッセージ通信}
 {tacosMessage}
 
 \begin{enumerate}
@@ -452,7 +455,7 @@ TacOSのマイクロカーネル内にある，
 プロセスマネージャのシステムコール処理ルーチンを実行する．
 処理結果は7行の{\tt send()}関数を用いてクライアントプロセスに返信する．
 
-\begin{myfig}{btp}{TacOSのメッセージ通信例（サーバ側）}{tacosPmMain}
+\begin{myfig}{btp}{TacOSのメッセージ通信使用例（サーバ側）}{tacosPmMain}
 \lstinputlisting{Lst/tacosPmMain.cmm}
 \end{myfig}
 
@@ -511,7 +514,7 @@ SVC割込みハンドラから{\tt exec()}関数を呼出す．
 処理結果は子プロセスのプロセス番号（PID）である．
 3行でPIDを呼出し側に返す．
 
-\begin{myfig}{btp}{TacOSのメッセージ通信例（クライアント側）}{tacosPmExec}
+\begin{myfig}{btp}{TacOSのメッセージ通信使用例（クライアント側）}{tacosPmExec}
 \lstinputlisting{Lst/tacosPmExec.cmm}
 \end{myfig}
 

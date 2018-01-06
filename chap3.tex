@@ -26,7 +26,7 @@ CPUを仮想化するためには時分割多重が用いられる．
 ディスパッチを行うプログラムを{\bf ディスパッチャ}と呼ぶ．
 \figref{osOrganization}にもディスパッチャは描かれていた．
 
-\myfigure{btp}{scale=0.7}{virtualCPU-crop.pdf}
+\myfigure{btp}{scale=0.7}{Fig/virtualCPU-crop.pdf}
 {時分割多重によるCPUの仮想化}{virtualCPU}
 
 \section{プロセスの状態}
@@ -67,7 +67,8 @@ CPUの数より多くのプロセスが同時にRunningになることはでき�
 プロセスは実行することができない．
 \end{itemize}
 
-\myfigure{btp}{scale=0.66}{procState-crop.pdf}{プロセスの状態遷移}{procState}
+\myfigure{btp}{scale=0.66}{Fig/procState-crop.pdf}
+{プロセスの状態遷移}{procState}
 
 \subsection{状態遷移}
 \figref{procState}に示された六つの状態遷移の意味は以下の通りである．
@@ -202,7 +203,8 @@ RETI命令は単一の命令でPSW（PCとフラグ）を一度にスタック�
 \figref{procSwitch}の下半分，
 プロセスBからプロセスAへ実行が移る手順も上と同様である．
 
-\myfigure{btp}{scale=0.6}{procSwitch-crop.pdf}{プロセスの切換え}{procSwitch}
+\myfigure{btp}{scale=0.6}{Fig/procSwitch-crop.pdf}
+{プロセスの切換え}{procSwitch}
 
 \subsection{切換えの例}
 計算に長い時間を要する二つのプロセスだけがある時，
@@ -210,7 +212,7 @@ RETI命令は単一の命令でPSW（PCとフラグ）を一度にスタック�
 交互に実行される様子を\figref{procSwitchInst}に示す．
 以下に手順を説明する．
 
-\myfigure{btp}{scale=0.6}{procSwitchInst-crop.pdf}
+\myfigure{btp}{scale=0.6}{Fig/procSwitchInst-crop.pdf}
 {プロセスの切換えの例}{procSwitchInst}
 
 \begin{enumerate}
@@ -326,7 +328,7 @@ PCBはプロセスを表現するデータ構造である．
 その様子を\figref{procQueue}に示す．
 図は，数値が小さいほど優先度が高い意味になっている．
 
-\myfigure{btp}{scale=0.55}{procQueue-crop.pdf}{PCBのリスト}{procQueue}
+\myfigure{btp}{scale=0.55}{Fig/procQueue-crop.pdf}{PCBのリスト}{procQueue}
 
 Ready状態のプロセスだけでなく，
 Running状態のプロセスや，
@@ -353,7 +355,7 @@ TacOSはマルチプロセスのオペレーティングシステムである．
 \subsection{PCB}
 PCBはプロセス切換え機構にとっても最も重要なデータ構造である．
 TacOSのPCBは\figref{tacosPCB}に示す\|PCB|構造体として定義されている\footnote{
-\figref{tacosPCB}はTacOSのソースコード
+%\figref{tacosPCB}はTacOSのソースコード
 \url{https://github.com/tctsigemura/TacOS/blob/master/os/kernel/process.h}
 の一部である．}．
 \|PCB|構造体の内容を順に説明する．
@@ -458,7 +460,7 @@ TacOSはPCBを初期化する際に\|magic|に\|0xabcd|を格納する．
 まず「物理メモリ空間」の配置について，
 次に「PCBとカーネルスタック」について説明する．
 
-\myfigure{btp}{scale=0.6}{tacosMemMap-crop.pdf}
+\myfigure{btp}{scale=0.6}{Fig/tacosMemMap-crop.pdf}
 {TacOSのメモリ配置}{tacosMemMap}
 
 \begin{enumerate}
@@ -500,9 +502,10 @@ PCBとカーネルスタックはプロセスの生成時に隣接して領域�
 
 \subsection{プロセス切換えプログラム}
 \figref{tacosDispatcher}にTacOSのプロセス切換えプログラムを示す
-\footnote{\figref{tacosDispatcher}はTacOSのソースコード
+\footnote{%\figref{tacosDispatcher}はTacOSのソースコード
 \url{https://github.com/tctsigemura/TacOS/blob/master/os/kernel/dispatcher.s}
-の一部である．プログラムはTaCのアセンブリ言語で記述してある．}．
+の一部である．}
+%プログラムはTaCのアセンブリ言語で記述してある．}．
 切換えプログラムは，
 コンテキストを保存する\|yield()|\footnote{
 高級言語から{\tt yield()}関数を呼出すと，
@@ -528,7 +531,7 @@ TacOSは，\figref{tacosMemMap}(b)に示すように，
 カーネル内の\|yield()|を呼出した位置になる．
 次に\figref{tacosDispatcher}の内容を解説する．
 
-\myfigure{btp}{scale=0.6}{tacosReadyQueue-crop.pdf}
+\myfigure{btp}{scale=0.6}{Fig/tacosReadyQueue-crop.pdf}
 {TacOSの実行可能列}{tacosReadyQueue}
 
 \begin{quote}
@@ -637,11 +640,11 @@ UNIXでは\|select()|システムコールがこの機能を持つ．
 \begin{myfig}{btp}{マルチプログラミングを用いないWebサーバ}
 {singleProcSingleThread}
 \begin{center}
-\myincludegraphics{singleProcSingleClient-crop.pdf}{scale=0.6}
+\includegraphics[scale=0.6]{Fig/singleProcSingleClient-crop.pdf}
 
 \vspace{0.8cm}
 
-\myincludegraphics{singleProcMultiClient-crop.pdf}{scale=0.6}
+\includegraphics[scale=0.6]{Fig/singleProcMultiClient-crop.pdf}
 \end{center}
 \end{myfig}
 
@@ -678,11 +681,11 @@ Webサーバプロセスは，
 \end{itemize}
 
 \begin{myfig}{btp}{マルチプログラミングを用いるWebサーバ}{multiProc}
-\myincludegraphics{multiProc-crop.pdf}{scale=0.6}
+\includegraphics[scale=0.6]{Fig/multiProc-crop.pdf}
 
 \vspace{0.8cm}
 
-\myincludegraphics{multiThread-crop.pdf}{scale=0.6}
+\includegraphics[scale=0.6]{Fig/multiThread-crop.pdf}
 \end{myfig}
 
 \subsection{スレッドの形式}
@@ -692,15 +695,15 @@ Webサーバプロセスは，
 ユーザプログラム内で実現するスレッドを{\bf ユーザスレッド}と呼ぶ．
 
 \begin{myfig}{btp}{ユーザスレッドとカーネルスレッド}{threadOrganization}
-\myincludegraphics{kernelThread-crop.pdf}{scale=0.6}
+\includegraphics[scale=0.6]{Fig/kernelThread-crop.pdf}
 
 \vspace{0.8cm}
 
-\myincludegraphics{userThread-crop.pdf}{scale=0.6}
+\includegraphics[scale=0.6]{Fig/userThread-crop.pdf}
 \end{myfig}
 
 \begin{itemize}
-\item カーネルスレッド \\
+\item {\bf カーネルスレッド} \\
 カーネルスレッドの模式図を\figref{threadOrganization}(a)に示す．
 カーネルスレッドはプロセスの仮想CPUを複数にし，
 仮想CPUがプログラムを並行して実行する．
@@ -709,7 +712,7 @@ Webサーバプロセスは，
 CPUが複数ある時，カーネルスレッドであれば，
 プロセス内を真に並列実行することが可能である．
 
-\item ユーザスレッド \\
+\item {\bf ユーザスレッド} \\
 ユーザスレッドの模式図を\figref{threadOrganization}(b)に示す．
 プロセスには単一の仮想CPUしかない．
 ユーザスレッドは仮想CPUを時分割多重して実現される．
@@ -754,7 +757,7 @@ CPUが複数ある時，カーネルスレッドであれば，
 小計は配列totalに格納する．
 最後にmainスレッドがtotalの合計を求めると全体の合計sumが計算できる．
 
-\myfigure{btp}{scale=0.66}{threadedSum-crop.pdf}
+\myfigure{btp}{scale=0.66}{Fig/threadedSum-crop.pdf}
 {M個のスレッドで手分けして合計を計算する様子}{threadedSum}
 
 \subsubsection{POSIXスレッドによる実装}
@@ -836,11 +839,12 @@ Apple LLVM version 7.0.0（clang-700.0.72）を使用した．
 単一スレッドを実行する場合は遊んでしまうコア内のユニットを，
 二つのスレッドを同時に実行することで効率よく使用する技術である．
 見かけ上コアの数が二倍になるが，合計の性能は二倍には達しないので，
-コアあたりの性能が下がったように見える\footnote{
-この計測結果からは，
-ハイパースレッディング・テクノロジーは，
-性能の改善に余り寄与していないように見える．
-}．
+コアあたりの性能が下がったように見える．
+%\footnote{
+%この計測結果からは，
+%ハイパースレッディング・テクノロジーは，
+%性能の改善に余り寄与していないように見える．
+%}
 
 %スレッド数を12以上にすると，
 %（見かけ上の）コア全てが常時使用されるので，

@@ -15,7 +15,7 @@
 I/Oコントローラ（\figref{hardBlock}ではアダプタやコントローラ）にも
 共有される．
 
-\myfigure{btp}{scale=0.48}{hardBlock-crop.pdf}{ハードウエア構成}{hardBlock}
+\myfigure{btp}{scale=0.48}{Fig/hardBlock-crop.pdf}{ハードウエア構成}{hardBlock}
 
 \begin{enumerate}
 \item CPU \\
@@ -93,7 +93,7 @@ CPUは，一つの機械語命令の実行が終わり次の命令の実行を�
 他の装置から割り込みを受け付けることができる\footnote{
 例外的に，メモリ管理に関する一部の割込は機械語命令の途中で発生する．}．
 
-\myfigure{btp}{scale=0.66}{cpuBlock-crop.pdf}{CPUの構成}{cpuBlock}
+\myfigure{btp}{scale=0.66}{Fig/cpuBlock-crop.pdf}{CPUの構成}{cpuBlock}
 
 \begin{enumerate}
 \item {\bf PSW（Program Status Word）} \\
@@ -138,7 +138,7 @@ L2は複数のコアにシェアされるレベル２キャッシュ（Level 2 c
 I/O装置のコントローラやアダプタはPCHに集積されている．
 CPUとPCHはDMIと呼ばれる専用のインタフェースを用いて接続される．
 
-\myfigure{btp}{scale=0.66}{intelDesktop-crop.pdf}
+\myfigure{btp}{scale=0.66}{Fig/intelDesktop-crop.pdf}
 {デスクトップPCの構成}{intelDesktop}
 
 \subsection{サーバコンピュータ}
@@ -149,7 +149,7 @@ CPU同士はUPIと呼ばれる高速な専用インタフェースで接続さ�
 最大の構成は，28コアのCPUを8個使用し合計224コアのものである．
 PCHもサーバ用のものでは，より多くのストレージやネットワークを接続できる．
 
-\myfigure{btp}{scale=0.5}{intelServer-crop.pdf}
+\myfigure{btp}{scale=0.5}{Fig/intelServer-crop.pdf}
 {サーバPCの構成}{intelServer}
 
 \section{オペレーティングシステムの構造}
@@ -183,7 +183,7 @@ PCHもサーバ用のものでは，より多くのストレージやネット�
 ユーザ・プロセスに提供するためのプログラムである．
 \end{enumerate}
 
-\myfigure{btp}{scale=0.66}{osOrganization-crop.pdf}
+\myfigure{btp}{scale=0.66}{Fig/osOrganization-crop.pdf}
 {オペレーティングシステムの構造}{osOrganization}
 
 \subsection{カーネルの動作概要}
@@ -251,7 +251,7 @@ CPUによってはTRAP命令，INT命令と呼ばれることもある．
 \figref{procOrganization}に示す．
 プロセスを構成する各部を以下で説明する．
 
-\myfigure{btp}{scale=0.66}{procOrganization-crop.pdf}
+\myfigure{btp}{scale=0.66}{Fig/procOrganization-crop.pdf}
 {プロセスの構造}{procOrganization}
 
 \begin{enumerate}
@@ -336,7 +336,7 @@ LinuxやFreeBSDは，この方式のカーネルを持つ．
 \figref{microkernel}にマイクロカーネル方式の概要を示す．
 カーネル・モードで実行されるのはマイクロカーネルだけである．
 
-\myfigure{btp}{scale=0.66}{microkernel-crop.pdf}
+\myfigure{btp}{scale=0.66}{Fig/microkernel-crop.pdf}
 {マイクロカーネル方式}{microkernel}
 
 サービスモジュールはカーネルから独立したサーバ・プロセスとし，
@@ -364,6 +364,129 @@ I/Oポートへのアクセスをマイクロカーネルのシステムコー�
 信頼性の高いオペレーティングシステムを構成するために有利である．
 しかし，IPCとプロセス切り換えのオーバヘッドが大きいため性能が低くなる．
 {\bf 多くの場合，信頼性と性能はトレードオフの関係にある．}
+
+\section{TaC}
+TaC（Tokuyama Advaced educational Computer）は，
+TeC7（Tokuyama Educational Computer Ver.7）\footnote{
+詳細は\url{https://github.com/tctsigemura/TeC7}を参照のこと．}に内蔵された
+16bitのコンピュータである．
+TeC7基板上のジャンパ設定によりTaCモードに切り換える．
+\figref{tacPhoto}に写真を示す．
+TaCは，ディスプレイ，キーボード，マイクロSDカードを接続することで，
+1980年代前半の8bitパソコン程度の能力を発揮する．
+コンピュータサイエンスを学ぶ大学や高専の学生が，
+実際に動作するPCの例として使用したり，
+設計を解析する目的で設計してある．
+
+\begin{myfig}{btp}{TeC7とTaC}{tacPhoto}
+\begin{minipage}{0.58\columnwidth}
+\begin{center}
+\includegraphics[scale=0.35]{Photo/TeC7.jpg}\\
+(a) TeC7の写真
+\end{center}
+\end{minipage}
+\begin{minipage}{0.38\columnwidth}
+\begin{center}
+\includegraphics[scale=0.3]{Photo/TaC.jpg}\\
+(b) TaCとしての使用例
+\end{center}
+\end{minipage}
+\end{myfig}
+
+TaC上では{\cmm}言語\footnote{
+C言語に似た言語，
+詳細は\url{https://github.com/tctsigemura/C--/blob/master/doc/cmm.pdf}を
+参照のこと．}で記述されたTacOS\footnote{
+詳細は\url{https://github.com/tctsigemura/TacOS}を参照のこと．} が動作する．
+本書ではTacOSをオペレーティングシステムの実装例として参照する．
+
+\subsection{ハードウェア構成}
+\figref{tacBlock}にTaCのハードウェア構成を示す．
+16ビットのシングルプロセッサ（CPUが一つ），
+主記憶64KiBの非常に単純なシステムである．
+単純なのでオペレーティングシステムの構築も容易である．
+TaCに関する資料を付録\ref{appTac}にまとめる．
+
+\myfigure{btp}{scale=0.48}{Fig/tacBlock-crop.pdf}
+{TaCのハードウェア構成}{tacBlock}
+
+\begin{itemize}
+\item {\bf コンソールパネル} \\
+\figref{tacPhoto}「(a) TeC7の写真」で，
+TeC7本体右半分のランプやスイッチで構成される部分をコンソールパネルと呼ぶ．
+コンソールパネルはCPUや主記憶と直接接続されており，
+CPUを停止した状態で，
+CPUや主記憶の内容を操作したり観察したりすることができる．
+また，機械語命令を一命令毎に実行するステップ実行機能や，
+ある番地の命令を実行した時点でプログラムを停止する
+ブレーク機能ポイントが利用できる．
+コンソールパネルの機能はハードウェアで実現されているので，
+オペレーティングシステムの内部をステップ実行することも可能である．
+TacOSの開発では，コンソールパネルがデバッグに活用された．
+
+\item {\bf CPU} \\
+\figref{tacRegPsw}に示すようなCPUレジスタとPSWを持つ16ビットCPUである．
+PSWのフラグに実行モードを表すPビットを持ち，
+カーネルモードとユーザモードを切り換えることができる．
+機械語命令は，\figref{tacInsTbl}に示す46種類が準備されている．
+機械語命令のアドレッシングモードは8種類ある．
+
+\item {\bf メモリ} \\
+メモリは\figref{tacMap}に示す構成である．
+メモリ空間全体で64KiB，
+自由に使用できるメモリが56KiB，
+2KiBのVRAMと4KiBのIPL，32Bの割込みベクタからなる．
+メモリは8ビット単位，または，16ビット単位で読み書きできる．
+16ビット単位の場合は偶数アドレスを用いる．
+
+\item {\bf タイマー} \\
+$1$ミリ秒から$2^{16}-1$ミリ秒までの間隔で割込みを発生する
+インターバルタイマーが二つ利用可能である．
+
+\item {\bf ディスプレイアダプタ} \\
+80文字×24行の文字をVGAディスプレイに表示する．
+メモリ空間の{\tt E000h}から配置されるVRAMに書き込んだ
+ASCIIコードと対応する文字をディスプレイに表示する．
+{\tt E000h}番地がディスプレイの左上隅に対応する，
+{\tt E001h}番地が一行目の2文字の位置，
+{\tt E04Fh}番地が一行目の80文字の位置，
+{\tt E050h}番地が二行目の1文字の位置に対応する．
+
+\item {\bf SPIホストコントローラ} \\
+スロットに挿入されたμSDカードをSPIモードに切換え読み書きを行う．
+SPIホストコントローラに初期化コマンドを発行すると，
+μSDカードをSPIモードに切換える．
+ブロックアドレスとメモリアドレスを設定して読み出しコマンドを発行すると，
+μSDカードの指定したブロックから512バイトのデータを
+CPUを介さずに（DMA：Direct Memory Accessを用いて）メモリに読み出す．
+書込みコマンドを発行すると，
+メモリから指定ブロックにデータを書き込む．
+
+\item {\bf シリアル通信インタフェース} \\
+調歩同期方式，9,600Baudの通信インタフェースである．
+USBシリアル変換ICを通してPC等のシリアルターミナルと通信できる．
+1バイト転送する毎に割込みを発生する．
+
+\end{itemize}
+
+\subsection{TacOS}
+\myfigure{btp}{scale=0.66}{Fig/tacosOrganization-crop.pdf}
+{TacOSの構成}{tacosOrganization}
+
+\figref{tacosOrganization}にTaC用のOSであるTacOSの構造を示す．
+マイクロカーネルがプロセス間通信（IPC）機能を提供し，
+サーバプロセスがメモリ管理やファイルシステム機能を提供する．
+\figref{microkernel}の一般的なマイクロカーネル方式と異なり，
+サーバプロセスがカーネルモードで動作しハードウェアに直接アクセスする．
+また，サーバプロセスはマイクロカーネルと同じアドレス空間で動作するので，
+カーネル内ルーチンをCALL機械語命令で直接に呼び出すことができる．
+
+割込みやSVC命令の実行が原因で，
+ユーザプロセスはカーネルモードに切り換わり
+マイクロカーネル内の割込みハンドラが呼び出される．
+割り込みハンドラで割込み原因を判断し，
+マイクロカーネル内のルーチンを呼び出したり，
+サーバプロセスの機能をIPCを用いて呼び出したりする．
 
 \section{もう一つの仮想マシン}
 
@@ -406,10 +529,10 @@ VMware Fusion，
 VirtualBox\footnote{
 徳山高専情報電子工学科のパソコン室では
 macOS上のVirtualBoxでWindowsを動作させている．
-このWindowsの中でXlinix ISE WebPACKが使用できる．
+%このWindowsの中でXlinix ISE WebPACKが使用できる．
 }等である．
 
-\myfigure{btp}{scale=0.66}{type2Hypervisor-crop.pdf}
+\myfigure{btp}{scale=0.66}{Fig/type2Hypervisor-crop.pdf}
 {Type 2 ハイパーバイザ}{type2Hypervisor}
 
 \subsection{Type 1 ハイパーバイザ}
@@ -431,7 +554,7 @@ Hyper-V等である．
 徳山高専情報電子工学科のパソコン室でも，
 2台のサーバ上に50台の仮想デスクトップマシンを動かしていたことがある．
 
-\myfigure{btp}{scale=0.66}{type1Hypervisor-crop.pdf}
+\myfigure{btp}{scale=0.66}{Fig/type1Hypervisor-crop.pdf}
 {Type 1 ハイパーバイザ}{type1Hypervisor}
 
 \subsection{仮想アプライアンス}
