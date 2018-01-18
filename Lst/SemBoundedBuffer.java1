@@ -1,0 +1,34 @@
+import java.util.concurrent.Semaphore;          // セマフォ型を使用可能にする
+public class SemBoundedBuffer {
+    private Semaphore guard = new Semaphore(1); // ガード用のセマフォ
+    private Semaphore next = new Semaphore(0);  // signal時にブロックするためのセマフォ
+    private int nextCont = 0;                   // signal時にブロックしたスレッド数
+    private class Condition {                   // 条件変数型を内部クラスとして定義する
+	Semaphore sem = new Semaphore(0);       // 条件変数で待つためのセマフォ sem
+	int count = 0;                          // 条件変数を待つスレッドの数
+	void await() {                          // 条件変数を待つメソッド
+	    count++;                            // この条件変数を待つスレッドの数
+	    if (nextCont>0) {                   // 起床後にawait()した場合なら
+		next.release();                 //   signal()したスレッドを起こす
+	    } else {                            // 起こすスレッドがないなら
+		guard.release();                //   ガードを外してからブロック
+	    }
+	    sem.acquireUninterruptibly();       // 条件変数のセマフォで待つ
+	    count--;                            // 待ちが完了
+	}
+	void signal() {                         // 条件変数で待つスレッドを起こす
+	    if (count>0) {                      // 待っているスレッドがあれば
+		nextCont++;                     //   signal途中のスレッド数
+		sem.release();                  //   待ちスレッドを起こす
+		next.acquireUninterruptibly();  //   起きたスレッドを先に実行する
+		nextCont--;                     //   signal完了
+	    }
+	}
+    }
+    private void exitProc() {                   // 手続きの出口処理
+	if (nextCont>0) {                       // signalされた後なら
+	    next.release();                     //   signalしたスレッドを起こす
+	} else {                                // そうでなければ
+	    guard.release();                    //   ガードを外す
+	}
+    }

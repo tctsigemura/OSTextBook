@@ -1,0 +1,21 @@
+    // 手続き
+    public void append(int x) {                 // (1)
+	guard.acquireUninterruptibly();         // (1) ガードを取得
+	if (cnt==N) full.await();               // (1)
+	buf[last] = x;                          // (3)
+	last = (last + 1) % N;                  // (3)
+	cnt++;                                  // (3)
+	empty.signal();                         // (3)
+	exitProc();                             // (3) 手続きの出口処理
+    }
+    public int remove() {                       // (2)
+	guard.acquireUninterruptibly();         // (2) ガードを取得
+	if (cnt==0) empty.await();              // (2)
+	int x = buf[first];                     // (2)
+	first = (first + 1) % N;                // (2)
+	cnt--;                                  // (2)
+	full.signal();                          // (2)
+	exitProc();                             // (4) 手続きの出口処理
+	return x;                               // (4)
+    }
+}

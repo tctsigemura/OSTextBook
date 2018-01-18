@@ -1,0 +1,16 @@
+// 銀行口座の残高を管理するモニタ
+monitor MonAccount {
+  // 資源
+  int       money;                            // スレッド間の共有変数（残高）
+  // 初期化プログラム
+  MonAccount(int m) {
+    money = m;                                // 口座の残高を初期化する
+  }
+  // 手続き
+  public void receive(int r) {                // 入金手続き
+    money = money + r;
+  }
+  void pay(int p) {                           // 引落し手続き
+    money = money - p;
+  }
+}

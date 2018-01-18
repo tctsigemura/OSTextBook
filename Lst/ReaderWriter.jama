@@ -1,0 +1,42 @@
+monitor ReaderWriter {
+    // 資源を管理するデータ
+    int activeReader;               // 活動中のリーダ数
+    int waitingReader;              // 待ちのリーダ数
+    boolean busy;                   // ライタが活動中
+    // 条件変数
+    Condition okToRead;             // リーダが待ち合わせる条件変数
+    Condition okToWrite;            // ライタが待ち合わせる条件変数
+    // 初期化
+    ReaderWriter() {
+        activeReader = waitingReader = 0;
+	busy = false;
+    }
+    // 手続き
+    public void startRead() {       // リーダが活動を開始する
+      if (busy) {
+        waitingReader++;            // ライタが活動中なら
+        okToRead.wait();            //   待つ
+        waitingReader--;
+      }
+      activeReader++;
+      if (waitingReader>0)          // 他に待ちリーダがあれば
+        okToRead.signal();          //   起こす
+    }
+    public void endRead() {         // リーダが活動を終了する
+      activeReader--;
+      if (activeReader==0)          // 最後のリーダなら
+        okToWrite.signal();         //   ライタを起こす
+    }
+    public void startWrite() {      // ライタが活動を開始する
+      if (activeReader!=0 || busy)  // リーダかライタが活動中なら
+        okToWrite.wait();           //   待つ
+      busy = true;                  // ライタが活動中
+    }
+    public void endWrite() {        // ライタが活動を終了する
+      busy = false;                 // ライタは終了
+      if (activeReader>0)           // リーダ待っていれば
+        okToRead.signal();          //   リーダを起こす
+      else                          // そうでなければ
+        okToWrite.signal();         //   ライタを起こす
+    }
+}

@@ -1,0 +1,13 @@
+    // 資源（リングバッファ）
+    private int N;
+    private int[] buf;
+    private int first, last, cnt;
+    // 条件変数
+    private Condition empty = new Condition();
+    private Condition full  = new Condition();
+    // 初期化
+    public SemBoundedBuffer(int n) {
+	N = n;
+	buf = new int[N];
+	first = last = cnt = 0;
+    }

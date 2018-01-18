@@ -1,0 +1,18 @@
+class MonAccontMain {
+  static MonAccount account = new MonAccount(0);  // 残高0円の口座を作る
+  static void receiveThread() {                   // 入金管理スレッド
+    for ( ; ; ) {                                 // 以下を繰り返す
+      int receipt = receiveMoney();               // ネットワークから入金を受信
+      account.receive(receipt);                   // 口座に入金する
+    }
+  }
+  static void payThread() {                       // 引落し管理スレッド
+    for ( ; ; ) {                                 // 以下を繰り返す
+      int payment = payMoney();                   // ネットワークから支払いを受信
+      account.pay(payment);                       // 口座から引落す
+  }
+  public static void main(String[] args) {
+    入金管理スレッドを起動;
+    引落し管理スレッドを起動;
+  }
+}

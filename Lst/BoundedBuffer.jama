@@ -1,0 +1,31 @@
+monitor BoundedBuffer {
+    // 資源（リングバッファ）
+    int N;
+    int[] buf;
+    int first, last, cnt;
+    // 条件変数
+    Condition empty;
+    Condition full;
+    // 初期化
+    BoundedBuffer(int n) {
+	N = n;
+	buf = new int[N];
+	first = last = cnt = 0;
+    }
+    // 手続き
+    public void append(int x) {    // (1)
+	if (cnt==N) full.wait();   // (1)
+	buf[last] = x;             // (3)
+	last = (last + 1) % N;     // (3)
+	cnt++;                     // (3)
+	empty.signal();            // (3)
+    }
+    public int remove() {          // (2)
+	if (cnt==0) empty.wait();  // (2)
+	int x = buf[first];        // (2)
+	first = (first + 1) % N;   // (2)
+	cnt--;                     // (2)
+	full.signal();             // (2)
+	return x;                  // (4)
+    }
+}
