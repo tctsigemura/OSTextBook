@@ -26,16 +26,17 @@
 \item データと操作をまとめて定義する．（抽象データ型で一般的）
 \item 同期のための機能が組込まれている．（モニタ独特）
 \end{itemize}
+\end{frame}
 
-\vspace{1ex}
-
-以下のものから構成される．
-\begin{itemize}
-\item 資源（データ，変数）
-\item 手続き（操作，メソッド）
-\item ガード
-\item 条件変数
-\end{itemize}
+\begin{frame}
+  \frametitle{モニタの模式図}
+  \begin{center}
+    \includegraphics[scale=0.6]{Fig/monitor-crop.pdf}
+  \end{center}
+  \begin{itemize}
+  \item 資源（データ，変数），手続き（メソッド），ガード，条件変数
+  \item 図では省略してあるが{\bf 初期化プログラム}
+  \end{itemize}
 \end{frame}
 
 \section{構成要素}
@@ -77,7 +78,8 @@ signal操作は条件変数の待ち行列から一つのスレッドを選ん�
   \begin{itemize}
   \item {\bf 資源}はスレッド間の共有変数{\tt money}である．
   \item {\bf 初期化プログラム}はモニタのインスタンス生成時に実行される．
-  \item {\bf 手続き}はガードにより自動的に排他制御される．
+  \item {\bf 手続き}（クリティカルセクション）は，
+    ガードにより自動的に相互排除される．
   \end{itemize}
 \end{frame}
 
