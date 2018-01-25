@@ -49,8 +49,7 @@ Javaのクラスは同期のための機構も持っており，
 \item 条件変数
 \end{itemize}
 
-\myfigure{btp}{scale=0.6}{Fig/monitor-crop.pdf}{モニタの模式図}
-{monitor}
+\myfigure{btp}{scale=0.6}{Fig/monitor-crop.pdf}{モニタの模式図}{monitor}
 
 \subsection{資源（データ，変数）}
 複数のスレッドによって共有される変数のことである．
@@ -145,7 +144,7 @@ signal操作は条件変数の待ち行列から一つのスレッドを選ん�
 \|receiveThread()|メソッドと\|payThread()|メソッドを実行するものとする．
 \end{description}
 
-\section{生産者と消費者の問題の解}
+\section{生産者と消費者問題の解}
 この問題で{\bf 資源}はデータを保管するFIFO構造のバッファである．
 このバッファを以下では{\bf キュー}と呼ぶことにする．
 キューとキューを操作する手続きは，
@@ -155,7 +154,7 @@ signal操作は条件変数の待ち行列から一つのスレッドを選ん�
 資源の操作に関する難しいプログラムが一箇所にまとめられることも，
 モニタを使用するメリットである．
 
-以下では生産者と消費者の問題の解を示すために，
+以下では生産者と消費者問題の解を示すために，
 まず，データのバッファになるキューをモニタを用いて記述する．
 次に，キューを使用する生産者スレッドと消費者スレッド作る．
 
@@ -220,10 +219,10 @@ Javaの\|class|定義に似た\|monitor|定義ができるものとする．
 
 \subsection{生産者と消費者スレッドの記述}
 \figref{monProducerConsumerMain}に
-Java風の仮想言語による生産者と消費者の問題の解を示す．
+Java風の仮想言語による生産者と消費者問題の解を示す．
 このプログラムは\figref{monProducerConsumer}で定義したキューを使用する．
 
-\begin{myfig}{btp}{モニタによる生産者と消費者の問題の解（仮想言語版）}
+\begin{myfig}{btp}{モニタによる生産者と消費者問題の解（仮想言語版）}
 {monProducerConsumerMain}
 \lstinputlisting[numbers=left]{Lst/BoundedBufferMain.jama}
 \end{myfig}
@@ -367,12 +366,12 @@ Javaの\|Object|クラスに別の\|wait()|メソッドが定義さているの�
 % \lstinputlisting[numbers=left]{Lst/BoundedBufferMain.jama}
 % \end{myfig}
 
-\section{Javaのモニタ風機構による生産者と消費者の問題の解}
+\section{Javaのモニタ風機構による生産者と消費者問題の解}
 Java言語はモニタに似た同期機構をサポートしている．
-\figref{javaMonProducerConsumer}にJavaによる生産者と消費者の問題の解を示す．
+\figref{javaMonProducerConsumer}にJavaによる生産者と消費者問題の解を示す．
 Javaには{\bf 条件変数}に相当するものが無い．
 
-\begin{myfig}{btp}{Javaのモニタ風機構による生産者と消費者の問題の解}
+\begin{myfig}{btp}{Javaのモニタ風機構による生産者と消費者問題の解}
 {javaMonProducerConsumer}
 \lstinputlisting[numbers=left]{Lst/MonBoundedBuffer.java}
 \end{myfig}
@@ -449,7 +448,7 @@ Javaの\|notify()|はモニタの\|signal()|と異なり，
 また，モニタ内の手続き（プログラム）の実行は自動的に相互排除されるので，
 クリティカルセクションを明示する必要もない．
 
-モニタで記述した「生産者と消費者の問題」の解を，
+モニタで記述した「生産者と消費者問題」の解を，
 セマフォを用いて実装し直す例を示した。
 この例をよく観察するとモニタの動作が細部まで理解できる．
 
@@ -460,10 +459,49 @@ Java言語はモニタに似た機能をサポートする言語であるが，
 \|signal()|を実行した後手続きの最後まで実行されること
 等が異なる．
 
-
-\section*{問題}
+\section*{練習問題}
 \begin{enumerate}
-\item 「\|signal()|は手続きの最後でしか使用できない」ことにすると，
-\figref{semProducerBuffer1}，\figref{semProducerBuffer2}のプログラムは
+\renewcommand{\labelenumi}{\tt \arabic{chapter}.\arabic{enumi}}
+ \setlength{\leftskip}{1em}
+
+\item {\bf 抽象データ型}の定義を調べなさい．
+
+\item \figref{monProducerConsumer}のプログラムにおいて，
+{\tt cnt}なしにキュー（リングバッファ）を記述できるか？
+
+\item \figref{monProducerConsumer}のプログラムにおいて，
+キューが空のとき一つのスレッドが{\tt remove()}を実行した．
+その後，別のスレッドが{\tt append()}を実行した．
+この時の{\tt append()}，{\tt remove()}内が実行される順を答えなさい．
+
+\item \figref{monProducerConsumer}のプログラムは，
+複数生産者と複数消費者問題の解に使用できるか？
+
+\item Java風仮想言語のモニタを用いてリーダ・ライタ問題の解を示しなさい．
+
+\item Java風仮想言語のモニタを用いてセマフォを記述しなさい．
+
+\item {\tt semBoundedBuffer}
+（\figref{semProducerBuffer1}，\figref{semProducerBuffer2}）に
+メインルーチンを補って実際に実行しなさい．
+ソースプログラムは以下から入手できる． \\
+\url{https://github.com/tctsigemura/OSTextBook/blob/master/Lst/SemBoundedBuffer.java}
+
+\item {\bf \|signal()|は手続きの最後でしか使用できないことにすると}，
+{\tt semBoundedBuffer}
+（\figref{semProducerBuffer1}，\figref{semProducerBuffer2}）は
 どのように簡略化できるか．
+
+\item {\tt MonBoundedBuffer}（\figref{javaMonProducerConsumer}）に
+メインルーチンを補って実際に実行しなさい．
+ソースプログラムは以下から入手できる．\\
+\url{https://github.com/tctsigemura/OSTextBook/blob/master/Lst/MonBoundedBuffer.java}
+
+\item \figref{monProducerConsumer}のプログラムと，
+\figref{javaMonProducerConsumer}でコメントに示すように実行順序が異なる．
+Javaのモニタ風機構と従来のモニタのどのような違いによるものか？
+
+\item その他に従来のモニタとJavaのモニタ風機構の違いは何があるか？
+
+\item モニタの signal と、セマフォのV操作の違いは何があるか？
 \end{enumerate}

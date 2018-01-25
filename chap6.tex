@@ -524,3 +524,51 @@ IPCには共有メモリとメッセージ通信の二種類があった．
 UNIXの共有メモリとメッセージ通信についてプログラム例を示した．
 TacOSのメッセージ通信について，
 それを実現するカーネル内プログラムと利用例を示した．
+
+\section*{練習問題}
+\begin{enumerate}
+\renewcommand{\labelenumi}{\tt \arabic{chapter}.\arabic{enumi}}
+ \setlength{\leftskip}{1em}
+
+\item プロセス間の共有メモリとスレッド間の共有変数の違いは何か？
+
+\item UNIXの共有メモリ使用例
+（\figref{ipcUnixShearedMemoryServer}，\figref{ipcUnixShearedMemoryClient}）
+を実際に実行し動作確認しなさい．
+なお，ソースプログラムは以下から入手可能である． \\
+\url{https://github.com/tctsigemura/OSTextBook/blob/master/Lst/ipcUnixShearedMemoryServer.c} （サーバ側）\\
+\url{https://github.com/tctsigemura/OSTextBook/blob/master/Lst/ipcUnixShearedMemoryClient.c} （クライアント側）
+
+\item 動作確認したプログラムでは，
+サーバプログラムは共有メモリが変更されたことを確認しないで，
+一定の時間間隔で共有メモリの内容を表示している．
+\begin{enumerate}
+\item どのような不都合が予想されるか？
+\item クライアントとサーバで同期をする方法はあるか？
+\end{enumerate}
+
+\item メッセージ通信でバッファを大きくすることのメリットは何か？
+
+\item UNIXのメッセージ通信プログラム例（\figref{ipcUnixMessageH}，
+\figref{ipcUnixMessageWriter}，\figref{ipcUnixMessageReader}）
+を実際に実行し動作確認しなさい．
+なお，ソースプログラムは以下から入手可能である． \\
+\url{https://github.com/tctsigemura/OSTextBook/blob/master/Lst/ipcUnixMessage.h}（ヘッダファイル）\\
+\url{https://github.com/tctsigemura/OSTextBook/blob/master/Lst/ipcUnixMessageWriter.c}（送信側）\\
+\url{https://github.com/tctsigemura/OSTextBook/blob/master/Lst/ipcUnixMessageReader.c}（受信側）
+
+\item UNIXのメッセージ通信プログラム例は生産者と消費者の問題の解になっている．
+複数生産者と複数消費者の問題の解にもなっているか？
+
+\item UNIXのメッセージ通信プログラム例が
+複数生産者と複数消費者の問題の解にもなっているか，
+動作確認する手順を説明しなさい．
+
+\item TacOSのメッセージ通信機構について正しいか正しくないか答えなさい．
+  \begin{enumerate}
+  \item メッセージの形式に柔軟性がある．
+  \item リンクに三つのセマフォが含まれる．
+  \item TacOSのメッセージ通信機構は相互排除と同期にセマフォだけを用いている．
+  \item 複数生産者と複数消費者の問題の解に使用できる．
+  \end{enumerate}
+\end{enumerate}
