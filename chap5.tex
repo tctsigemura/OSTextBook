@@ -54,7 +54,8 @@
 
 以上のように，
 スレッドの実行順序等により計算結果が間違ってしまうことがある．
-このような状況を{\tt 競合（Race Condition または Competition）}と呼ぶ．
+これは資源の利用について，
+{\tt 競合（Race Condition または Competition）}が発生しているからである．
 
 \section{クリティカルセクション（Critical Section）}
 \label{criticalsection}
@@ -162,7 +163,7 @@ TS命令（\|TS R,M|）の動作は，例えば次のようになる．
 \begin{enumerate}
 \item バスをロックする
 \item $R \leftarrow [M]$
-\item {\tt if (R==0) } $z \leftarrow 1;$ {\tt ~else} $z \leftarrow 0;$
+\item {\tt if (R==0) } $Zero \leftarrow 1;$ {\tt ~else} $Zero \leftarrow 0;$
 \item $[M] \leftarrow 1$
 \item バスのロックを解除する
 \end{enumerate}
@@ -170,13 +171,14 @@ TS命令（\|TS R,M|）の動作は，例えば次のようになる．
 
 TS命令は，他のCPUがメモリをアクセスしないように，まずバスをロックする．
 次に，メモリの指定番地から値をCPUレジスタにロードする．
-また，レジスタの値によってZeroフラグの値を決定する．
+また，レジスタの値によってCPUの$Zero$フラグの値を決める．
 更に，メモリの指定番地に「1」をストアする．
 最後にバスのロックを解除する．
 ロードとストアで合計二回のメモリアクセスがあるが，
 バスがロックされているので，
 TS命令の実行途中に他のCPUがメモリをアクセスすることはない．
 \figref{testAndSet}にTS命令の使用例を示す．
+JZ命令は$Zero$フラグが「1」の場合のみジャンプする．
 この例のように，
 クリティカルセクションに入れるようになるまでループで待つ方式を
 {\bf ビジーウェイティング（Busy Waiting）}と呼ぶ．
@@ -185,16 +187,17 @@ TS命令の実行途中に他のCPUがメモリをアクセスすることはな
 \lstinputlisting[numbers=none]{Lst/testAndSet.s}
 \end{myfig}
 
-フラグのクリアは通常のST命令でできる\footnote{
+メモリのクリアは通常のST命令でできる\footnote{
 通常の命令もメモリアクセスする度にバスをロックしている．}．
 TS命令を用いる場合もクリティカルセクションは割込み禁止で実行する必要がある．
-優先度の低いプロセス（スレッド）が
+クリティカルセクションでのプリエンプションを避けるためである．
+もしも，優先度の低いプロセス（スレッド）が
 クリティカルセクション内でプリエンプションすると，
 優先度の高いプロセス（スレッド）が
 エントリーセクションで{\bf ビジーウェイティング}を始め
 {\bf デッドロック}に陥る可能性があるからである．
-「0」をロードしたプロセス（スレッド）は，
-クリティカルセクションでプリエンプションしてはならない．
+%「0」をロードしたプロセス（スレッド）は，
+%クリティカルセクションでプリエンプションしてはならない．
 この方式も，
 特権命令DI，EIを使用するのでカーネル内でしか利用できない．
 
@@ -229,8 +232,8 @@ CAS（Compare And Swap）命令もSMPシステムでの相互排除に使用で�
 \begin{enumerate}
 \item バスをロックする
 \item $T \leftarrow [M]$
-\item {\tt if ($T==R0$) \{} $[M] \leftarrow R1;~ z \leftarrow 1;$
-      {\tt \} else \{} $R0 \leftarrow T;~  z \leftarrow 0;$ {\tt \}}
+\item {\tt if ($T==R0$) \{} $[M] \leftarrow R1;~ Zero \leftarrow 1;$
+      {\tt \} else \{} $R0 \leftarrow T;~  Zero \leftarrow 0;$ {\tt \}}
 \item バスのロックを解除する
 \end{enumerate}
 \end{quote}
