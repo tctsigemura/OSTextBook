@@ -372,8 +372,8 @@ TacOSのメッセージ通信機構は，
 \subsection{リンク構造体}
 \figref{tacosLink}にTacOSのリンク構造体の宣言を示す\footnote{
 %\figref{tacosLink}はTacOSのソースコード
-\url{https://github.com/tctsigemura/TacOS/blob/master/os/kernel/process.h}の
-一部である．}．
+\url{https://github.com/tctsigemura/TacOS/blob/master/os/kernel/process.hmm}
+の一部である．}．
 {\tt Link}構造体はランデブー用のリンクを定義している．
 {\tt server}はリンクを所有するサーバプロセスのPCB，
 {\tt client}はリンクを使用中のクライアントプロセスのPCBである．
@@ -447,7 +447,7 @@ TacOSのマイクロカーネル内にある，
 一部である．}．
 プロセスマネージャはexecシステムコール等を処理するサーバプロセスである．
 3行でリンクを作成し{\tt pmLink}グローバル変数\footnote{
-\url{https://github.com/tctsigemura/TacOS/blob/master/os/pm/pm.h}
+\url{https://github.com/tctsigemura/TacOS/blob/master/os/pm/pm.hmm}
 で宣言されている．}に記録する．
 5行でクライアントプロセスからのメッセージを待ち受ける．
 メッセージを受信したら6行に進み，
