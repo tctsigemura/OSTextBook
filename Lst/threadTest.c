@@ -33,7 +33,7 @@ int main() {                      // mainスレッドの実行はここから始
     pthread_attr_init(&attr[m]);                  //   アトリビュート初期化
     pthread_create(&tid[m], &attr[m], thread, p); //   スレッドを生成しスタート
   }
-  // 各スレッド終了を待ち，求めた小計を合算する
+  // 各スレッドの終了を待ち，求めた小計を合算する
   int sum = 0;
   for (int m=0; m<M; m++) {                       // 各スレッドについて
     pthread_join(tid[m], NULL);                   //   終了を待ち
