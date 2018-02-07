@@ -10,7 +10,7 @@ monitor MonAccount {
   public void receive(int r) {                // 入金手続き
     money = money + r;
   }
-  void pay(int p) {                           // 引落し手続き
+  public void pay(int p) {                    // 引落し手続き
     money = money - p;
   }
 }
