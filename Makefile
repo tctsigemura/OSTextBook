@@ -2,7 +2,7 @@
 .SUFFIXES: .tex .pdf
 
 PDFS = os.pdf chap1_Sld.pdf chap2_Sld.pdf chap3_Sld.pdf chap4_Sld.pdf \
-	chap5_Sld.pdf chap6_Sld.pdf chap7_Sld.pdf
+	chap5_Sld.pdf chap6_Sld.pdf chap7_Sld.pdf chap8_Sld.pdf
 
 %.pdf : %.tex
 	platex $*.tex
@@ -28,6 +28,7 @@ chap6_Sld.pdf : chap6_Sld.tex mySld.sty
 
 chap7_Sld.pdf : chap7_Sld.tex mySld.sty
 
+chap8_Sld.pdf : chap8_Sld.tex mySld.sty
 
 clean :
 	rm -f *.log *.aux *.dvi *.out *.toc *.vrb *.snm *.nav *~

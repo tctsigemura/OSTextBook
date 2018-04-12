@@ -1,0 +1,9 @@
+public void[] malloc(int n);
+
+public int x = 1;
+public int y;
+
+public void main() {
+  int z;
+  char[] p = malloc(10);
+}
