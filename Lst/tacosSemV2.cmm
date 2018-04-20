@@ -1,8 +1,0 @@
-// セマフォの V 操作
-public void semV(int sd) {
-  int r = setPri(DI|KERN);                          // 割り込み禁止、カーネル
-  if (iSemV(sd)) {                                  // V 操作し必要なら
-    yield();                                        //   プロセスを切り替える
-  }
-  setPri(r);                                        // 割り込み状態を復元する
-}

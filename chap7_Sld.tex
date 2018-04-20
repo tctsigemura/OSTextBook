@@ -1,4 +1,5 @@
-\documentclass[dvipdfmx]{beamer}
+%\documentclass[dvipdfmx]{beamer}
+\documentclass{beamer}                   % lualatex の場合
 \usepackage{mySld}
 
 \begin{document}
@@ -106,7 +107,7 @@ signal操作は条件変数の待ち行列から一つのスレッドを選ん�
 \section{生産者と消費者問題の解}
 \begin{frame}
   \frametitle{モニタによるキューの実現（仮想言語、前半）}
-  \lstinputlisting{Lst/BoundedBuffer.jama1}
+  \lstinputlisting[lastline=14,frame=tlr]{Lst/BoundedBuffer.jama}
 
   \begin{itemize}
   \item この例ではリングバッファのデータ構造が資源である．
@@ -118,7 +119,7 @@ signal操作は条件変数の待ち行列から一つのスレッドを選ん�
 
 \begin{frame}
   \frametitle{モニタによるキューの実現（仮想言語、後半）}
-  \lstinputlisting{Lst/BoundedBuffer.jama2}
+  \lstinputlisting[firstline=15,frame=lrb]{Lst/BoundedBuffer.jama}
 
   \begin{itemize}
   \item {\tt wait()}はスレッドを状態変数の待ち行列に入れる．
@@ -139,7 +140,8 @@ signal操作は条件変数の待ち行列から一つのスレッドを選ん�
 \section{セマフォによるモニタの実装}
 \begin{frame}
   \frametitle{モニタと同等なキューをJavaのセマフォで実現（1/4）}
-  \lstinputlisting{Lst/SemBoundedBuffer.java11}
+  \lstinputlisting[firstline=3,lastline=20,frame=tlr]
+                  {Lst/SemBoundedBuffer.java}
 
   \begin{itemize}
   \item Javaのセマフォはカウンティングセマフォ（計数セマフォ）
@@ -149,7 +151,8 @@ signal操作は条件変数の待ち行列から一つのスレッドを選ん�
 
 \begin{frame}
   \frametitle{モニタと同等なキューをJavaのセマフォで実現（2/4）}
-  \lstinputlisting{Lst/SemBoundedBuffer.java12}
+  \lstinputlisting[firstline=21,lastline=36,frame=lr]
+                  {Lst/SemBoundedBuffer.java}
 
   \begin{itemize}
   \item 条件変数型を内部クラスとして定義
@@ -160,7 +163,8 @@ signal操作は条件変数の待ち行列から一つのスレッドを選ん�
 
 \begin{frame}
   \frametitle{モニタと同等なキューをJavaのセマフォで実現（3/4）}
-  \lstinputlisting{Lst/SemBoundedBuffer.java21}
+  \lstinputlisting[firstline=37,lastline=49,frame=lr]
+                  {Lst/SemBoundedBuffer.java}
 
   \begin{itemize}
   \item {\bf 資源}はクラス外から見えないように{\tt private}にする．
@@ -171,7 +175,7 @@ signal操作は条件変数の待ち行列から一つのスレッドを選ん�
 
 \begin{frame}
   \frametitle{モニタと同等なキューをJavaのセマフォで実現（4/4）}
-  \lstinputlisting{Lst/SemBoundedBuffer.java22}
+  \lstinputlisting[firstline=50,frame=lrb]{Lst/SemBoundedBuffer.java}
 
   \begin{itemize}
   \item モニタなら自動的に実行されるものも明示
@@ -181,7 +185,7 @@ signal操作は条件変数の待ち行列から一つのスレッドを選ん�
 \section{Javaのモニタ風機構による生産者と消費者問題の解（前半）}
 \begin{frame}
   \frametitle{Javaによる生産者と消費者問題の解（前半）}
-  \lstinputlisting{Lst/MonBoundedBuffer.java1}
+  \lstinputlisting[lastline=15,frame=tlr]{Lst/MonBoundedBuffer.java}
 
   \begin{itemize}
   \item 資源には{\tt private}を明示
@@ -192,7 +196,7 @@ signal操作は条件変数の待ち行列から一つのスレッドを選ん�
 
 \begin{frame}
   \frametitle{Javaによる生産者と消費者問題の解（後半）}
-  \lstinputlisting{Lst/MonBoundedBuffer.java2}
+  \lstinputlisting[firstline=16,frame=rlb]{Lst/MonBoundedBuffer.java}
 
   \begin{itemize}
   \item {\bf 手続き}は{\tt synchronized}修飾したメソッド

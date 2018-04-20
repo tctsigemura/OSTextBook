@@ -1,7 +1,6 @@
 // Java のセマフォクラス
 // P操作がacquireUninterruptibly(), V操作がrelease() になる
-import java.util.concurrent.Semaphore;
-
+import java.util.concurrent.Semaphore;          // セマフォ型を利用可能にする
 public class SemBoundedBuffer {
     private Semaphore guard = new Semaphore(1); // ガード用のセマフォ
     private Semaphore next = new Semaphore(0);  // signal時にブロックするためのセマフォ

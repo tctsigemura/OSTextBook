@@ -3,7 +3,8 @@
 % OS 教科書
 %
 %------------------------------------------------------------------------------
-\documentclass[a4paper,11pt,twocolumn,dvipdfmx]{jsbook}
+%\documentclass[a4paper,11pt,twocolumn,dvipdfmx]{jsbook}   % platex の場合
+\documentclass[a4paper,11pt,twocolumn]{ltjsbook}     % lualatex の場合
 \usepackage{mySty}
 %------------------------------------------------------------------------------
 % はじまり
@@ -64,6 +65,8 @@ CC-BY-SA 4.0 ライセンス全文は
 \include{chap7} % モニタ
 \part{主記憶管理}
 \include{chap8} % 主記憶
+\include{chap9} % メモリ割付け
+\include{chapA} % 実装例
 \include{bibliography} % 参考文献
 \appendix
 \include{appA}  % 付録A

@@ -1,4 +1,5 @@
-\documentclass[dvipdfmx]{beamer}
+%\documentclass[dvipdfmx]{beamer}
+\documentclass{beamer}                   % lualatex の場合
 \usepackage{mySld}
 
 \begin{document}
@@ -49,22 +50,22 @@
 
 \begin{frame}
   \frametitle{UNIXの共有メモリサーバ例（前半）}
-  \lstinputlisting{Lst/ipcUnixShearedMemoryServer1.c}
+  \lstinputlisting[lastline=20,frame=tlr]{Lst/ipcUnixShearedMemoryServer.c}
 \end{frame}
 
 \begin{frame}
   \frametitle{UNIXの共有メモリサーバ例（後半）}
-  \lstinputlisting{Lst/ipcUnixShearedMemoryServer2.c}
+  \lstinputlisting[firstline=21,frame=lrb]{Lst/ipcUnixShearedMemoryServer.c}
 \end{frame}
 
 \begin{frame}
   \frametitle{UNIXの共有メモリクライアント例（前半）}
-  \lstinputlisting{Lst/ipcUnixShearedMemoryClient1.c}
+  \lstinputlisting[lastline=16,frame=trl]{Lst/ipcUnixShearedMemoryClient.c}
 \end{frame}
 
 \begin{frame}
   \frametitle{UNIXの共有メモリクライアント例（後半）}
-  \lstinputlisting{Lst/ipcUnixShearedMemoryClient2.c}
+  \lstinputlisting[firstline=17,frame=lrb]{Lst/ipcUnixShearedMemoryClient.c}
 \end{frame}
 
 \begin{frame}
@@ -131,22 +132,22 @@
 \begin{frame}
   \frametitle{UNIXのメッセージ通信プログラム例１}
   \lstinputlisting{Lst/ipcUnixMessage.h}
-  \lstinputlisting{Lst/ipcUnixMessageWriter1.c}
+  \lstinputlisting[lastline=15,frame=tlr]{Lst/ipcUnixMessageWriter.c}
 \end{frame}
 
 \begin{frame}
   \frametitle{UNIXのメッセージ通信プログラム例２}
-  \lstinputlisting{Lst/ipcUnixMessageWriter2.c}
+  \lstinputlisting[firstline=16,frame=lrb]{Lst/ipcUnixMessageWriter.c}
 \end{frame}
 
 \begin{frame}
   \frametitle{UNIXのメッセージ通信プログラム例３}
-  \lstinputlisting{Lst/ipcUnixMessageReader1.c}
+  \lstinputlisting[lastline=19,frame=tlr]{Lst/ipcUnixMessageReader.c}
 \end{frame}
 
 \begin{frame}
   \frametitle{UNIXのメッセージ通信プログラム例４}
-  \lstinputlisting{Lst/ipcUnixMessageReader2.c}
+  \lstinputlisting[firstline=20,frame=lrb]{Lst/ipcUnixMessageReader.c}
   \lstinputlisting{Lst/ipcUnixMessageTest.txt}
 \end{frame}
 

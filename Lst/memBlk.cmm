@@ -1,0 +1,18 @@
+#define MBSIZE sizeof(MemBlk)                   // MemBlk のバイト数
+#define MAGIC  (memPool)                        // 番兵のアドレスを使用する
+
+// 空き領域はリストにして管理される
+struct MemBlk {                                 // 空き領域管理用の構造体
+  MemBlk next;                                  // 次の空き領域アドレス
+  int    size;                                  // 空き領域サイズ
+};
+
+// メモリ管理の初期化
+MemBlk memPool = {null, 0};                     // 空き領域リストの番兵
+public int _end();                              // カーネルの BBS 領域の最後
+
+void mmInit() {                                 // プログラム起動前の初期化
+  memPool.next = _ItoA(addrof(_end));           // 空き領域
+  memPool.next.size = 0xe000 - addrof(_end);    // 空きメモリサイズ
+  memPool.next.next = null;
+}

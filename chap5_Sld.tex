@@ -1,4 +1,5 @@
-\documentclass[dvipdfmx]{beamer}
+%\documentclass[dvipdfmx]{beamer}
+\documentclass{beamer}                   % lualatex の場合
 \usepackage{mySld}
 
 \begin{document}
@@ -217,23 +218,23 @@
 
 \begin{frame}
   \frametitle{セマフォの使用例（複数生産者・複数消費者問題 1/2）}
-  \lstinputlisting{Lst/semMultiProducerConsumer1.c}
+  \lstinputlisting[lastline=17,frame=tlr]{Lst/semMultiProducerConsumer.c}
 \end{frame}
 
 \begin{frame}
   \frametitle{セマフォの使用例（複数生産者・複数消費者問題 2/2）}
-  \lstinputlisting{Lst/semMultiProducerConsumer2.c}
+  \lstinputlisting[firstline=18,frame=lrb]{Lst/semMultiProducerConsumer.c}
 \end{frame}
 
 \begin{frame}
   \frametitle{セマフォの使用例（リーダ・ライタ問題 1/2）}
-  \lstinputlisting{Lst/semReaderWriter1.c}
+  \lstinputlisting[lastline=12,frame=tlr]{Lst/semReaderWriter.c}
   {\bf 排他ロック（exclusive lock）}
 \end{frame}
 
 \begin{frame}
   \frametitle{セマフォの使用例（リーダ・ライタ問題 2/2）}
-  \lstinputlisting{Lst/semReaderWriter2.c}
+  \lstinputlisting[firstline=13,frame=lrb]{Lst/semReaderWriter.c}
   {\bf 共有ロック（shared lock）}
 \end{frame}
 
@@ -278,7 +279,7 @@
 
 \begin{frame}
   \frametitle{TacOSのV操作ルーチン（1/2）（カーネル内）}
-  \lstinputlisting{Lst/tacosSemV1.cmm}
+  \lstinputlisting[lastline=19,frame=tlr]{Lst/tacosSemV.cmm}
   \begin{itemize}
   \item {\tt iSemV()}は割込禁止で呼び出す．
   \end{itemize}
@@ -286,7 +287,7 @@
 
 \begin{frame}
   \frametitle{TacOSのV操作ルーチン（2/2）（カーネル内）}
-  \lstinputlisting{Lst/tacosSemV2.cmm}
+  \lstinputlisting[firstline=20,frame=lrb]{Lst/tacosSemV.cmm}
   \begin{itemize}
   \item {\tt iSemV()}を呼び出す前に割込禁止にする．
   \item {\tt iSemV()}がtrueで返ったらプロセスの切換えを試みる．

@@ -1,5 +1,8 @@
 % スライド用のスタイルファイル
 \ProvidesPackage{mySld}
+\usepackage{luatexja}                              % lualatex の場合
+\usepackage[hiragino-pron]{luatexja-preset}        % ヒラギノフォント
+\usepackage{ascmac}
 
 \usepackage{color}
 \def\|{\verb|} %|
@@ -21,8 +24,8 @@
 }
 
 % リスト環境
-\usepackage{listings,jlisting}
-%\usepackage{listings}
+%\usepackage{listings,jlisting} % platex の場合
+\usepackage{listings}           % lualatex の場合
 \def\lstlistingname{リスト}
 \lstset{language=,
 %  numbers=left,
