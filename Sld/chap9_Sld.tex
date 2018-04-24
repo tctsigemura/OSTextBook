@@ -20,9 +20,7 @@
 %=========================================================================
 \begin{frame}
   \frametitle{固定区画方式}
-  \begin{center}
-    \includegraphics[scale=0.45]{Fig/fixedPartition-crop.pdf}\\
-  \end{center}
+  \fig{scale=0.45}{fixedPartition-crop.pdf}
   予めメモリを大小数種類の区画に分割しておく．
 \end{frame}
 
@@ -44,9 +42,7 @@
 %=========================================================================
 \begin{frame}
   \frametitle{可変区画方式}
-  \begin{center}
-    \includegraphics[scale=0.45]{Fig/variablePartition-crop.pdf}\\
-  \end{center}
+  \fig{scale=0.45}{variablePartition-crop.pdf}
   必要に応じて空き領域から区画を作る．\\
   {\bf 外部フラグメント}が生じる．
 \end{frame}
@@ -55,9 +51,7 @@
 %=========================================================================
 \begin{frame}
   \frametitle{可変区画方式の領域選択方式}
-  \begin{center}
-    \includegraphics[scale=0.4]{Fig/firstBestWorstFit-crop.pdf}\\
-  \end{center}
+  \fig{scale=0.4}{firstBestWorstFit-crop.pdf}
   \begin{itemize}
   \item ファーストフィット（first-fit）方式：アドレス順にさがす．
   \item ベストフィット（best-fit）方式：最小の領域を選択する．
@@ -70,9 +64,7 @@
 \begin{frame}
   \frametitle{空き領域の管理方式（ビットマップ方式）}
   どこに利用可能な空き領域があるかビットマップで管理する．
-  \begin{center}
-    \includegraphics[scale=0.5]{Fig/bitMap-crop.pdf}\\
-  \end{center}
+  \fig{scale=0.5}{bitMap-crop.pdf}
   \begin{itemize}
   \item メモリを一定の大きさのブロックに分割する．
   \item ビットマップの１ビットが１ブロックに対応する．
@@ -100,18 +92,14 @@
   \frametitle{空き領域の管理方式（リスト方式）}
   空き領域をリストにして管理する．\\
   様々なサイズの空き領域が混在しても良い．
-  \begin{center}
-    \includegraphics[scale=0.5]{Fig/memFree-crop.pdf}\\
-  \end{center}
+  \fig{scale=0.5}{memFree-crop.pdf}
   使用中の領域が解放されると隣接する空き領域と合体させる．
 \end{frame}
 
 %=========================================================================
 \begin{frame}
   \frametitle{空き領域リストのデータ構造}
-  \begin{center}
-    \includegraphics[scale=0.38]{Fig/linkedList-crop.pdf}\\
-  \end{center}
+  \fig{scale=0.38}{linkedList-crop.pdf}
   \begin{itemize}
     \item 空き領域の一部を管理データの格納に使用する．
     \item アドレス順のリストにして管理する．

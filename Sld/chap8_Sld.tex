@@ -40,7 +40,7 @@ CPU と同様に重要な装置
   \frametitle{ハードウェア構成}
   メモリを共有するSMP（Symmetric Multiprocessing）システム
   \begin{center}
-    \includegraphics[scale=0.40]{Fig/hardBlock-crop.pdf}\\
+    \fig{scale=0.40}{hardBlock-crop.pdf}
     この講義で前提にしているコンピュータの構成
   \end{center}
 \end{frame}
@@ -48,9 +48,7 @@ CPU と同様に重要な装置
 %=========================================================================
 \begin{frame}
   \frametitle{本章で用いるモデル}
-  \begin{center}
-    \includegraphics[scale=0.40]{Fig/cpuAndMemory-crop.pdf}\\
-  \end{center}
+  \fig{scale=0.40}{cpuAndMemory-crop.pdf}
       {\bf MMU（Memory Management Unit：メモリ管理装置）}
       \begin{itemize}
       \item メモリ保護機構，メモリ再配置機構，仮想記憶
@@ -80,9 +78,7 @@ CPU と同様に重要な装置
     \item プロセスのメモリアクセスはアドレスをチェックする（ハード）
     \item レジスタを操作できるのはカーネルだけ．
   \end{itemize}
-  \begin{center}
-    \includegraphics[scale=0.60]{Fig/baseLimitRegister-crop.pdf}\\
-  \end{center}
+  \fig{scale=0.60}{baseLimitRegister-crop.pdf}
 \end{frame}
 
 %=========================================================================
@@ -92,9 +88,7 @@ CPU と同様に重要な装置
     \item メモリをページに分割する（例：64KiBを256ページに）
     \item ページ毎に，アクセスしてよいプロセスとアクセス方法を記録
   \end{itemize}
-  \begin{center}
-    \includegraphics[scale=0.60]{Fig/lockKey-crop.pdf}\\
-  \end{center}
+  \fig{scale=0.60}{lockKey-crop.pdf}
 \end{frame}
 
 \section{プログラムの再配置}
@@ -107,9 +101,7 @@ CPU と同様に重要な装置
     \item メモリフラグメント（断片）が沢山できる．
     \item フラグメントを解消すために{\bf 動的再配置}が必要！
   \end{itemize}
-  \begin{center}
-    \includegraphics[scale=0.60]{Fig/memoryCompaction-crop.pdf}\\
-  \end{center}
+  \fig{scale=0.60}{memoryCompaction-crop.pdf}
 \end{frame}
 
 %=========================================================================
@@ -149,9 +141,7 @@ CPU と同様に重要な装置
     \item メモリ保護の機能も持つ．
     \item ロードアドレス（B:Base）と大きさ（L:Limit）を記録
   \end{itemize}
-  \begin{center}
-    \includegraphics[scale=0.60]{Fig/relocationRegister-crop.pdf}
-  \end{center}
+  \fig{scale=0.60}{relocationRegister-crop.pdf}
 \end{frame}
 
 \section{主記憶の仮想化}
@@ -159,9 +149,7 @@ CPU と同様に重要な装置
 \begin{frame}
   \frametitle{仮想アドレス空間}
   プロセスは専用の仮想アドレス空間を持っていた（参考）
-  \begin{center}
-    \includegraphics[scale=0.45]{Fig/procOrganization-crop.pdf}
-  \end{center}
+  \fig{scale=0.45}{procOrganization-crop.pdf}
 \end{frame}
 %=========================================================================
 \begin{frame}
@@ -171,9 +159,7 @@ CPU と同様に重要な装置
     \item 仮想アドレスから物理アドレスにMMUがマッピングする．
     \item 通常は{\bf 多重仮想記憶}方式を用いる．
   \end{itemize}
-  \begin{center}
-    \includegraphics[scale=0.40]{Fig/memorySpaceMapping-crop.pdf}
-  \end{center}
+  \fig{scale=0.40}{memorySpaceMapping-crop.pdf}
 \end{frame}
 
 %=========================================================================
@@ -183,15 +169,13 @@ CPU と同様に重要な装置
     \item （伝統的な）UNIXの配置をC言語プログラムと対比
     \item ヒープとスタックの間はどれだけ空けておくか？
   \end{itemize}
-  \begin{center}
-    \includegraphics[scale=0.50]{Fig/memoryMapVsClang-crop.pdf}
-  \end{center}
+  \fig{scale=0.50}{memoryMapVsClang-crop.pdf}
 \end{frame}
 
 %=========================================================================
 \begin{frame}
   \frametitle{前のプログラムをアセンブリ言語に変換したもの}
-  \lstinputlisting[numbers=none]{Lst/cmmSample.s}
+  \lst{numbers=none}{cmmSample.s}
 \end{frame}
 
 \end{document}

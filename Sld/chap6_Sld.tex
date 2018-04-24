@@ -37,9 +37,7 @@
 \section{共有メモリ}
 \begin{frame}
   \frametitle{共有メモリ}
-  \begin{center}
-    \includegraphics[scale=0.6]{Fig/ipcShearedMemory-crop.pdf}
-  \end{center}
+  \fig{scale=0.6}{ipcShearedMemory-crop.pdf}
   \begin{itemize}
   \item 同じ物理メモリを複数のプロセスの仮想メモリ空間に貼り付ける．
   \item MMU（Memory Management Unit）の働きで可能になる．
@@ -50,27 +48,27 @@
 
 \begin{frame}
   \frametitle{UNIXの共有メモリサーバ例（前半）}
-  \lstinputlisting[lastline=20,frame=tlr]{Lst/ipcUnixShearedMemoryServer.c}
+  \lst{lastline=20,frame=tlr}{ipcUnixShearedMemoryServer.c}
 \end{frame}
 
 \begin{frame}
   \frametitle{UNIXの共有メモリサーバ例（後半）}
-  \lstinputlisting[firstline=21,frame=lrb]{Lst/ipcUnixShearedMemoryServer.c}
+  \lst{firstline=21,frame=lrb}{ipcUnixShearedMemoryServer.c}
 \end{frame}
 
 \begin{frame}
   \frametitle{UNIXの共有メモリクライアント例（前半）}
-  \lstinputlisting[lastline=16,frame=trl]{Lst/ipcUnixShearedMemoryClient.c}
+  \lst{lastline=16,frame=trl}{ipcUnixShearedMemoryClient.c}
 \end{frame}
 
 \begin{frame}
   \frametitle{UNIXの共有メモリクライアント例（後半）}
-  \lstinputlisting[firstline=17,frame=lrb]{Lst/ipcUnixShearedMemoryClient.c}
+  \lst{firstline=17,frame=lrb}{ipcUnixShearedMemoryClient.c}
 \end{frame}
 
 \begin{frame}
   \frametitle{UNIXの共有メモリプログラム実行例}
-  \lstinputlisting{Lst/ipcUnixShearedMemoryTest.txt}
+  \lst{language=}{ipcUnixShearedMemoryTest.txt}
   \begin{itemize}
   \item このプログラムは相互排除をやっていない．
   \item このプログラムは{\bf 使用してはならない}．
@@ -80,9 +78,7 @@
 \section{メッセージ通信}
 \begin{frame}
   \frametitle{メッセージ通信}
-  \begin{center}
-    \includegraphics[scale=0.6]{Fig/ipcMessagePassing-crop.pdf}
-  \end{center}
+  \fig{scale=0.6}{ipcMessagePassing-crop.pdf}
   \begin{itemize}
   \item {\tt send()}システムコールでメッセージを送信する．
   \item {\tt receive()}システムコールでメッセージを受信する．
@@ -93,9 +89,9 @@
 \begin{frame}
   \frametitle{通信相手の指定方式（Naming）}
   \begin{center}
-    \includegraphics[scale=0.6]{Fig/ipcDirect-crop.pdf}\\
+    \fig{scale=0.6}{ipcDirect-crop.pdf}
     直接指定方式
-    \includegraphics[scale=0.6]{Fig/ipcIndirect-crop.pdf}\\
+    \fig{scale=0.6}{ipcIndirect-crop.pdf}
     間接指定方式
   \end{center}
   \begin{itemize}
@@ -131,33 +127,31 @@
 
 \begin{frame}
   \frametitle{UNIXのメッセージ通信プログラム例１}
-  \lstinputlisting{Lst/ipcUnixMessage.h}
-  \lstinputlisting[lastline=15,frame=tlr]{Lst/ipcUnixMessageWriter.c}
+  \lst{language={C}}{ipcUnixMessage.h}
+  \lst{lastline=15,frame=tlr}{ipcUnixMessageWriter.c}
 \end{frame}
 
 \begin{frame}
   \frametitle{UNIXのメッセージ通信プログラム例２}
-  \lstinputlisting[firstline=16,frame=lrb]{Lst/ipcUnixMessageWriter.c}
+  \lst{firstline=16,frame=lrb}{ipcUnixMessageWriter.c}
 \end{frame}
 
 \begin{frame}
   \frametitle{UNIXのメッセージ通信プログラム例３}
-  \lstinputlisting[lastline=19,frame=tlr]{Lst/ipcUnixMessageReader.c}
+  \lst{lastline=19,frame=tlr}{ipcUnixMessageReader.c}
 \end{frame}
 
 \begin{frame}
   \frametitle{UNIXのメッセージ通信プログラム例４}
-  \lstinputlisting[firstline=20,frame=lrb]{Lst/ipcUnixMessageReader.c}
-  \lstinputlisting{Lst/ipcUnixMessageTest.txt}
+  \lst{firstline=20,frame=lrb}{ipcUnixMessageReader.c}
+  \lst{}{ipcUnixMessageTest.txt}
 \end{frame}
 
 \section{TacOSのメッセージ通信機構}
 \begin{frame}
   \frametitle{TacOSのメッセージ通信機構}
   クライアント・サーバモデルに特化したプロセス間通信機構を提供する．
-  \begin{center}
-    \includegraphics[scale=0.6]{Fig/tacosMessage-crop.pdf}
-  \end{center}
+  \fig{scale=0.6}{tacosMessage-crop.pdf}
   \begin{enumerate}
   \item サーバプロセスが{\bf リンク}を所有し通信を待ち受ける．
   \item クライアントプロセスは{\tt sndrec()}関数でメッセージを送信する．
@@ -170,7 +164,7 @@
 
 \begin{frame}
   \frametitle{TacOSのリンク構造体}
-  \lstinputlisting{Lst/tacosLink.hmm}
+  \lst{language={C++}}{tacosLink.hmm}
   \begin{itemize}
   \item リンクはサーバが所有する．
   \item セマフォを用いて相互排除と同期を行う．
@@ -180,7 +174,7 @@
 
 \begin{frame}
   \frametitle{TacOSのリンク作成ルーチン}
-  \lstinputlisting{Lst/tacosNewLink.cmm}
+  \lst{language={C++}}{tacosNewLink.cmm}
   \begin{itemize}
   \item 割込み禁止による相互排除を行っている．
   \item リンクの廃棄（削除）はできない．
@@ -190,7 +184,7 @@
 
 \begin{frame}
   \frametitle{TacOSのメッセージ通信ルーチン（サーバ用）}
-  \lstinputlisting{Lst/tacosSendReceive.cmm}
+  \lst{language={C++}}{tacosSendReceive.cmm}
   \begin{itemize}
   \item {\tt receive()}はリンクにメッセージが届くのを待つ．
   \item {\tt receive()}はメッセージが書き込まれたリンクを返す．
@@ -200,7 +194,7 @@
 
 \begin{frame}
   \frametitle{TacOSのメッセージ通信使用例（サーバ側）}
-  \lstinputlisting{Lst/tacosPmMain.cmm}
+  \lst{language={C++}}{tacosPmMain.cmm}
   \begin{itemize}
   \item プロセスマネージャ（サーバプロセス）の例．
   \item サーバはリンクを作成した後，受信，処理，返信を繰り返す．
@@ -212,7 +206,7 @@
 
 \begin{frame}
   \frametitle{TacOSのメッセージ通信ルーチン（クライアント用）}
-  \lstinputlisting{Lst/tacosSndRec.cmm}
+  \lst{language={C++}}{tacosSndRec.cmm}
   \begin{itemize}
   \item {\tt iSemv()}を使用するので割込み禁止による相互排除が必要．
   \item クライアント間での相互排除にセマフォ{\tt s2}を使用．
@@ -221,7 +215,7 @@
 
 \begin{frame}
   \frametitle{TacOSのメッセージ通信使用例（クライアント側）}
-  \lstinputlisting{Lst/tacosPmExec.cmm}
+  \lst{language={C++}}{tacosPmExec.cmm}
   \begin{itemize}
   \item execシステムコールを例にする．
   \item execは{\tt path}のプログラムを新しいプロセスで実行する．
@@ -238,16 +232,10 @@
 \begin{frame}
   \frametitle{TaC7とTaC（参考）}
   \begin{minipage}{0.58\columnwidth}
-    \begin{center}
-      \includegraphics[scale=0.27]{Photo/TeC7.jpg}\\
-      (a) TeC7の写真
-    \end{center}
+    \photo{scale=0.27}{TeC7.jpg}{(a) TeC7の写真}
   \end{minipage}
   \begin{minipage}{0.38\columnwidth}
-    \begin{center}
-      \includegraphics[scale=0.22]{Photo/TaC.jpg}\\
-      (b) TaCとしての使用例
-    \end{center}
+    \photo{scale=0.22}{TaC.jpg}{(b) TaCとしての使用例}
   \end{minipage}
 \vfill
 TeC7は，TacOSを書き込んだマイクロSDカードを装着すると，

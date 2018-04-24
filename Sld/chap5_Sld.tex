@@ -30,7 +30,7 @@
 
 \begin{frame}
   \frametitle{競合（Race Condition，Competition）}
-  \lstinputlisting{Lst/race.txt}
+  \lst{language=}{race.txt}
 \end{frame}
 
 \section{クリティカルセクション（Critical Section）}
@@ -59,7 +59,7 @@
 
 \begin{frame}
   \frametitle{割込み禁止}
-  \lstinputlisting{Lst/disableInterrupt.txt}
+  \lst{language=}{disableInterrupt.txt}
   \begin{itemize}
   \item エントリーセクション（Entry Section）\\
     割り込み禁止の場合はDI命令
@@ -92,7 +92,7 @@
 
 \begin{frame}
   \frametitle{専用命令（TS命令の使用例）}
-  \lstinputlisting{Lst/testAndSet.s}
+  \lst{language=}{testAndSet.s}
 \end{frame}
 
 \begin{frame}
@@ -112,7 +112,7 @@
 
 \begin{frame}
   \frametitle{専用命令（SW命令の使用例）}
-  \lstinputlisting{Lst/swap.s}
+  \lst{language=}{swap.s}
 \end{frame}
 
 \begin{frame}
@@ -127,13 +127,13 @@
   \item バスのロックを解除する
   \end{enumerate}
   \vspace{1em}
-  \lstinputlisting{Lst/cas.txt}
+  \lst{language=}{cas.txt}
   {\bf ロックフリー（Lock-free）}なアルゴリズム
 \end{frame}
 
 \begin{frame}
   \frametitle{Peterson のアルゴリズム}
-  \lstinputlisting{Lst/peterson.txt}
+  \lst{language=}{peterson.txt}
 \end{frame}
 
 \section{セマフォ（Semaphore）}
@@ -149,9 +149,7 @@
 
 {\bf セマフォ（Semaphore：腕木式信号機）}の元々の意味はこれ！
 
-\begin{center}
-\includegraphics[scale=0.35]{Fig/semaphore-crop.pdf}
-\end{center}
+\fig{scale=0.35}{semaphore-crop.pdf}
 \end{frame}
 
 \begin{frame}
@@ -183,7 +181,7 @@
 
   \begin{center}
     \begin{minipage}{0.6\columnwidth}
-      \lstinputlisting{Lst/semP.c}
+      \lst{language={C}}{semP.c}
     \end{minipage}
   \end{center}
 \end{frame}
@@ -200,48 +198,48 @@
 
   \begin{center}
     \begin{minipage}{0.6\columnwidth}
-      \lstinputlisting{Lst/semV.c}
+      \lst{language={C}}{semV.c}
     \end{minipage}
   \end{center}
 \end{frame}
 
 \begin{frame}
   \frametitle{セマフォの使用例（相互排除問題）}
-  \lstinputlisting{Lst/semMutex.c}
+  \lst{language={C}}{semMutex.c}
   {\bf 初期値が１のセマフォを用いる．}
 \end{frame}
 
 \begin{frame}
   \frametitle{セマフォの使用例（生産者・消費者問題）}
-  \lstinputlisting{Lst/semProducerConsumer.c}
+  \lst{language={C}}{semProducerConsumer.c}
 \end{frame}
 
 \begin{frame}
   \frametitle{セマフォの使用例（複数生産者・複数消費者問題 1/2）}
-  \lstinputlisting[lastline=17,frame=tlr]{Lst/semMultiProducerConsumer.c}
+  \lst{language={C},lastline=17,frame=tlr}{semMultiProducerConsumer.c}
 \end{frame}
 
 \begin{frame}
   \frametitle{セマフォの使用例（複数生産者・複数消費者問題 2/2）}
-  \lstinputlisting[firstline=18,frame=lrb]{Lst/semMultiProducerConsumer.c}
+  \lst{language={C},firstline=18,frame=lrb}{semMultiProducerConsumer.c}
 \end{frame}
 
 \begin{frame}
   \frametitle{セマフォの使用例（リーダ・ライタ問題 1/2）}
-  \lstinputlisting[lastline=12,frame=tlr]{Lst/semReaderWriter.c}
+  \lst{language={C},lastline=12,frame=tlr}{semReaderWriter.c}
   {\bf 排他ロック（exclusive lock）}
 \end{frame}
 
 \begin{frame}
   \frametitle{セマフォの使用例（リーダ・ライタ問題 2/2）}
-  \lstinputlisting[firstline=13,frame=lrb]{Lst/semReaderWriter.c}
+  \lst{language={C},firstline=13,frame=lrb}{semReaderWriter.c}
   {\bf 共有ロック（shared lock）}
 \end{frame}
 
 \section{TacOSのセマフォ}
 \begin{frame}
   \frametitle{TacOSのセマフォ構造体（カーネル内）}
-  \lstinputlisting{Lst/sem.hmm}
+  \lst{language={C}}{sem.hmm}
   \begin{itemize}
     \item セマフォは最大30個（TaCのメモリは小さい）
     \item セマフォ構造体の名前は{\tt Sem}
@@ -253,9 +251,7 @@
 
 \begin{frame}
   \frametitle{TacOSのセマフォ関連データ構造（カーネル内）}
-  \begin{center}
-    \includegraphics[scale=0.45]{Fig/tacosSemaphore-crop.pdf}
-  \end{center}
+  \fig{scale=0.45}{tacosSemaphore-crop.pdf}
   \begin{itemize}
     \item TacOSでは，セマフォを{\tt semTbl}のインデクスで識別する．
     \item Sem構造体（\#0，\#1，\#29）は，未使用，待ちあり，待ちなしの例
@@ -264,22 +260,22 @@
 
 \begin{frame}
   \frametitle{TacOSでのセマフォの架空の使用例}
-  \lstinputlisting{Lst/tacosSemUse.cmm}
+  \lst{language={C}}{tacosSemUse.cmm}
 \end{frame}
 
 \begin{frame}
   \frametitle{TacOSのセマフォ割当て解放ルーチン（カーネル内）}
-  \lstinputlisting{Lst/tacosNewSem.cmm}
+  \lst{language={C}}{tacosNewSem.cmm}
 \end{frame}
 
 \begin{frame}
   \frametitle{TacOSのP操作ルーチン（カーネル内）}
-  \lstinputlisting{Lst/tacosSemP.cmm}
+  \lst{language={C}}{tacosSemP.cmm}
 \end{frame}
 
 \begin{frame}
   \frametitle{TacOSのV操作ルーチン（1/2）（カーネル内）}
-  \lstinputlisting[lastline=19,frame=tlr]{Lst/tacosSemV.cmm}
+  \lst{language={C},lastline=19,frame=tlr}{tacosSemV.cmm}
   \begin{itemize}
   \item {\tt iSemV()}は割込禁止で呼び出す．
   \end{itemize}
@@ -287,7 +283,7 @@
 
 \begin{frame}
   \frametitle{TacOSのV操作ルーチン（2/2）（カーネル内）}
-  \lstinputlisting[firstline=20,frame=lrb]{Lst/tacosSemV.cmm}
+  \lst{language={C++},firstline=20,frame=lrb}{tacosSemV.cmm}
   \begin{itemize}
   \item {\tt iSemV()}を呼び出す前に割込禁止にする．
   \item {\tt iSemV()}がtrueで返ったらプロセスの切換えを試みる．
@@ -298,7 +294,7 @@
 
 \begin{frame}
   \frametitle{TacOSのCPUフラグ操作関数（カーネル内）}
-  \lstinputlisting{Lst/setPri.s}
+  \lst{language=}{setPri.s}
   \begin{itemize}
   \item CPUのPSWのフラグに割込禁止ビットがある．
   \item {\tt C--}言語から{\tt setPri()}関数として呼び出せるようにするには，

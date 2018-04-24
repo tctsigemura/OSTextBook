@@ -32,7 +32,7 @@
 %=========================================================================
 \begin{frame}
   \frametitle{データ構造の初期化}
-  \lstinputlisting{Lst/memBlk.cmm}
+  \lst{language={C++}}{memBlk.cmm}
   \begin{itemize}
   \item {\tt memInit()}はカーネル起動時に一度だけ実行される．
   \item 番兵付きのリストで管理する．
@@ -42,9 +42,7 @@
 %=========================================================================
 \begin{frame}
   \frametitle{初期化直後のデータ構造}
-  \begin{center}
-    \includegraphics[scale=0.6]{Fig/mmInit-crop.pdf}\\
-  \end{center}
+  \fig{scale=0.6}{mmInit-crop.pdf}
   \begin{itemize}
   \item {\tt \_end()}はカーネルサイズにより決まる．
   \item EOOO より後ろはビデオメモリやIPL ROMがある．
@@ -57,7 +55,7 @@
   右のプログラムでa，b，cを割付けたときのデータ構造
   \begin{center}
     \begin{minipage}{0.39\columnwidth}
-    \includegraphics[scale=0.5]{Fig/mmAlloc-crop.pdf}
+    \fig{scale=0.5}{mmAlloc-crop.pdf}
     \end{minipage}
     \begin{minipage}{0.59\columnwidth}
       \begin{lstlisting}
@@ -72,7 +70,7 @@ c = mmAlloc( 1024 );  // 1KiB の領域を割り付ける
 %=========================================================================
 \begin{frame}
   \frametitle{メモリの割付けプログラム}
-  \lstinputlisting[basicstyle={\tiny\ttfamily}]{Lst/mmAlloc.cmm}
+  \lst{basicstyle={\tiny\ttfamily},language={C++}}{mmAlloc.cmm}
 \end{frame}
 
 %=========================================================================
@@ -80,22 +78,17 @@ c = mmAlloc( 1024 );  // 1KiB の領域を割り付ける
   \frametitle{領域の解放}
   b，cを開放したときのデータ構造\\\vfill
   \begin{minipage}{0.49\columnwidth}
-    \begin{center}
-      \includegraphics[scale=0.6]{Fig/mmFree1-crop.pdf}
-    \end{center}
+    \fig{scale=0.6}{mmFree1-crop.pdf}
   \end{minipage}
   \begin{minipage}{0.49\columnwidth}
-    \begin{center}
-      \includegraphics[scale=0.6]{Fig/mmFree2-crop.pdf}
-    \end{center}
+    \fig{scale=0.6}{mmFree2-crop.pdf}
   \end{minipage}
 \end{frame}
 
 %=========================================================================
 \begin{frame}
   \frametitle{メモリの解放プログラム（前半）}
-  \lstinputlisting[lastline=15,frame=tlr]{Lst/mmFree.cmm}
-
+  \lst{language={C++},lastline=15,frame=tlr}{mmFree.cmm}
   \begin{itemize}
   \item 領域の本当の先頭アドレスを計算する．
   \item {\tt MAGIC}を確認する．
@@ -106,7 +99,7 @@ c = mmAlloc( 1024 );  // 1KiB の領域を割り付ける
 %=========================================================================
 \begin{frame}
   \frametitle{メモリの解放プログラム}
-  \lstinputlisting[firstline=16,frame=lrb]{Lst/mmFree.cmm}
+  \lst{language={C++},firstline=16,frame=lrb}{mmFree.cmm}
 \end{frame}
 
 \end{document}
