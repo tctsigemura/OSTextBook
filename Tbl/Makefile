@@ -1,11 +1,11 @@
 .SUFFIXES:
 .SUFFIXES: .tex .pdf
 
-PDFS = threadTimeTbl.pdf threadTimeGrph.pdf schedulingObjective.pdf
+PDFS = threadTimeTbl.pdf threadTimeGrph.pdf schedulingObjective.pdf \
+       segmentTableAttr.pdf
 
 %.pdf : %.tex
-	platex $*.tex
-	dvipdfmx $*.dvi
+	lualatex $*.tex
 	open $*.pdf
 
 all : ${PDFS}
