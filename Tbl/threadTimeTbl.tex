@@ -1,5 +1,8 @@
 % Mac Pro
-\documentclass[dvipdfmx]{standalone}
+\RequirePackage{luatex85}
+\documentclass{standalone}
+\usepackage{luatexja}                              % lualatex の場合
+\usepackage[hiragino-pron]{luatexja-preset}        % ヒラギノフォント
 \begin{document}
 \tt\footnotesize
 \begin{tabular}{r | r r r r r r r r r r}
@@ -24,7 +27,7 @@
                    & 2.011 & 2.244 & 2.462 & 2.679 & 2.846 \\
 システムCPU時間(s) & 0.002 & 0.002 & 0.002 & 0.001 & 0.001
                    & 0.002 & 0.003 & 0.003 & 0.003 & 0.002 \\
-\end{tabular}~
+\end{tabular}
 \end{document}
 
 

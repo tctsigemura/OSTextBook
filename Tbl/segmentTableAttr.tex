@@ -1,0 +1,16 @@
+\RequirePackage{luatex85}
+\documentclass{standalone}
+\usepackage{luatexja}                              % lualatex の場合
+\usepackage[hiragino-pron]{luatexja-preset}        % ヒラギノフォント
+\begin{document}
+\begin{tabular}{l|r|l}
+\hline\hline
+\multicolumn{1}{c}{名称} &
+ \multicolumn{1}{|c}{ビット数} &
+ \multicolumn{1}{|c}{意　味} \\
+\hline
+V（Valid）                 & 1 & メモリにロードされている． \\
+D（Dirty）                 & 1 & ロード後に変更された． \\
+RWX（Read/Write/eXecute）  & 3 & 許されるアクセス方法． \\
+\end{tabular}
+\end{document}

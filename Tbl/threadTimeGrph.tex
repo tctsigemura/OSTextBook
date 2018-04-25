@@ -1,4 +1,7 @@
-\documentclass[dvipdfmx]{standalone}
+\RequirePackage{luatex85}
+\documentclass{standalone}
+\usepackage{luatexja}                              % lualatex の場合
+\usepackage[hiragino-pron]{luatexja-preset}        % ヒラギノフォント
 \usepackage{tikz}
 \usetikzlibrary{datavisualization}
 \begin{document}

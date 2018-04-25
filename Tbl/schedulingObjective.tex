@@ -1,6 +1,8 @@
-\documentclass[dvipdfmx]{standalone}
+\RequirePackage{luatex85}
+\documentclass{standalone}
+\usepackage{luatexja}                              % lualatex の場合
+\usepackage[hiragino-pron]{luatexja-preset}        % ヒラギノフォント
 \begin{document}
-\small
 \begin{tabular}{l|l}
 \hline\hline
 \multicolumn{1}{c}{コンピュータの種類} & \multicolumn{1}{|c}{重視する性能} \\
@@ -10,5 +12,5 @@
 デスクトップパソコン               & レスポンス時間 \\
 モバイルデバイス                   & レスポンス時間，省エネルギー \\
 組込み制御                         & 締め切り \\
-\end{tabular}~
+\end{tabular}
 \end{document}
