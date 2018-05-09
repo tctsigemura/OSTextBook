@@ -320,6 +320,42 @@ IA-32ではセグメンテーション機構が出力する一次元のアドレ
 
 %==========================================================================
 %\newpage
+\section*{練習問題}
+セグメントテーブルが次のような状態の時，以下の問に答えなさい．
+なお，仮想アドレスは「セグメント番号：物理アドレス」と表記するものとします．
+また，物理アドレスは8ビットとします．
+
+\begin{center}
+\begin{tabular}{r |r|r|r|}
+\multicolumn{1}{c}{} &
+\multicolumn{1}{c}{C} &
+\multicolumn{1}{c}{B} &
+\multicolumn{1}{c}{L} \\
+\cline{2-4}
+0   & V=1 & 0x30 & 0x20 \\
+1   & V=1 & 0x80 & 0x30 \\
+2   & V=1 & 0x00 & 0x20 \\
+3   & V=0 & 0x50 & 0x20 \\
+... & ... & ... & ... \\
+\cline{2-4}
+\end{tabular}
+\end{center}
+
+\begin{enumerate}
+\item 次の仮想アドレスに対応する物理アドレスを答えなさい．
+  但し，物理アドレスに変換できない場合はエラーと答えなさい．
+  \begin{enumerate}
+    \item \texttt{0x0:0x10}
+    \item \texttt{0x1:0x10}
+    \item \texttt{0x1:0x40}
+    \item \texttt{0x2:0x10}
+    \item \texttt{0x2:0x20}
+    \item \texttt{0x3:0x10}
+  \end{enumerate}
+\item セグメントの配置を記入した
+物理アドレス空間のメモリマップを作成しなさい．
+\end{enumerate}
+
 \section*{問題}
 スタックセグメントを意識した
 \emph{前向きに伸びるセグメント}も利用可能な

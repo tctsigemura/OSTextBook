@@ -1,0 +1,18 @@
+\RequirePackage{luatex85}
+\documentclass{standalone}
+\usepackage{luatexja}                              % lualatex の場合
+\usepackage[hiragino-pron]{luatexja-preset}        % ヒラギノフォント
+\usepackage{multirow}
+\begin{document}
+\begin{tabular}{l|r|l}
+\hline\hline
+\multicolumn{1}{c}{名称} &
+ \multicolumn{1}{|c}{ビット数} &
+ \multicolumn{1}{|c}{意　味} \\
+\hline
+V（Valid）               & 1 & フレームが割り付けられている．\\
+R（Reference）           & 1 & ページの内容が参照された． \\
+D（Dirty）               & 1 & ページの内容が変更された． \\
+RWX（Read/Write/eXecute）& 3 & 許されるアクセス方法．\\
+\end{tabular}
+\end{document}

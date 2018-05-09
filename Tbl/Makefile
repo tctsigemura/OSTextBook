@@ -2,7 +2,7 @@
 .SUFFIXES: .tex .pdf
 
 PDFS = threadTimeTbl.pdf threadTimeGrph.pdf schedulingObjective.pdf \
-       segmentTableAttr.pdf
+       segmentTableAttr.pdf pageTableAttr.pdf
 
 %.pdf : %.tex
 	lualatex $*.tex
