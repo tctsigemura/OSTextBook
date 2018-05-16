@@ -289,7 +289,7 @@
   \item プロセスあたり最低でも3区画必要 \\
     $2MiB \times 3 = 6MiB$
   \item 400個のプロセスがあったとすると \\
-    $6MiB \times 400 = 2.4GiB$
+    $6MiB \times 400 = 2.4GiB$（8GiBの30\%）
   \item 二段のページテーブルでは区画が大きくなりすぎる．
   \item 区画を小さくするために段数を多くする．
   \end{itemize}
@@ -303,8 +303,99 @@
   \item ページサイズ（フレームサイズ）は4KiB
   \item ページテーブルの区画は$2^9 \times 8B = 4KiB$
   \item ページテーブルは最低7フレーム（28KiB）
-  \item 400プロセスでも約11MiBで済む（二段では2.4GiBだった）
+  \item 400プロセスでも約11MiBで済む（8GiBの0.14\%）
   \end{itemize}
+\end{frame}
+
+%=========================================================================
+\begin{frame}
+  \frametitle{逆引きページテーブル}
+  \fig{scale=0.4}{pagingInvertedTable-crop.pdf}
+  \begin{itemize}
+  \item テーブルでフレーム番号とページ番号の立場が逆転（逆引き）
+  \item システム全体でページテーブル一つ（プロセス毎ではない）
+  \item どの仮想アドレス空間のエントリか識別するための pid あり
+  \end{itemize}
+\end{frame}
+
+%=========================================================================
+\begin{frame}
+  \frametitle{逆引きページテーブル}
+  \emph{ページテーブルのサイズ}
+  \begin{itemize}
+  \item 8GiBのメモリを4KiBのページで分割する場合のエントリ数\\
+    \centerline{$8GiB \div 4KiB = 2^{33} \div 2^{12} = 2Mi$エントリ}
+  \item １エントリ8バイト仮定すると
+    \centerline{$2Mi \times 8B = 12MiB$}
+  \item システム全体で12MiBで済む（8GiBの0.2\%）
+  \end{itemize}
+  \vfill
+  \emph{Page Table Walk}
+  \begin{itemize}
+  \item CPUは仮想アドレスの他にpid（プロセス番号を出力）
+  \item ページテーブルを pid と p（ページ番号）で探索する
+  \item 線形探索などを用いると遅くて実用にならない
+  \end{itemize}
+\end{frame}
+
+%=========================================================================
+\begin{frame}
+  \frametitle{逆引きページテーブル（IBM 801 の例）}
+  \fig{scale=0.4}{paging801-crop.pdf}
+  \begin{itemize}
+  \item ハッシュ表を用いて探索を高速化
+  \item ハッシュ表の大きさは二の累乗（$0 〜 2^n-1$）
+  \item ページテーブルはnext を使用してチェインを作る
+  \end{itemize}
+\end{frame}
+
+%=========================================================================
+\begin{frame}
+  \frametitle{逆引きページテーブル（IBM 801 の例）}
+  \emph{ハッシュ表を用いた Page Table Walk}
+  \begin{itemize}
+  \item pid と p を用いてハッシュ関数を計算する（$h \leftarrow f(pid, p)$）\\
+    （ハッシュ関数は pid と p の XOR。。。速度優先）
+    \vfill
+  \item ハッシュ表の第 h エントリを見る
+    \begin{itemize}
+      \item 空（図では×）ならページ不在（\emph{割込み！}）
+      \item 空でなければページテーブルのインデクス（f）
+    \end{itemize}
+    \vfill
+  \item ページテーブルの第 f エントリの内容を見る
+    \begin{itemize}
+      \item pid ，p が一致 →  この時の f をフレーム番号にする（\emph{完了！}）
+      \item pid ，p が一致しない →  next を見る
+        \begin{itemize}
+        \item 空（図では×）ならページ不在（\emph{割込み！}）
+        \item 空でなければ\\ 
+          ページテーブルのインデクス（f）を更新して再度トライ
+        \end{itemize}
+    \end{itemize}
+  \end{itemize}
+
+  \emph{TLB} : 不可欠！
+\end{frame}
+
+%=========================================================================
+\begin{frame}
+  \frametitle{練習問題}
+  \begin{enumerate}
+  \item[(1)] 一回のメモリアクセス時間に1ns，page table walk に2nsかかるとする，
+    TLBのヒット率が90パーセントの時の平均メモリアクセス時間を計算しなさい．
+  \item[(2)] 図12.7 において，
+    $p=1$の仮想アドレスの範囲を8桁の16進数で答えなさい．
+  \item[(3)] 図12.7 において，
+    $p=1$，$q=1$の仮想アドレスの範囲を8桁の16進数で答えなさい．
+  \item[(4)] 逆引きページテーブルを用いる場合，
+    TLBに格納すべき最低限の情報の範囲を考察しなさい．
+  \item[(5)] 図12.11 に，
+    $pid=3$，$p=2$のページがフレーム１にマッピングされるような
+    ページテーブルの状態を書き込みなさい．
+  \item[(6)] 逆引きページテーブルを用いるシステムで，
+    プロセス間でページの共有が可能か考察しなさい．
+  \end{enumerate}
 \end{frame}
 
 \end{document}
