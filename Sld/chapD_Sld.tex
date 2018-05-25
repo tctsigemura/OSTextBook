@@ -1,0 +1,217 @@
+%\documentclass[dvipdfmx]{beamer}
+\documentclass{beamer}                   % lualatex の場合
+\usepackage{mySld}
+
+\begin{document}
+\title[主記憶]{オペレーティングシステム\\第１３章 仮想記憶}
+\date{}
+
+\begin{frame}
+  \titlepage
+\end{frame}
+
+%\section{}
+%=========================================================================
+%\begin{frame}
+%  \frametitle{}
+%\end{frame}
+
+\section{仮想記憶}
+%=========================================================================
+\begin{frame}
+  \frametitle{基本概念}
+  ページングをベースに仮想記憶を実現する．
+  \begin{itemize}
+  \item システムの使用メモリ合計が物理メモリより大きい． → 実行可
+  \item 単一のプログラムがメモリより大きい。 → 実行可
+  \item ページテーブルのV=0を上手く使用する．
+  \item V=0のページにアクセスするとページ不在割込み → OSへ
+  \item プロセステーブルのV=0に二つの場合がある．
+    \begin{itemize}
+      \item[1.] 無効な領域 → プロセス終了
+      \item[2.] \emph{バッキングストア}に退避中 → 復旧して再開
+    \end{itemize}
+  \item プロセス生成時にバッキングストアにプロセスのイメージを作る．
+  \item Windows，macOS，Linux等，現代のOSのほとんどが採用している．
+  \end{itemize}
+\end{frame}
+
+%=========================================================================
+\begin{frame}
+  \frametitle{仮想記憶の基本}
+  \fig{scale=0.45}{virtualMemoryBasic-crop.pdf}
+\end{frame}
+
+%=========================================================================
+\begin{frame}
+  \frametitle{デマンドページング（Demand Paging）}
+  \fig{scale=0.45}{virtualMemoryWithZMagic-crop.pdf}
+  \begin{itemize}
+  \item ページをswap-inするための方式の一つ．
+  \item 全てのページが不在の状態からスタートする．
+  \item ページ不在を起こしたページをswap-inする．\\
+    （使用しないページを読み込むような無駄が無い）
+  \end{itemize}
+\end{frame}
+
+%=========================================================================
+\begin{frame}
+  \frametitle{プログラムファイルの直接swap-inによる実行}
+  \fig{scale=0.45}{virtualMemoryWithZMagic-crop.pdf}
+  \begin{itemize}
+  \item デマンドページング用の実行可能形式ファイルを用いる．\\
+    （このファイルはページサイズを意識した構造になっている）
+  \item プログラムはファイルからswap-inする（R-Xに設定）．
+  \item 初期化データはファイルからswap-inする（RW-に設定）．
+  \item 非初期化データ，ヒープ，スタックはゼロにする（RW-に設定）．
+  \end{itemize}
+\end{frame}
+
+%=========================================================================
+\begin{frame}
+  \frametitle{プログラムのswap-out}
+  \fig{scale=0.45}{virtualMemoryWithZMagic-crop.pdf}
+  \begin{itemize}
+  \item フレームが枯渇したら使用頻度の低いフレームを解放し再利用する．
+  \item プログラム（R-X）は変化しないのでswap-outしない．
+  \item 初期化データ（RW-）はバッキングストアにswap-outする．
+  \item 非初期化データ，ヒープ，スタックもswap-outする．
+  \end{itemize}
+\end{frame}
+
+%=========================================================================
+\begin{frame}
+  \frametitle{Copy on Write（１）}
+  \fig{scale=0.40}{virtualMemoryFork-crop.pdf}
+  \begin{itemize}
+  \item fork-exec ではアドレス空間のコピーに無駄が多い． → vfork
+  \item vforkは使いにくい．使いやすいforkを改良する．
+  \item forkの後，書き込み可能ページを一時的に\texttt{R--}に設定しておく．
+  \end{itemize}
+\end{frame}
+
+%=========================================================================
+\begin{frame}
+  \frametitle{Copy on Write（２）}
+  \fig{scale=0.40}{virtualMemoryCOW-crop.pdf}
+  \begin{itemize}
+  \item 例えばスタックに\emph{書き込み}があるとメモリ保護割込みが発生する．
+  \item この時点でOSが新しいフレームを割当て，内容を\emph{コピー}する．
+  \item ページを\texttt{RW-}に変更しプロセスを再開する．
+  \end{itemize}
+\end{frame}
+
+%=========================================================================
+\begin{frame}
+  \frametitle{メモリマップドファイル（１）}
+  \fig{scale=0.45}{virtualMemoryWithMmap-crop.pdf}
+  \begin{itemize}
+  \item 仮想記憶機構を用いたファイルへのアクセス手段である．
+  \item プロセスはメモリ上の配列のようにファイルにアクセスできる．
+  \item ファイルアクセスで，一々システムコールを使用しない．\\
+    （軽いファイルアクセス手段）
+  \item 同じファイルを複数プロセスがマッピング → 共有メモリになる．
+  \end{itemize}
+\end{frame}
+
+%=========================================================================
+\begin{frame}[fragile]
+  \frametitle{メモリマップドファイル（２）}
+  UNIX のメモリマップドファイルの例（mmapシステムコール）
+
+\begin{lstlisting}[numbers=none]
+void * mmap(void *addr, size_t len, int prot, int flags, int fd, off_t offset);
+\end{lstlisting}
+
+  \begin{description}
+  \item[\emph{戻り値}：] マップされた領域の先頭アドレスが返される．
+  \item[\texttt{addr}：] マップしたい仮想アドレス空間の先頭アドレスを渡す．
+  \item[\texttt{len}：] マップする領域の大きさを渡す．
+  \item[\texttt{prot}：] 保護モード（protection：RWX）を表す値を渡す．
+  \item[\texttt{flags}：]共用する（\|MAP_SHARED|）／
+    しない（\|MAP_PRIVATE|）等
+  \item[\texttt{fd}：] オープン済みファイルのファイルディスクリプタを渡す．
+  \item[\texttt{offset}：] ファイル中のマッピング位置．
+  \end{description}
+
+  アドレスや長さはページサイズの整数倍にする．
+\end{frame}
+
+%=========================================================================
+\begin{frame}
+  \frametitle{メモリマップドファイル（３）}
+  \lst{numbers=none}{mmapTest.c}
+\end{frame}
+
+%=========================================================================
+\begin{frame}
+  \frametitle{メモリマップドファイル（４）}
+  メモリマップドファイルの仕組み
+  \fig{scale=0.45}{virtualMemoryWithMmap-crop.pdf}
+  \begin{itemize}
+  \item ファイルの読み込みはデマンドページングの要領で行う．
+  \item ファイルの書き込みは
+    \begin{itemize}
+      \item Dirty ページを定期的にファイルに書き戻す．
+      \item プロセスの終了やマッピングの解消時に書き戻す．
+    \end{itemize}
+  \end{itemize}
+\end{frame}
+
+%=========================================================================
+\begin{frame}
+  \frametitle{メモリマップドファイル（５）}
+  read/writeシステムコールとの比較
+  \fig{scale=0.45}{mmapVsReadWrite-crop.pdf}
+  \begin{itemize}
+  \item ファイルを操作する度にシステムコールを発行する．\\
+    （システムコールは重い処理）
+  \item ディスクキャッシュとプログラムのバッファ間でメモリコピー\\
+    （メモリコピーは重い処理）
+  \end{itemize}
+\end{frame}
+
+%=========================================================================
+\begin{frame}[fragile]
+  \frametitle{メモリマップドファイル（６）}
+  プロセスにローカルなマッピング
+  \fig{scale=0.45}{virtualMemoryWithPrivateMap-crop.pdf}
+  \begin{itemize}
+  \item これまでは\|MAP_SHARD|の例だった．
+  \item \|MAP_PRIVATE|の例を紹介する．
+  \item 最初は「ファイルデータ１」のように共有される（\texttt{R--}）．
+  \item 書き換えが発生した時点でコピーを作る（Copy on Write）．
+  \item 「ファイルデータ２」のようにプロセスは別々のコピーを参照する．
+  \end{itemize}
+\end{frame}
+
+%=========================================================================
+\begin{frame}[fragile]
+  \frametitle{メモリマップドファイル（７）}
+  プログラムの実行とメモリマップドファイル
+  \fig{scale=0.40}{virtualMemoryWithZMagic-crop.pdf}
+  \begin{itemize}
+  \item 実行形式ファイルをメモリにマッピングする．
+  \item プログラムは，\|R-X|，\|MAP_SHARD|でマッピングする．\\
+    （プログラムはプロセス間で共用される）
+  \item 初期化データは，\|RW-|，\|MAP_PRIVATE|でマッピングする．
+  \item 非初期化データ，ヒープ，スタックはファイルにマッピングしない．
+  \end{itemize}
+\end{frame}
+
+%=========================================================================
+\begin{frame}
+  \frametitle{練習問題}
+  \begin{enumerate}
+  \item[(1)] 次の言葉の意味を説明しなさい．
+    \begin{itemize}
+      \item 仮想記憶
+      \item デマンドページング
+      \item swap-in，swap-out
+      \item Copy on Write
+      \item メモリマップドファイル
+    \end{itemize}
+  \end{enumerate}
+\end{frame}
+
+\end{document}

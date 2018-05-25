@@ -218,12 +218,13 @@ CPUのアドレスにプロセスのロードアドレス（B）を足した値�
 全てのプロセスが0番地から始まるアドレス空間を持つことが可能になる．
 プロセス毎に完全に独立したアドレス空間を持つ方式を{\bf 多重仮想記憶}と呼ぶ．
 実行可能形式のプログラムは，いつも0番地にロードされ実行される．
-再配置可能なオブジェクトでなくても良い．
+%再配置可能なオブジェクトでなくても良い．
 
 \subsection{仮想アドレス空間の配置}
 仮想アドレス空間にプログラムや変数を配置する方法は
 オペレーティングシステムの種類により一定ではない．
-\figref{memoryMapVsClang}にUNIXの例を示す．
+\figref{memoryMapVsClang}とリスト\ref{cmmSample}に
+UNIX上でC言語プログラムが配置される様子を示す．
 
 \myfigure{btp}{scale=0.6}{Fig/memoryMapVsClang-crop.pdf}
 {仮想アドレス空間の配置例}{memoryMapVsClang}
@@ -238,7 +239,7 @@ CPUのアドレスにプロセスのロードアドレス（B）を足した値�
 関数内で{\tt static}修飾した変数も含まれる．}は，
 非初期化データ領域（{\bf bssセグメント}）に配置される．
 \item {\tt main()}関数は機械語に変換され，
-0番地から始まるプログラム領域（{\bf textセグメント}）に配置される．
+プログラム領域（{\bf textセグメント}）に配置される．
 \item 関数のローカル変数\footnote{
 正確には自動変数．
 関数内で{\tt static}修飾した変数は含まれない．}は，
@@ -250,9 +251,5 @@ CPUのアドレスにプロセスのロードアドレス（B）を足した値�
 ヒープは必要に応じて仮想アドレス空間を0番地とは逆の方向に伸びていく．
 \end{itemize}
 
-\begin{figure}
-\begin{quote}
 \lstinputlisting[caption=C言語プログラムをTaCの機械語に変換した例,
-numbers=none]{Lst/cmmSample.s}
-\end{quote}
-\end{figure}
+  numbers=none,float=btp,label=cmmSample]{Lst/cmmSample.s}
