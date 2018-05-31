@@ -177,7 +177,7 @@ void * mmap(void *addr, size_t len, int prot, int flags, int fd, off_t offset);
   プロセスにローカルなマッピング
   \fig{scale=0.45}{virtualMemoryWithPrivateMap-crop.pdf}
   \begin{itemize}
-  \item これまでは\|MAP_SHARD|の例だった．
+  \item これまでは\|MAP_SHARED|の例だった．
   \item \|MAP_PRIVATE|の例を紹介する．
   \item 最初は「ファイルデータ１」のように共有される（\texttt{R--}）．
   \item 書き換えが発生した時点でコピーを作る（Copy on Write）．
@@ -188,30 +188,350 @@ void * mmap(void *addr, size_t len, int prot, int flags, int fd, off_t offset);
 %=========================================================================
 \begin{frame}[fragile]
   \frametitle{メモリマップドファイル（７）}
+  無名メモリ
+  \fig{scale=0.45}{virtualMemoryWithAnonymousMap-crop.pdf}
+  \begin{itemize}
+  \item ファイルに関連付けられないがメモリ領域．
+  \item \|MAP_ANON|フラグを用いる．
+  \item アクセスがあった時点で作成される（デマンドページング）．
+  \item ページの初期値は\emph{ゼロ}．
+  \end{itemize}
+\end{frame}
+
+%=========================================================================
+\begin{frame}[fragile]
+  \frametitle{メモリマップドファイル（８）}
   プログラムの実行とメモリマップドファイル
   \fig{scale=0.40}{virtualMemoryWithZMagic-crop.pdf}
   \begin{itemize}
   \item 実行形式ファイルをメモリにマッピングする．
-  \item プログラムは，\|R-X|，\|MAP_SHARD|でマッピングする．\\
+  \item プログラムは，\|R-X|，\|MAP_SHARED/PRIVATE|でマッピングする．\\
     （プログラムはプロセス間で共用される）
   \item 初期化データは，\|RW-|，\|MAP_PRIVATE|でマッピングする．
-  \item 非初期化データ，ヒープ，スタックはファイルにマッピングしない．
+  \item 非初期化データ，ヒープ，スタックは無名メモリ（\|RW-|，\|MAP_ANON|）
   \end{itemize}
+\end{frame}
+
+%=========================================================================
+\begin{frame}[fragile]
+  \frametitle{ページ置換えアルゴリズム}
+  ページングによる仮想記憶で重要な三つのアルゴリズム
+  \begin{enumerate}
+  \item[1.]\emph{ページ読み込みアルゴリズム} ：
+    いつページをswap-inするか決める．
+    普通は，既に学んだデマンドページングを用いる．
+  \item[2.] \emph{ページ置き換えアルゴリズム} ：
+    フレーム不足時に，どのページを再利用するか決める．
+  \item[3.] \emph{フレーム割付けアルゴリズム} ：
+    どのフレームを使用するか決める．
+  \end{enumerate}
+  \vfill
+  ページ置き換えアルゴリズムが，
+  将来，使用されないフレームをうまく選択しないと，
+  swap-outしたページが直後にswap-inされることになり，
+  システムの性能が著しく低下する．
+\end{frame}
+
+%=========================================================================
+\begin{frame}
+  \frametitle{局所性・ワーキングセット・フェーズ化（１）}
+  \fig{scale=0.48}{locality-crop.pdf}
+  \begin{description}
+  \item[局所性]
+    短い時間に着目すると，
+    一部の連続したページが集中的にアクセスされる．
+    →　\emph{空間的局所性}\\
+    あるページに着目すると一部の連続した時刻にアクセスが集中している．
+    → \emph{時間的局所性}
+  \end{description}
+\end{frame}
+
+%=========================================================================
+\begin{frame}
+  \frametitle{局所性・ワーキングセット・フェーズ化（２）}
+  \fig{scale=0.48}{locality-crop.pdf}
+  \begin{description}
+  \item[ワーキングセット]
+    ある時間にアクセスされるページの集合のこと．\\
+    メモリに入り切らなくなると急激に性能が低下する．\\
+    → \emph{スラッシング}
+  \end{description}
+\end{frame}
+
+%=========================================================================
+\begin{frame}
+  \frametitle{局所性・ワーキングセット・フェーズ化（３）}
+  \fig{scale=0.48}{locality-crop.pdf}
+  \begin{description}
+  \item[フェーズ化現象]
+    ワーキングセットが急激に変化する現象のこと．\\
+    「入力フェーズ」，「計算フェーズ」，「出力フェーズ」 \\
+    フェーズ遷移時は局所性が失われる → ページ不在集中
+\end{description}
+\end{frame}
+
+%=========================================================================
+\begin{frame}
+  \frametitle{LRU（Least Recentry Used）アルゴリズム（１）}
+  仮定：最近アクセスされていないページは，この先，アクセスされない．\\
+  （時間的局所性があるなら最良な方法．）
+  \fig{scale=0.43}{pagingLRU-crop.pdf}
+  \begin{enumerate}
+  \item[1.] メモリアクセス毎にページテーブルにカウンタの値を書く．
+  \item[2.] ページテーブルをスキャンし最も古いページを見つける．
+  \item[3.] 見つけたページをswap-outし目的のページをswap-inする．（置換え）
+  \end{enumerate}
+\end{frame}
+
+%=========================================================================
+\begin{frame}
+  \frametitle{LRU（Least Recentry Used）アルゴリズム（２）}
+  \fig{scale=0.43}{pagingLRU-crop.pdf}
+  問題点（LRUの完全な実装は困難と言われている）\\
+  \begin{enumerate}
+  \item[1.] ハードウェアのコスト
+  \item[2.] ページ不在時の処理の重さ．（ページ不在は頻繁に発生）
+  \end{enumerate}
+  macOSのvm\_statで調べると毎秒数千回のページ不在！！
+\end{frame}
+
+%=========================================================================
+\begin{frame}
+  \frametitle{LFU（Least Frequently Used）アルゴリズム}
+  NFU（Not Frequently Used）とも呼ばれる．
+  \begin{itemize}
+  \item LRUの近似方式の一種である．
+  \item ページテーブルのRビットを使用．
+  \item フレーム毎にカウンタを準備．
+  \item 特別なハードウェアは不要．
+  \end{itemize}
+  \vfill
+  \emph{アルゴリズム}
+  \begin{enumerate}
+  \item[1.] Rビットとフレームのカウンタをゼロにクリアする．
+  \item[2.] 定期的（例えばTICK=20ms毎）にページテーブルをスキャンする．
+    R=1のエントリを見つけたら対応するフレームのカウンタをインクリメントし，
+    Rをゼロにクリアする．
+  \item[3.] ページ不在時にフレームが不足したなら，
+    カウンタの値が最小のフレームを置き換える．
+  \end{enumerate}
+\end{frame}
+
+%=========================================================================
+\begin{frame}
+  \frametitle{エージングアルゴリズム}
+  LFU（Least Frequently Used）アルゴリズムの改良\\
+  \vfill
+  \emph{LFUの問題点}\\
+  一度カウンタの値が大きくなると，
+  使用されなくなっても置き換えが起こらない．
+  \vfill
+  \emph{LFUの改良}\\
+  定期的にページテーブルをスキャンする際の
+  カウンタの更新方法を次のように改良する．
+  \begin{description}
+  \item[R=1のフレーム]
+    $cnt \leftarrow cnt \div 2 + 0x8000$（カウンタは16bitと仮定）
+  \item[R=0のフレーム]
+    $cnt \leftarrow cnt \div 2$
+  \end{description}
+  この改良により，過去のRビットの影響が徐々に小さくなる．
+\end{frame}
+
+%=========================================================================
+\begin{frame}
+  \frametitle{FIFO（First-In First-Out）アルゴリズム}
+  仮定：「長くメモリに滞在しているページは役割を終えている」\\
+  特別なハードウェアを用いることなく，ソフトウェアだけで実現できる．
+  \fig{scale=0.6}{pagingFIFO-crop.pdf}
+  \vfill
+  \emph{アルゴリズム}
+  \begin{enumerate}
+  \item[1.] swap-in したフレームをリストの最後に追加する．
+  \item[2.] フレームが不足時は，リストの先頭のフレームを置き換える．
+  \end{enumerate}
+  \vfill
+  ページテーブルのスキャンが不要なので非常に軽い．\\
+  常時使用されるページも時間が経過するとswap-outされる問題がある．\\
+  \emph{Beladyの異常な振る舞い}をすることがある．
+\end{frame}
+
+%=========================================================================
+\begin{frame}
+  \frametitle{Beladyの異常な振る舞いの例}
+  \vfill
+  FIFOアルゴリズムを用い，\\
+  ページ参照ストリング（W : 1 2 3 4 1 2 5 1 2 3 4 5）の場合
+  \begin{itemize}
+  \item フレーム数（m=3）の場合（ページ不在9回）\\
+    \tbl{scale=1.0}{beladyAnomalyM3.pdf}
+  \item フレーム数（m=4）の場合（ページ不在10回）\\
+    \tbl{scale=1.0}{beladyAnomalyM4.pdf}
+  \end{itemize}
+  メモリが多い方（m=4）のページ不在回数が多い．
+  \vfill
+\end{frame}
+
+%=========================================================================
+\begin{frame}
+  \frametitle{Clock アルゴリズム}
+  環状リストを用いる．Rビットも使用する．
+
+  \fig{scale=0.55}{pagingClock-crop.pdf}
+
+  \begin{enumerate}
+  \item[1.] swap-inする度にフレームを環状リストに挿入していく．
+  \item[2.] 定期的（例えばTICK=20ms毎）にRビットをクリアする．
+  \item[3.] 時計の針が指しているフレームのRビットを調べる．
+    \begin{description}
+    \item[R=0の場合]
+      ページは古い＋最近アクセスされていない．→ 置換え
+    \item[R=1の場合]
+      ページは最近アクセスされている．→ 針を進める
+    \end{description}
+    最悪でも時計の針が一周回るとR=0のページが見つかる．
+  \end{enumerate}
+\end{frame}
+
+%=========================================================================
+\begin{frame}
+  \frametitle{WSClock アルゴリズム（１）}
+
+  \fig{scale=0.55}{pagingWSClock-crop.pdf}
+
+  \begin{itemize}
+  \item ワーキングセットを考慮したClockアルゴリズムである．
+  \item 単純でパフォーマンスが良いので広く使用されている．
+  \item アクセス時刻を記録した環状リストに用いる．
+  \end{itemize}
+
+\end{frame}
+
+%=========================================================================
+\begin{frame}
+  \frametitle{WSClock アルゴリズム（２）}
+
+  \fig{scale=0.55}{pagingWSClock-crop.pdf}
+
+  \begin{itemize}
+  \item 時刻が古くなっているフレームはワーキングセット外と判断．
+  \item ページテーブルのRビットとDビットも使用する．
+  \end{itemize}
+\end{frame}
+
+%=========================================================================
+\begin{frame}
+  \frametitle{WSClock アルゴリズム（３）}
+
+  \fig{scale=0.55}{pagingWSClock-crop.pdf}
+
+  \begin{enumerate}
+  \item[1.] swap-inする度にフレームを環状リストに挿入していく．
+  \item[2.] 定期的に全テーブルエントリのRビットをクリアする．\\
+    その際，R=1だったフレームだけに現在時刻を記録する．
+  \end{enumerate}
+\end{frame}
+
+%=========================================================================
+\begin{frame}
+  \frametitle{WSClock アルゴリズム（４）}
+
+  \fig{scale=0.55}{pagingWSClock-crop.pdf}
+
+  \begin{enumerate}
+  \item[3.] フレーム不足なら時計の針のフレームを調べる．
+    \begin{description}
+    \item[R=1の場合]
+      Rビットをクリアして次のフレームに進む．
+    \item[時刻が新しい場合]
+      次のフレームに進む．
+    \item[時刻が古い場合]
+      ページはワーキングセットに含まれていない．\\
+      \emph{ページの置換え処理}を行う．
+    \end{description}
+  \end{enumerate}
+\end{frame}
+
+%=========================================================================
+\begin{frame}
+  \frametitle{WSClock アルゴリズム（５）}
+
+  \fig{scale=0.55}{pagingWSClock-crop.pdf}
+
+  \begin{enumerate}
+  \item[3.] フレーム不足なら時計の針のフレームを調べる．
+    \begin{description}
+    \item[時刻が古い場合] \emph{ページの置換え処理}を行う．
+      \begin{description}
+      \item[D=1の場合]
+        swap-outを予約し次のフレームに進む．
+      \item[D=0の場合]
+        このフレームを置き換える．
+      \end{description}
+    \end{description}
+  \end{enumerate}
+\end{frame}
+
+%=========================================================================
+\begin{frame}
+  \frametitle{フレーム割付方式（１）}
+  \fig{scale=0.41}{hardBlock-crop.pdf}
+  \begin{itemize}
+  \item フレームはどれも均質
+  \item SMPシステムであってもそうである．
+  \end{itemize}
+\end{frame}
+
+%=========================================================================
+\begin{frame}
+  \frametitle{フレーム割付方式（２）}
+  \fig{scale=0.3}{intelServer-crop.pdf}
+  \begin{itemize}
+  \item 近年のサーバ用SMPでは均質ではない．
+  \item メモリとCPUからなるノードを相互接続している．
+  \item 自ノードと他ノードでメモリアクセス時間が異なる．
+  \item このことを考慮したフレーム割付とCPUスケジューリングが必要．
+  \end{itemize}
+\end{frame}
+
+%=========================================================================
+%\begin{frame}
+%  \frametitle{}
+%\end{frame}
+
+%=========================================================================
+\begin{frame}
+  \frametitle{練習問題}
+  \begin{enumerate}
+  \item[1.] 次の言葉の意味を説明しなさい．
+    \begin{itemize}
+    \item 仮想記憶
+    \item デマンドページング
+    \item swap-in，swap-out
+    \item Copy on Write
+    \item メモリマップドファイル
+    \item 局所性
+    \item ワーキングセット
+    \item フェーズ化
+    \item スラッシング
+    \item ページ読み込みアルゴリズム
+    \item ページ置き換えアルゴリズム
+    \item ページ割付けアルゴリズム
+    \item Beladyの異常な振る舞い
+    \end{itemize}
+  \end{enumerate}
 \end{frame}
 
 %=========================================================================
 \begin{frame}
   \frametitle{練習問題}
   \begin{enumerate}
-  \item[(1)] 次の言葉の意味を説明しなさい．
-    \begin{itemize}
-      \item 仮想記憶
-      \item デマンドページング
-      \item swap-in，swap-out
-      \item Copy on Write
-      \item メモリマップドファイル
-    \end{itemize}
+  \item[2.] 「Beladyの異常な振る舞いの例」で示した
+    ページ参照ストリングとフレーム数を用い，
+    他のページ置き換えアルゴリズムを適用した場合をトレースしなさい．
   \end{enumerate}
+  \vfill
+  \vfill
 \end{frame}
 
 \end{document}

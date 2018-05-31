@@ -10,7 +10,7 @@ int main() {
     perror(fname);
     return 1;
   }
-  p = mmap(NULL,4096,PROT_READ|PROT_WRITE,MAP_SHARED,fd,0);  // マップする
+  p = mmap(NULL,4096,PROT_READ|PROT_WRITE,MAP_FILE|MAP_SHARED,fd,0);
   if (p==MAP_FAILED) {
     perror("mmap");
     return 1;
