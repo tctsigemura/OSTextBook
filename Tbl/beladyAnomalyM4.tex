@@ -4,12 +4,13 @@
 \usepackage[hiragino-pron]{luatexja-preset}        % ヒラギノフォント
 \usepackage{multirow}
 \begin{document}
-\begin{tabular}{r|rrrrrrrrrrrr}
+\begin{tabular}{c|rrrrrrrrrrrr}
 W & 1 & 2 & 3 & 4 & 1 & 2 & 5 & 1 & 2 & 3 & 4 & 5 \\
 \hline
-  & *1 & *2 & *3 & *4 &  4 &  4 & *5 & *1 & *2 & *3 & *4 & *5 \\
-S &    &  1 &  2 &  3 &  3 &  3 &  4 &  5 &  1 &  2 &  3 &  4 \\
-  &    &    &  1 &  2 &  2 &  2 &  3 &  4 &  5 &  1 &  2 &  3 \\
-  &    &    &    &  1 &  1 &  1 &  2 &  3 &  4 &  5 &  1 &  2 \\
+\multirow{4}{*}{S}
+ & *1 & *2 & *3 & *4 &  4 &  4 & *5 & *1 & *2 & *3 & *4 & *5 \\
+ &    &  1 &  2 &  3 &  3 &  3 &  4 &  5 &  1 &  2 &  3 &  4 \\
+ &    &    &  1 &  2 &  2 &  2 &  3 &  4 &  5 &  1 &  2 &  3 \\
+ &    &    &    &  1 &  1 &  1 &  2 &  3 &  4 &  5 &  1 &  2 \\
 \end{tabular}
 \end{document}
