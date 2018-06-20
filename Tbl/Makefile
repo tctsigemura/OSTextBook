@@ -3,7 +3,7 @@
 
 PDFS = threadTimeTbl.pdf threadTimeGrph.pdf schedulingObjective.pdf \
        segmentTableAttr.pdf pageTableAttr.pdf beladyAnomalyM3.pdf \
-       beladyAnomalyM4.pdf
+       beladyAnomalyM4.pdf partitionTableEntry.pdf partitionTableType.pdf
 
 %.pdf : %.tex
 	lualatex $*.tex

@@ -1,0 +1,18 @@
+\RequirePackage{luatex85}
+\documentclass{standalone}
+\usepackage{luatexja}                              % lualatex の場合
+\usepackage[hiragino-pron]{luatexja-preset}        % ヒラギノフォント
+\usepackage{multirow}
+\begin{document}
+\begin{tabular}{c|l}\hline\hline
+  \texttt{Type} & \multicolumn{1}{c}{意味} \\\hline
+  \texttt{00H}  & 空き      \\
+  \texttt{01H}  & FAT12     \\
+  \texttt{04H}  & FAT16(小) \\
+  \texttt{06H}  & FAT16(大) \\
+  \texttt{07H}  & NTFS      \\
+  \texttt{0BH}  & FAT32     \\
+  \texttt{83H}  & Linux(ext2) \\
+  \texttt{A5H}  & FreeBSD   \\
+\end{tabular}
+\end{document}
