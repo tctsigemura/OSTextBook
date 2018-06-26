@@ -1,0 +1,19 @@
+\RequirePackage{luatex85}
+\documentclass{standalone}
+\usepackage{luatexja}                              % lualatex の場合
+\usepackage[hiragino-pron]{luatexja-preset}        % ヒラギノフォント
+\usepackage{multirow}
+\def\|{\verb|} %|
+\begin{document}
+\begin{tabular}{l | l}\hline\hline
+  \multicolumn{1}{c|}{機能} & \multicolumn{1}{c}{対応するUNIXのAPI}\\\hline
+  ファイルの作成     &  \|creat|，\|open(... O_CREAT ...)| システムコール \\
+  ディレクトリの作成 &  \|mkdir| システムコール \\
+  ファイルの削除     &  \|unlink| システムコール \\
+  ディレクトリの削除 &  \|rmdir| システムコール \\
+  リンクの作成       &  \|link|，\|symlink| システムコール　\\
+  リンクの削除       &  \|unlink| システムコール　\\
+  名前の変更         &  \|rename| システムコール\\
+  ディレクトリエントリの読出し & \|opendir|，\|readdir|，\|closedir| 関数\\
+\end{tabular}
+\end{document}

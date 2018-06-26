@@ -1,0 +1,30 @@
+\RequirePackage{luatex85}
+\documentclass{standalone}
+\usepackage{luatexja}                              % lualatex の場合
+\usepackage[hiragino-pron]{luatexja-preset}        % ヒラギノフォント
+\usepackage{multirow}
+\begin{document}
+\begin{tabular}{l|l}\hline\hline
+  \multicolumn{1}{c|}{拡張子} & \multicolumn{1}{c}{意味} \\\hline
+              {\tt .c}，{\tt .java}，{\tt .s}等     &
+              ソース・プログラム（C言語，Java言語，アセンブリ言語）  \\
+              {\tt .py}，{\tt .pl}，{\tt .php}等    &
+              スクリプト言語のプログラム（python，perl，PHP）        \\
+              {\tt .txt}，{\tt .html}，{\tt .xml}等 &
+              プレーンテキスト，マークアップ言語                     \\
+              {\tt .jpg}，{\tt .png}，{\tt .bmp}等  &
+              画像データ                                             \\
+              {\tt .mp3}，{\tt .m4a}，{\tt .wma}等  &
+              音声データ                                             \\
+              {\tt .mpg}，{\tt .mp4}，{\tt .wmv}等  &
+              動画データ                                             \\
+              {\tt .pdf}，{\tt .ps}，{\tt .eps}等   &
+              印刷・表示用の文書ファイル                             \\
+              {\tt .zip}，{\tt .tar}，{\tt .tbz}等  &
+              アーカイブファイル                                     \\
+              {\tt .exe}，{\tt .app}，拡張子無し    &
+              実行形式プログラム（Windows，macOS，UNIX）             \\
+              {\tt .doc}，{\tt .docx}               &
+              MS Word文書                                            \\
+\end{tabular}
+\end{document}
