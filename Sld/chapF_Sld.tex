@@ -1,0 +1,333 @@
+%\documentclass[dvipdfmx]{beamer}
+\documentclass{beamer}                   % lualatex の場合
+\usepackage{mySld}
+\begin{document}
+\title[主記憶]{オペレーティングシステム\\第１５章 ファイルシステムの概念}
+\date{}
+\begin{frame}
+  \titlepage
+  \centerline{\url{https://github.com/tctsigemura/OSTextBook}}
+\end{frame}
+
+%\section{}
+%=========================================================================
+%\begin{frame}
+%  \frametitle{}
+%\end{frame}
+
+\section{ファイルシステムの概念}
+%=========================================================================
+\begin{frame}
+  \frametitle{ファイルシステム}
+  \begin{itemize}
+  \item ファイルシステムは二次記憶装置を
+    \begin{itemize}
+    \item 管理する．（どのセクタが，どのファイルの一部？）
+    \item 抽象化する．（ハードディスク → ファイル）
+    \item 仮想化する．（１台のハードディスク → 多数のファイル）
+    \end{itemize}
+  \item ファイルは一次元のバイト列（バイトストリーム） \\
+    オペレーティングシステムはファイルの構造を決めない．
+  \item ファイルは名前を持つ．
+  \item 名前とバイト位置でデータが決まる．\\
+    名前＝ファイル名，バイト位置＝ファイル内オフセット
+  \end{itemize}
+\end{frame}
+
+%=========================================================================
+\begin{frame}
+  \frametitle{ファイルの名前付け}
+  \fig{scale=0.6}{dirTree-crop.pdf}
+  \begin{itemize}
+  \item ファイルは木構造のディレクトリシステムに格納する．
+  \item ディレクトリは名前とファイル本体のポインタを格納する．
+  \item 階層構造を持った名前(\emph{パス}）でファイルを特定する．
+  \item \emph{絶対パス}はルートディレクトリを起点にする．
+  \item \emph{相対パス}はワーキングディレクトリを起点にする．
+  \end{itemize}
+
+\end{frame}
+
+%=========================================================================
+\begin{frame}
+  \frametitle{ファイルの別名（１）}
+  \emph{別名があると便利な例}（最新のファイルはいつも同じ名前）
+  \vfill
+  ある日
+  \begin{center}
+    \begin{tabular}{l c l}
+      \texttt{2017\_06\_30.log} &   & 2017年6月30日のファイル \\
+      \texttt{2017\_07\_01.log} &   & 2017年7月1日のファイル  \\
+      \texttt{2017\_07\_02.log} &   & 2017年7月2日のファイル  \\
+      \texttt{today.log}        & → & \texttt{2017\_07\_02.log}
+    \end{tabular}
+  \end{center}
+  \vfill
+  次の日
+  \begin{center}
+    \begin{tabular}{l c l}
+      \texttt{2017\_07\_01.log} &   & 2017年7月1日のファイル  \\
+      \texttt{2017\_07\_02.log} &   & 2017年7月2日のファイル  \\
+      \texttt{2017\_07\_03.log} &   & 2017年7月3日のファイル  \\
+      \texttt{today.log}        & → & \texttt{2017\_07\_03.log}
+    \end{tabular}
+  \end{center}
+  \vfill
+\end{frame}
+
+%=========================================================================
+\begin{frame}
+  \frametitle{ファイルの別名（２）}
+  \begin{itemize}
+  \item \emph{ハードリンク} \\
+    \begin{itemize}
+    \item ファイルシステム仕組みとしてOSカーネルに組み込む．
+    \item ファイルの本体が複数のディレクトリ・エントリから指される．
+    \item リンクカウントを用いる．
+    \item ディレクトリをリンクするとループ検出が厄介 → 禁止！
+    \end{itemize}
+  \item \emph{シンボリックリンク} \\
+    \begin{itemize}
+    \item ファイルシステム仕組みとしてOSカーネルに組み込む．
+    \item 他ファイルのパスを格納した特別なファイル．
+    \item リンク切れ状態が許される．（Webページのリンクに似ている）
+    \end{itemize}
+  \item \emph{ファイルシステムの外で実装されるリンク} \\
+    \begin{itemize}
+    \item Windowsのショートカット，macOSのエイリアスなど
+    \item ファイルシステム本体が持つリンク機構は一定ではない． \\
+      → 現代のOSは同時に複数のファイルシステムを使用する．\\
+      → アプリに近い側でどのファイルシステムでも共通の仕組みを提供
+    \end{itemize}
+  \end{itemize}
+\end{frame}
+
+%=========================================================================
+\begin{frame}
+  \frametitle{ファイルの別名（３）}
+  \emph{HFS+上のmacOSのエイリアスの例}
+  \begin{quote}
+    \lst{numbers=left}{aliasOnHFS.txt}
+  \end{quote}
+  \begin{description}
+    \item[3行] 拡張属性付きの通常ファイルとしてエイリアスが存在
+    \item[4行] 拡張属性の名前は\texttt{com.apple.FinderInfo}
+    \item[4行] 拡張属性のサイズは32バイト
+  \end{description}
+  ファイルシステムのより汎用的な機構である拡張属性を利用して，\\
+  \emph{エイリアス}を実装している．
+  \vfill
+\end{frame}
+
+%=========================================================================
+\begin{frame}
+  \frametitle{ファイルの別名（４）}
+  \emph{FAT上のmacOSのエイリアスの例}
+  \begin{quote}
+    \lst{numbers=left}{aliasOnFAT.txt}
+  \end{quote}
+  \begin{description}
+    \item[4,5行] 拡張属性付きの通常ファイルとしてエイリアスが存在
+    \item[2行]   隠しファイルができている！！
+    \item[6行]   隠しファイルを消してみる．
+    \item[9行]   拡張属性が消えてしまった！！
+  \end{description}
+  FATファイルシステムの規約の範囲で\emph{エイリアス}を実装している．
+  \vfill
+\end{frame}
+
+%=========================================================================
+\begin{frame}
+  \frametitle{ボリュームのマウント}
+  \fig{scale=0.45}{mount-crop.pdf}
+  \begin{itemize}
+  \item 二つ目以降のボリュームの接続方法
+  \item マウント方式
+    \begin{itemize}
+    \item ボリュームを既存のディレクトリに接続する．
+    \item \texttt{/Volumes/NO NAME/hello.c}がUSBメモリのCプログラム
+    \end{itemize}
+  \item ドライブレター方式
+    \begin{itemize}
+    \item ボリュームを区別するドライブレターを用いる．
+    \item \texttt{D:{\bs}hello.c}がUSBメモリのCプログラム
+    \end{itemize}
+  \end{itemize}
+\end{frame}
+
+%=========================================================================
+\begin{frame}
+  \frametitle{ファイルの属性（１）}
+  \begin{itemize}
+  \item \emph{名前}：ファイル名をファイルの属性と考える場合もある．
+  \item \emph{識別子}：ファイル本体の番号など．
+  \item \emph{型（タイプ）}：通常ファイル，ディレクトリ，リンクなど．
+  \item \emph{保護}：\texttt{rwxrwxrwx}など．（後で詳しく）
+  \item \emph{日時}：作成日時，最終変更日時など．
+  \item \emph{所有者}：所有者，グループなど．
+  \item \emph{位置}：ディスク上のどこにファイル本体があるか．\\
+    （データ位置のブロック番号など）
+  \item \emph{サイズ}：ファイルのバイト数．
+  \item \emph{拡張属性}：名前付きの小さな追加データ．\\
+    ファイルシステムで用途を定めていない．
+  \end{itemize}
+\end{frame}
+
+%=========================================================================
+\begin{frame}
+  \frametitle{ファイルの属性（２）}
+  \begin{quote}
+    \lst{numbers=left}{extendedAttr.txt}
+  \end{quote}
+  \begin{description}
+  \item[1行] 拡張属性付きでファイルの一覧を表示させる．
+  \item[4行] 拡張属性を持つファイルがあることが分かる．
+  \item[5行] 拡張属性の内容を表示してみる．
+  \end{description}
+  この例の拡張属性は，以下のようなものであった．
+  \begin{itemize}
+  \item 属性の名前：\texttt{com.apple.FinderInfo}
+  \item 属性の大きさ：32バイト
+  \item 目的：ファイルがエイリアスであることを表す．（恐らく）
+  \end{itemize}
+\end{frame}
+
+%=========================================================================
+\begin{frame}
+  \frametitle{アクセス制御（１）}
+  ファイルの\emph{保護属性}に基づき，ファイルに誰が何をできるか制御する．
+  \begin{itemize}
+  \item \emph{ビット表現の保護モード}\\
+    \begin{itemize}
+    \item UNIXで使用される\texttt{rwxrwxrwx}のような情報．
+    \item UNIXの場合，「所有者，グループ，その他」のユーザについて\\
+      \begin{itemize}
+      \item[r]：読める（Read），
+      \item[w]：書ける（Write），
+      \item[x]：実行できる（eXecute）
+      \end{itemize}
+      を指定する．
+    \end{itemize}
+  \end{itemize}
+\end{frame}
+
+%=========================================================================
+\begin{frame}
+  \frametitle{アクセス制御（２）}
+  \begin{itemize}
+  \item \emph{ACL（Access Control List）}\\
+    ファイル毎に，ユーザやグループを指定して細かな制御が可能
+
+    \lst{numbers=left}{acl.txt}
+
+    \begin{description}
+    \item[1行] \texttt{a.txt}にACLが無いことを確認した．
+    \item[3,4行] \texttt{chmod}コマンドで\texttt{a.txt}にACL追加した．
+    \item[7,8行] 二行のACLが確認できる．
+    \end{description}
+
+    \begin{itemize}
+    \item リストの先頭から順に評価する．
+    \item 許可・不許可が決まったら評価を完了する．
+    \item ACLで決まらない場合は\texttt{rwx}を使用する．
+    \end{itemize}
+  \end{itemize}
+\end{frame}
+
+%=========================================================================
+\begin{frame}
+  \frametitle{ファイルの種類}
+  \begin{itemize}
+  \item ファイルシステム（OSカーネル）で決まっている種類 \\
+    （通常ファイル・ディレクトリ・リンクなど）
+  \item アプリケーションなどが決めている種類 \\
+    （通常ファイルの拡張子で区別する）
+  \end{itemize}
+  \tbl{scale=0.85}{filenameExtensions.pdf}
+  \texttt{.app}だけはディレクトリの拡張子
+\end{frame}
+
+%=========================================================================
+\begin{frame}
+  \frametitle{ファイルシステムの操作（１）}
+  \emph{ディレクトリ操作}
+  \tbl{scale=0.9}{dirOperations.pdf}
+  \begin{itemize}
+  \item ファイルの作成はcreatシステムコールでもできる．
+  \item ディレクトリの読み出しはライブラリ関数で行う．
+  \item renameシステムコールはファイルの移動もできる．
+  \end{itemize}
+\end{frame}
+
+%=========================================================================
+\begin{frame}
+  \frametitle{ファイルシステムの操作（２）}
+  \emph{ファイル操作}
+  \tbl{scale=0.9}{fileOperations.pdf}
+  \begin{itemize}
+  \item openはファイルの保護属性をチェックする．
+  \item 切り詰めは専用のtruncateシステムコールも使える．
+  \item ファイルの属性の読み書きができるべき．
+  \end{itemize}
+\end{frame}
+
+%=========================================================================
+\begin{frame}[fragile]
+  \frametitle{ファイルシステムの操作（３）}
+  \emph{ファイルの共有とロック}
+\begin{lstlisting}[numbers=none]
+  #include <sys/file.h>
+  #define   LOCK_SH   1    // 共有ロック
+  #define   LOCK_EX   2    // 排他ロック
+  #define   LOCK_NB   4    // ブロックしない
+  #define   LOCK_UN   8    // ロック解除
+  int flock(int fd, int operation);
+\end{lstlisting}
+  \begin{itemize}
+  \item \|LOCK_SH|：\emph{共有ロック（shred lock）}
+  \item \|LOCK_EX|：\emph{排他ロック（exclusive lock）}
+  \item \|LOCK_NB|：ロックできない時，ブロックしないでエラー
+  \item openシステムコールにもロックの機能がある．
+  \end{itemize}
+  \vfill
+
+  \emph{ワーキングディレクトリの変更}
+\begin{lstlisting}[numbers=none]
+  #include <unistd.h>
+  int chdir(const char *path);
+\end{lstlisting}
+
+  \vfill
+\end{frame}
+
+%=========================================================================
+\begin{frame}
+  \frametitle{ファイルシステムの健全性（１）}
+  \emph{一貫性チェック}
+  \begin{itemize}
+  \item 正常終了時にはファイルシステムにアンマウントの印をする．
+  \item OSの起動時に印がなかったら一貫性チェックをする．
+  \item \emph{メタデータ}の矛盾を解消するだけ．
+  \item ファイルが消えたり，データが消えたりは修復できない．
+  \end{itemize}
+  \vfill
+\end{frame}
+
+%=========================================================================
+\begin{frame}
+  \frametitle{ファイルシステムの健全性（２）}
+  \emph{ジャーナリング・ファイルシステム}
+  \fig{scale=.5}{journaling-crop.pdf}
+  \begin{itemize}
+  \item データベースのWAL（Write Ahead Logging）のアイデア．
+  \item NTFS，ext3，ext4，HFS+ 等が該当する．
+  \end{itemize}
+  \vfill
+\end{frame}
+
+%=========================================================================
+%\begin{frame}
+%  \frametitle{}
+%\end{frame}
+
+\end{document}
