@@ -1,0 +1,9 @@
+$ ls -la@ ._* a.txt*
+-rwxrwxrwx  1 sigemura  staff  4096 Jun 27 09:55 ._a.txtのエイリアス
+-rwxrwxrwx  1 sigemura  staff     5 Jun 27 09:55 a.txt
+-rwxrwxrwx@ 1 sigemura  staff  1040 Jun 27 09:55 a.txtのエイリアス
+        com.apple.FinderInfo         32 
+$ rm ._a.txtのエイリアス 
+$ ls -la@ a.txt*
+-rwxrwxrwx  1 sigemura  staff     5 Jun 27 09:55 a.txt
+-rwxrwxrwx  1 sigemura  staff  1040 Jun 27 09:55 a.txtのエイリアス

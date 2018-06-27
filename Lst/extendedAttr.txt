@@ -1,0 +1,8 @@
+$ ls -l@ b.txt*
+-rw-r--r--  2 sigemura  staff     123 Jun 25 19:38 b.txt
+-rw-r--r--@ 1 sigemura  staff     836 Jun 25 19:39 b.txtのエイリアス
+        com.apple.FinderInfo            32 
+$ xattr -l b.txtのエイリアス 
+com.apple.FinderInfo:
+00000000  61 6C 69 73 4D 41 43 53 80 00 00 00 00 00 00 00  |alisMACS........|
+00000010  00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00  |................|
