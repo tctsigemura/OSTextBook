@@ -2,7 +2,8 @@
 .SUFFIXES: .tex .pdf
 
 PDFS = memoryHierarchy.pdf masterBootRecord.pdf hddPartition.pdf \
-	partitionTable.pdf
+       partitionTable.pdf fatBPB.pdf fatVolume.pdf fatDirEntry.pdf \
+       fatConcept.pdf fatCls.pdf fatDir.pdf fatFat.pdf
 
 %.pdf : %.tex myfig.sty
 	lualatex $*.tex

@@ -1,0 +1,29 @@
+\RequirePackage{luatex85}
+\documentclass{standalone}
+\usepackage{luatexja}                              % lualatex の場合
+\usepackage[hiragino-pron]{luatexja-preset}        % ヒラギノフォント
+\begin{document}
+\begin{tabular}{l | l | r | r | r}\hline\hline
+  \multicolumn{1}{c|}{パラメータ} &
+  \multicolumn{1}{c|}{意味} &
+  \multicolumn{1}{c|}{位置} &
+  \multicolumn{1}{c|}{長さ} &
+  \multicolumn{1}{c}{値の例}\\\hline
+  ジャンプ命令     & ジャンプ機械語命令 & 0 & 3 & \texttt{0xeb 0x?? 0x90} \\
+  セクタサイズ     & 1セクタのバイト数 & 11 & 2 & 512バイト \\
+  クラスタサイズ   & 1クラスタのセクタ数& 13 & 1 & 64セクタ \\
+  予約セクタ数     & 予約セクタ数（BPBを含む）& 14 & 2 & 1セクタ \\
+  FAT数            & FATを何重に記録するか& 16 & 1 & 2個 \\
+  rootDirサイズ    & ディレクトリエントリ数 &  17 & 2 & 512エントリ \\
+  総セクタ数       & ボリュームのサイズ & 19 & 2 & 3,999,681セクタ \\
+  ボリュームラベル & ボリュームの名前 & 43 & 11 
+                   & \texttt{"MICRODRIVE\textvisiblespace"} \\
+  FATサイズ        & FATのセクタ数    & 22 & 2  & 245セクタ \\
+  ブートプログラム & ブートプログラム & 62 & 448 & \\
+  シグネチャ       & フォーマット済みマーク & 510 & 2 & \texttt{0x55 0xaa} \\
+  \multicolumn{5}{r}{
+    （位置と長さの単位はバイト）}\\
+  \multicolumn{5}{r}{
+    （値の例はボリュームサイズ2GiB，クラスタサイズ32KiB，FAT16の場合）}
+\end{tabular}
+\end{document}

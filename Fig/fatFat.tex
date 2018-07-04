@@ -1,0 +1,21 @@
+\RequirePackage{luatex85}
+\documentclass[border=1mm]{standalone}
+\usepackage{luatexja}                              % lualatex の場合
+\usepackage[hiragino-pron]{luatexja-preset}        % ヒラギノフォント
+\begin{document}
+\ttfamily\small\begin{tabular}{ r | c |}\cline{2-2}
+  0 & 0x0000 \\\cline{2-2}
+  1 & 0x0000 \\\cline{2-2}
+  2 & 0x0004 \\\cline{2-2}
+  3 & 0xfff7 \\\cline{2-2}
+  4 & 0x0005 \\\cline{2-2}
+  5 & 0xffff \\\cline{2-2}
+  6 & 0xffff \\\cline{2-2}
+  7 & 0x0000 \\\cline{2-2}
+  ... & ... \\\cline{2-2}
+  62,487 & 0x0000 \\\cline{2-2}
+  62,488 & 0x0000 \\\cline{2-2}
+  ... & ... \\\cline{2-2}
+  62,719 & 0x0000 \\\cline{2-2}
+\end{tabular}
+\end{document}

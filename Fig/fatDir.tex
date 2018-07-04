@@ -1,0 +1,27 @@
+\RequirePackage{luatex85}
+\documentclass[border=1mm]{standalone}
+\usepackage{luatexja}                              % lualatex の場合
+\usepackage[hiragino-pron]{luatexja-preset}        % ヒラギノフォント
+\begin{document}
+\tt\small\begin{tabular}{r | c | c | c | c | c | c | c | c|}
+\multicolumn{1}{c}{} &
+\multicolumn{1}{c}{FileName} &
+\multicolumn{1}{c}{Ext} &
+\multicolumn{1}{c}{Atr} &
+\multicolumn{1}{c}{~~~Reserved~~~} &
+\multicolumn{1}{c}{Time} &
+\multicolumn{1}{c}{Date} &
+\multicolumn{1}{c}{Cls} &
+\multicolumn{1}{c}{Size} \\\cline{2-9}
+0 & "ABCDEFGH" & "TXT" &
+0x00 & - & 0x0000 & 0x0021 & 0x0002 & 0x00010400 \\\cline{2-9}
+0 & "SAMPLE\textvisiblespace\textvisiblespace" & "DAT" &
+0x00 & - & 0x0000 & 0x0021 & 0x0006 & 0x00000400 \\\cline{2-9}
+2 & 0x00 ... & - &
+- & - & - & - & - & - \\\cline{2-9}
+... & ... & ... &
+... & ... & ... & ... & ... & ... \\\cline{2-9}
+511 & 0x00 ... & - &
+- & - & - & - & - & - \\\cline{2-9}
+\end{tabular}
+\end{document}

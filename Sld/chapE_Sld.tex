@@ -134,19 +134,6 @@
 
 %=========================================================================
 \begin{frame}
-  \frametitle{ハードディスク（４）}
-  \lst{numbers=left}{tacosReadSct.cmm}
-  \begin{itemize}
-  \item \emph{TacOSのuSDドライバの例}
-    \begin{itemize}
-    \item \texttt{restart()}：割り込みハンドラ
-    \item \texttt{readSct()}：１セクタ読み出しルーチン
-    \end{itemize}
-  \end{itemize}
-\end{frame}
-
-%=========================================================================
-\begin{frame}
   \frametitle{フォーマッティング（１）}
   \emph{ハードディスクの初期化の例}
   \begin{itemize}
@@ -221,13 +208,6 @@
 
 %=========================================================================
 \begin{frame}
-  \frametitle{パーティションを見つけるプログラムの例}
-  \lst{numbers=left}{tacosReadMBR.cmm}
-  TacOSがPC用のuSDカードからFAT16パーティションを見つける．
-\end{frame}
-
-%=========================================================================
-\begin{frame}
   \frametitle{ブートストラップ（１）}
   \emph{PCの場合を例にブートストラップを説明する．}
   \begin{itemize}
@@ -278,7 +258,7 @@
 
 %=========================================================================
 \begin{frame}
-  \frametitle{練習問題}
+  \frametitle{練習問題（１）}
   \begin{enumerate}
   \item[1.] 次の言葉の意味を説明しなさい．
     \begin{itemize}
@@ -289,9 +269,54 @@
     \item シーケンシャルアクセス・ランダムアクセス
     \item セクタ・トラック・シリンダ
     \item CHS・LBA
+    \item ボリューム
     \item パーティション
+    \item MBR
+    \item IPL
     \item ブートストラップ
     \end{itemize}
+  \end{enumerate}
+\end{frame}
+
+%=========================================================================
+\begin{frame}
+  \frametitle{練習問題（２）}
+  \begin{enumerate}
+  \item[2.] 次のディスクに付いて答えなさい．
+    \begin{quote}
+      \begin{tabular}{l l}
+        1台全体   & 1,024シリンダ  \\
+        1シリンダ & 8トラック      \\
+        1トラック & 128セクタ      \\
+        1セクタ   & 512バイト
+      \end{tabular}
+    \end{quote}
+    \begin{itemize}
+    \item ディスクの容量をセクタ単位で答えなさい．
+    \item ディスクの容量をバイト単位で答えなさい．
+    \item 最後のセクタのアドレスをLBAで答えなさい．
+    \item 最後のセクタのアドレスをCHSで答えなさい．\\
+      （但し，C：0以上，H：0以上，S：1以上である．）
+    \end{itemize}
+  \end{enumerate}
+\end{frame}
+
+%=========================================================================
+\begin{frame}
+  \frametitle{練習問題（３）}
+  \begin{enumerate}
+  \item[3.] 例示したパーティションテーブルに付いて答えなさい．
+    \begin{itemize}
+    \item 第1パーティションの位置をLBAで答えなさい．
+    \item 第1パーティションのサイズをセクタ数で答えなさい．
+    \item 第1パーティションの種類を答えなさい．
+    \item 第2パーティションの位置をLBAで答えなさい．
+    \item 第2パーティションのサイズをセクタ数で答えなさい．
+    \item 第2パーティションの種類を答えなさい．
+    \end{itemize}
+    \vfill
+  \item[4.] PC用の高機能なブートローダGRUBについて調査しなさい．
+    \vfill
   \end{enumerate}
 \end{frame}
 

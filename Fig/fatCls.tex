@@ -1,0 +1,32 @@
+\RequirePackage{luatex85}
+\documentclass[border=1mm]{standalone}
+\usepackage{luatexja}                              % lualatex の場合
+\usepackage[hiragino-pron]{luatexja-preset}        % ヒラギノフォント
+\begin{document}
+\tt\small\begin{tabular}{r | c |}\cline{2-2}
+  & "ABCDEFGH.TXT"の \\
+2 & 第1クラスタ  \\
+  & （32KiB）    \\\cline{2-2}
+  &              \\
+3 & 不良クラスタ \\
+  & （32KiB）   \\\cline{2-2}
+  & "ABCDEFGH.TXT"の \\
+4 & 第2クラスタ \\
+  & （32KiB）   \\\cline{2-2}
+  & "ABCDEFGH.TXT"の \\
+5 & 第3クラスタ \\
+  & （32KiB）   \\\cline{2-2}
+  & "SAMPLE.DAT"の \\
+6 & 第1クラスタ \\
+  & （32KiB）   \\\cline{2-2}
+  &             \\
+7 & 空きクラスタ \\
+  & （32KiB）   \\\cline{2-2}
+  &             \\
+... & ...       \\
+  &             \\\cline{2-2}
+  &             \\
+62,487 & 空きクラスタ \\
+  & （32KiB）   \\\cline{2-2}
+\end{tabular}
+\end{document}

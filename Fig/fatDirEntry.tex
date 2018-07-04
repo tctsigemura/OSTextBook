@@ -1,0 +1,17 @@
+\RequirePackage{luatex85}
+\documentclass[border=1mm]{standalone}
+\usepackage{luatexja}                              % lualatex の場合
+\usepackage[hiragino-pron]{luatexja-preset}        % ヒラギノフォント
+\begin{document}
+\texttt{\begin{tabular}{rcccccccc}
+    Bytes &  8 & 3 & 1 & 10 & 2 & 2 & 2 & 4 \\\cline{2-9}
+    &\multicolumn{1}{|c}{FileName} &
+    \multicolumn{1}{|c}{Ext} &
+    \multicolumn{1}{|c}{Atr} &
+    \multicolumn{1}{|c}{Reserved} &
+    \multicolumn{1}{|c}{Time} &
+    \multicolumn{1}{|c}{Date} &
+    \multicolumn{1}{|c}{Cls} &
+    \multicolumn{1}{|c|}{Size} \\\cline{2-9}
+\end{tabular}}
+\end{document}

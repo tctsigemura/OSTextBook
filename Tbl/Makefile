@@ -4,7 +4,8 @@
 PDFS = threadTimeTbl.pdf threadTimeGrph.pdf schedulingObjective.pdf \
        segmentTableAttr.pdf pageTableAttr.pdf beladyAnomalyM3.pdf \
        beladyAnomalyM4.pdf partitionTableEntry.pdf partitionTableType.pdf \
-       filenameExtensions.pdf dirOperations.pdf fileOperations.pdf
+       filenameExtensions.pdf dirOperations.pdf fileOperations.pdf \
+       fatVariety.pdf fatBpbParameter.pdf fatClsNum.pdf
 
 %.pdf : %.tex
 	lualatex $*.tex

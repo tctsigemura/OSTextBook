@@ -1,0 +1,16 @@
+\RequirePackage{luatex85}
+\documentclass{standalone}
+\usepackage{luatexja}                              % lualatex の場合
+\usepackage[hiragino-pron]{luatexja-preset}        % ヒラギノフォント
+\begin{document}
+\begin{tabular}{c | r | r |r }\hline\hline
+  \multicolumn{1}{c|}{種類} &
+  \multicolumn{1}{c|}{最大ボリュームサイズ} &
+  \multicolumn{1}{c|}{最大ファイルサイズ} &
+  \multicolumn{1}{c}{ファイル名} \\\hline
+  FAT12 & 32MiB & 32MiB & 8+3文字 \\
+  FAT16 & 2GiB  & 2GiB & 8+3文字 \\
+  FAT32 & 2TiB  & 4GiB & 8+3文字 \\
+  exFAT & 16EiB & 16EiB & 255文字 \\
+\end{tabular}
+\end{document}

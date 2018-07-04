@@ -1,0 +1,16 @@
+\RequirePackage{luatex85}
+\documentclass{standalone}
+\usepackage{luatexja}                              % lualatex の場合
+\usepackage[hiragino-pron]{luatexja-preset}        % ヒラギノフォント
+\def\|{\verb|} %|
+\begin{document}                                   
+\begin{tabular}{ l | l }\hline\hline
+  \multicolumn{1}{c|}{値} &
+  \multicolumn{1}{c}{意味} \\\hline
+  \|0x0000|               & 未使用クラスタ \\
+  \|0x0001|               & 予約クラスタ   \\
+  \|0x0002| 〜 \|0xfff6|  & 普通のクラスタ \\
+  \|0xfff7|               & 不良クラスタ   \\
+  \|0xfff8| 〜 \|0xffff|  & 終了クラスタ   \\
+\end{tabular}
+\end{document}

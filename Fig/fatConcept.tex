@@ -1,0 +1,19 @@
+\RequirePackage{luatex85}
+\documentclass[border=1mm]{standalone}
+\usepackage{luatexja}                              % lualatex の場合
+\usepackage[hiragino-pron]{luatexja-preset}        % ヒラギノフォント
+\def\|{\verb|} %|
+\begin{document}
+\begin{tabular}{r | c | c l}\cline{2-2}
+  \|0| & \|0x0000| & ←  & 使用不可        \\\cline{2-2}
+  \|1| & \|0x0000| & ←  & 使用不可        \\\cline{2-2}
+  \|2| & \|0x0004| & ←  & 次は第4クラスタ \\\cline{2-2}
+  \|3| & \|0xfff7| & ←  & 不良クラスタ    \\\cline{2-2}
+  \|4| & \|0x0005| & ←  & 次は第5クラスタ \\\cline{2-2}
+  \|5| & \|0xffff| & ←  & 終了クラスタ    \\\cline{2-2}
+  \|6| & \|0x0000| & ←  & 未使用クラスタ  \\\cline{2-2}
+%       &           &    &                 \\
+\|...| & \|...|    &    &                 \\
+       &           &    &                 \\\cline{2-2}
+\end{tabular}
+\end{document}

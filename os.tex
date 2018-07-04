@@ -48,11 +48,7 @@ CC-BY-SA 4.0 ライセンス全文は
 \tableofcontents
 
 % 本文
-%\twocolumn
 \mainmatter
-
-\part{OSの機能を使用してみよう}
-% \chapter{システムプログラミング}
 
 \part{OSとは}
 \include{chap1} % オペレーティングシステムとは
@@ -74,14 +70,20 @@ CC-BY-SA 4.0 ライセンス全文は
 \include{chapD} % 仮想記憶
 
 \part{ファイル管理}
+\setcounter{chapter}{13}
+\setcounter{page}{177}               % 途中からコンパイルしたいので
 \include{chapE} % 二次記憶装置
-% \setcounter{chapter}{14}
-% \setcounter{page}{187}               % 途中からコンパイルしたいので
+\setcounter{chapter}{14}
+\setcounter{page}{189}               % 途中からコンパイルしたいので
 \include{chapF} % ファイルシステムの概念
+\setcounter{chapter}{15}
+\setcounter{page}{201}               % 途中からコンパイルしたいので
+\include{chapG} % FATファイルシステム
 
 \include{bibliography} % 参考文献
 \appendix
 \include{appA}  % 付録A
+\include{appB}  % 付録B
 
 %------------------------------------------------------------------------------
 % 発行元

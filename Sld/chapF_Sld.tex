@@ -2,7 +2,8 @@
 \documentclass{beamer}                   % lualatex の場合
 \usepackage{mySld}
 \begin{document}
-\title[主記憶]{オペレーティングシステム\\第１５章 ファイルシステムの概念}
+\title[ファイルシステムの概念]
+      {オペレーティングシステム\\第１５章 ファイルシステムの概念}
 \date{}
 \begin{frame}
   \titlepage
@@ -106,9 +107,7 @@
 \begin{frame}
   \frametitle{ファイルの別名（３）}
   \emph{HFS+上のmacOSのエイリアスの例}
-  \begin{quote}
-    \lst{numbers=left}{aliasOnHFS.txt}
-  \end{quote}
+  \lst{numbers=left,xleftmargin=5mm}{aliasOnHFS.txt}
   \begin{description}
     \item[3行] 拡張属性付きの通常ファイルとしてエイリアスが存在
     \item[4行] 拡張属性の名前は\texttt{com.apple.FinderInfo}
@@ -123,9 +122,7 @@
 \begin{frame}
   \frametitle{ファイルの別名（４）}
   \emph{FAT上のmacOSのエイリアスの例}
-  \begin{quote}
-    \lst{numbers=left}{aliasOnFAT.txt}
-  \end{quote}
+  \lst{numbers=left,xleftmargin=5mm}{aliasOnFAT.txt}
   \begin{description}
     \item[4,5行] 拡張属性付きの通常ファイルとしてエイリアスが存在
     \item[2行]   隠しファイルができている！！
@@ -176,9 +173,7 @@
 %=========================================================================
 \begin{frame}
   \frametitle{ファイルの属性（２）}
-  \begin{quote}
-    \lst{numbers=left}{extendedAttr.txt}
-  \end{quote}
+  \lst{numbers=left,xleftmargin=5mm}{extendedAttr.txt}
   \begin{description}
   \item[1行] 拡張属性付きでファイルの一覧を表示させる．
   \item[4行] 拡張属性を持つファイルがあることが分かる．
@@ -323,6 +318,66 @@
   \item NTFS，ext3，ext4，HFS+ 等が該当する．
   \end{itemize}
   \vfill
+\end{frame}
+
+%=========================================================================
+\begin{frame}
+  \frametitle{練習問題（１）}
+  \begin{enumerate}
+  \item[1.] 次の言葉の意味を説明しなさい．
+    \begin{itemize}
+    \item ディレクトリシステム
+    \item パス，絶対パス，相対パス
+    \item ディレクトリ，ファイル
+    \item ハードリンク，シンボリックリンク
+    \item ショートカット，エイリアス
+    \item マウント，ドライブレター
+    \item 拡張属性，ACL
+    \end{itemize}
+
+  \item[2.] 自分のオペレーティングシステムについて調査しなさい．\\
+    （GUIよりCLIのコマンドを用い方がより詳しい観察ができる．）
+    \begin{itemize}
+    \item ショートカット（Windows），エイリアス（macOS）
+    \item ファイルの属性（保護，日時，所有者，サイズ等）
+    \item 拡張属性が使用できるオペレーティングシステムか？
+    \item ACLが使用できるオペレーティングシステムか？
+    \item USBメモリにはどのようなパスで到達できるか？
+    \item ファイルシステムの一貫性をチェックするコマンドは何か？
+    \end{itemize}
+  \end{enumerate}
+\end{frame}
+
+%=========================================================================
+\begin{frame}[fragile]
+  \frametitle{練習問題（２）}
+  \begin{enumerate}
+  \item[3.] 自分が使用しているオペレーティングシステムで試してみなさい．
+    \begin{itemize}
+    \item ショートカットやエイリアスを作成し試してみなさい．
+\begin{lstlisting}
+      # macOSの場合の実行例
+      $ echo aaa > a.txt
+      $ open a.txt
+      $ open a.txtのエイリアス      <--- エイリアスはGUIで作る
+      $ cat a.txt
+      $ cat a.txtのエイリアス
+\end{lstlisting} %$
+    \item UNIXやmacOSで実行して結果が異なる理由を考察しなさい．
+\begin{lstlisting}
+      # ハードリンクの場合          # シンボリックリンクの場合
+      $ echo aaa > a.txt          $ echo aaa > a.txt
+      $ echo bbb > b.txt          $ echo bbb > b.txt
+      $ ln a.txt c.txt            $ ln -s a.txt c.txt
+      $ mv a.txt d.txt            $ mv a.txt d.txt
+      $ mv b.txt a.txt            $ mv b.txt a.txt
+      $ cat c.txt                 $ cat c.txt
+\end{lstlisting} %$
+    \item ショートカットやエイリアスの振る舞いを調べる．\\
+      （リンク先ファイルを削除・移動・別ファイルに置換えした場合など）
+    \item ACLの追加・削除とその効果を確認する．
+    \end{itemize}
+  \end{enumerate}
 \end{frame}
 
 %=========================================================================
