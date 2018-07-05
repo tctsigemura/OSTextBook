@@ -3,18 +3,21 @@
 \usepackage{mySld}
 
 \begin{document}
-\title[OS]{オペレーティングシステム\\第６章 プロセス間通信}
+\title[プロセス間通信]
+      {オペレーティングシステム\\第６章 プロセス間通信}
 \date{}
-
 \begin{frame}
   \titlepage
+  \centerline{\url{https://github.com/tctsigemura/OSTextBook}}
 \end{frame}
 
+%=========================================================================
 %\begin{frame}
 %  \frametitle
 %  \tableofcontents
 %\end{frame}
 
+%=========================================================================
 \section{プロセス間通信}
 \begin{frame}
   \frametitle{プロセス間通信の必要性}
@@ -34,6 +37,7 @@
 {\bf 共有メモリ}と{\bf メッセージ通信}がある．
 \end{frame}
 
+%=========================================================================
 \section{共有メモリ}
 \begin{frame}
   \frametitle{共有メモリ}
@@ -46,26 +50,31 @@
   \end{itemize}
 \end{frame}
 
+%=========================================================================
 \begin{frame}
   \frametitle{UNIXの共有メモリサーバ例（前半）}
   \lst{lastline=20,frame=tlr}{ipcUnixShearedMemoryServer.c}
 \end{frame}
 
+%=========================================================================
 \begin{frame}
   \frametitle{UNIXの共有メモリサーバ例（後半）}
   \lst{firstline=21,frame=lrb}{ipcUnixShearedMemoryServer.c}
 \end{frame}
 
+%=========================================================================
 \begin{frame}
   \frametitle{UNIXの共有メモリクライアント例（前半）}
   \lst{lastline=16,frame=trl}{ipcUnixShearedMemoryClient.c}
 \end{frame}
 
+%=========================================================================
 \begin{frame}
   \frametitle{UNIXの共有メモリクライアント例（後半）}
   \lst{firstline=17,frame=lrb}{ipcUnixShearedMemoryClient.c}
 \end{frame}
 
+%=========================================================================
 \begin{frame}
   \frametitle{UNIXの共有メモリプログラム実行例}
   \lst{language=}{ipcUnixShearedMemoryTest.txt}
@@ -75,6 +84,7 @@
   \end{itemize}
 \end{frame}
 
+%=========================================================================
 \section{メッセージ通信}
 \begin{frame}
   \frametitle{メッセージ通信}
@@ -86,6 +96,7 @@
   \end{itemize}
 \end{frame}
 
+%=========================================================================
 \begin{frame}
   \frametitle{通信相手の指定方式（Naming）}
   \begin{center}
@@ -100,6 +111,7 @@
   \end{itemize}
 \end{frame}
 
+%=========================================================================
 \begin{frame}
   \frametitle{通信方式}
   一般に
@@ -125,28 +137,33 @@
   \end{itemize}
 \end{frame}
 
+%=========================================================================
 \begin{frame}
   \frametitle{UNIXのメッセージ通信プログラム例１}
   \lst{language={C}}{ipcUnixMessage.h}
   \lst{lastline=15,frame=tlr}{ipcUnixMessageWriter.c}
 \end{frame}
 
+%=========================================================================
 \begin{frame}
   \frametitle{UNIXのメッセージ通信プログラム例２}
   \lst{firstline=16,frame=lrb}{ipcUnixMessageWriter.c}
 \end{frame}
 
+%=========================================================================
 \begin{frame}
   \frametitle{UNIXのメッセージ通信プログラム例３}
   \lst{lastline=19,frame=tlr}{ipcUnixMessageReader.c}
 \end{frame}
 
+%=========================================================================
 \begin{frame}
   \frametitle{UNIXのメッセージ通信プログラム例４}
   \lst{firstline=20,frame=lrb}{ipcUnixMessageReader.c}
   \lst{}{ipcUnixMessageTest.txt}
 \end{frame}
 
+%=========================================================================
 \section{TacOSのメッセージ通信機構}
 \begin{frame}
   \frametitle{TacOSのメッセージ通信機構}
@@ -162,6 +179,7 @@
   \end{enumerate}
 \end{frame}
 
+%=========================================================================
 \begin{frame}
   \frametitle{TacOSのリンク構造体}
   \lst{language={C++}}{tacosLink.hmm}
@@ -172,6 +190,7 @@
   \end{itemize}
 \end{frame}
 
+%=========================================================================
 \begin{frame}
   \frametitle{TacOSのリンク作成ルーチン}
   \lst{language={C++}}{tacosNewLink.cmm}
@@ -182,6 +201,7 @@
   \end{itemize}
 \end{frame}
 
+%=========================================================================
 \begin{frame}
   \frametitle{TacOSのメッセージ通信ルーチン（サーバ用）}
   \lst{language={C++}}{tacosSendReceive.cmm}
@@ -192,6 +212,7 @@
   \end{itemize}
 \end{frame}
 
+%=========================================================================
 \begin{frame}
   \frametitle{TacOSのメッセージ通信使用例（サーバ側）}
   \lst{language={C++}}{tacosPmMain.cmm}
@@ -204,6 +225,7 @@
   \end{itemize}
 \end{frame}
 
+%=========================================================================
 \begin{frame}
   \frametitle{TacOSのメッセージ通信ルーチン（クライアント用）}
   \lst{language={C++}}{tacosSndRec.cmm}
@@ -213,6 +235,7 @@
   \end{itemize}
 \end{frame}
 
+%=========================================================================
 \begin{frame}
   \frametitle{TacOSのメッセージ通信使用例（クライアント側）}
   \lst{language={C++}}{tacosPmExec.cmm}
@@ -229,6 +252,7 @@
   \end{itemize}
 \end{frame}
 
+%=========================================================================
 \begin{frame}
   \frametitle{TaC7とTaC（参考）}
   \begin{minipage}{0.58\columnwidth}
@@ -242,26 +266,31 @@ TeC7は，TacOSを書き込んだマイクロSDカードを装着すると，
 簡単なPC（TaC）として使用できる．
 \end{frame}
 
+%=========================================================================
 \begin{frame}
   \frametitle{TaCのハードウェア（参考）}
   \fig{scale=0.49}{tacBlock-crop.pdf}
 \end{frame}
 
+%=========================================================================
 \begin{frame}
   \frametitle{一般的なPCのハードウェア（参考）}
   \fig{scale=0.40}{hardBlock-crop.pdf}
 \end{frame}
 
+%=========================================================================
 \begin{frame}
   \frametitle{TacOSの構造（参考）}
   \fig{scale=0.49}{tacosOrganization-crop.pdf}
 \end{frame}
 
+%=========================================================================
 \begin{frame}
   \frametitle{マイクロカーネル方式（参考）}
   \fig{scale=0.49}{microkernel-crop.pdf}
 \end{frame}
 
+%=========================================================================
 \begin{frame}
   \frametitle{オペレーティングシステムの構造（参考）}
   \fig{scale=0.49}{osOrganization-crop.pdf}

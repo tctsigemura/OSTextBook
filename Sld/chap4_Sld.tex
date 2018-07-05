@@ -3,18 +3,21 @@
 \usepackage{mySld}
 
 \begin{document}
-\title[OS]{オペレーティングシステム\\第４章 スケジューリング}
+\title[スケジューリング]
+      {オペレーティングシステム\\第４章 スケジューリング}
 \date{}
-
 \begin{frame}
   \titlepage
+  \centerline{\url{https://github.com/tctsigemura/OSTextBook}}
 \end{frame}
 
+%=========================================================================
 %\begin{frame}
 %  \frametitle
 %  \tableofcontents
 %\end{frame}
 
+%=========================================================================
 \section{評価基準}
 \begin{frame}
   \frametitle{評価基準}
@@ -27,12 +30,14 @@
   \end{itemize}
 \end{frame}
 
+%=========================================================================
 \section{システムごとの目標}
 \begin{frame}
   \frametitle{スケジューリングの目標}
   \tbl{scale=1.0}{schedulingObjective.pdf}
 \end{frame}
 
+%=========================================================================
 \section{プロセスの振舞}
 \begin{frame}
   \frametitle{CPUバウンドプロセス}
@@ -43,6 +48,7 @@
   \end{itemize}
 \end{frame}
 
+%=========================================================================
 \begin{frame}
   \frametitle{I/Oバウンドプロセス}
   \fig{scale=0.7}{ioBound-crop.pdf}
@@ -51,6 +57,7 @@
   \end{itemize}
 \end{frame}
 
+%=========================================================================
 \section{スケジューリング方式}
 \subsection{FCFS}
 \begin{frame}
@@ -69,6 +76,7 @@
   \end{itemize}
 \end{frame}
 
+%=========================================================================
 \begin{frame}
   \frametitle{FCFSスケジューリング（２）}
   \small\begin{tabular}{c c c}
@@ -85,6 +93,7 @@
   \end{itemize}
 \end{frame}
 
+%=========================================================================
 \subsection{SJF}
 \begin{frame}
   \frametitle{SJFスケジューリング}
@@ -101,6 +110,7 @@
   \end{itemize}
 \end{frame}
 
+%=========================================================================
 \subsection{SRTF}
 \begin{frame}
   \frametitle{SJFスケジューリング（比較のため）}
@@ -119,6 +129,7 @@
   \end{itemize}
 \end{frame}
 
+%=========================================================================
 \begin{frame}
   \frametitle{SRTFスケジューリング}
   \small\begin{tabular}{c c c}
@@ -136,6 +147,7 @@
   \end{itemize}
 \end{frame}
 
+%=========================================================================
 \subsection{RR}
 \begin{frame}
   \frametitle{RRスケジューリング（１）}
@@ -154,6 +166,7 @@
   \end{itemize}
 \end{frame}
 
+%=========================================================================
 \begin{frame}
   \frametitle{RRスケジューリング（２）}
   \small\begin{tabular}{c c c}
@@ -171,6 +184,7 @@
   \end{itemize}
 \end{frame}
 
+%=========================================================================
 \subsection{優先度順}
 \begin{frame}
   \frametitle{優先度順スケジューリング}
@@ -181,7 +195,7 @@
   \end{itemize}
 \end{frame}
 
-
+%=========================================================================
 \subsection{FB}
 \begin{frame}
   \frametitle{FBスケジューリング}
@@ -191,12 +205,14 @@
   \end{itemize}
 \end{frame}
 
+%=========================================================================
 \subsection{TacOSのスケジューラ}
 \begin{frame}[fragile]
   \frametitle{TacOSのスケジューラ}
   \lst{language={C}}{sch.cmm}
 \end{frame}
 
+%=========================================================================
 \begin{frame}
   \frametitle{TacOSの実行可能列（参考）}
   \begin{itemize}

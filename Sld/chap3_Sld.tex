@@ -3,18 +3,20 @@
 \usepackage{mySld}
 
 \begin{document}
-\title[OS]{オペレーティングシステム\\第３章 CPUの仮想化}
+\title[CPUの仮想化]{オペレーティングシステム\\第３章 CPUの仮想化}
 \date{}
-
 \begin{frame}
   \titlepage
+  \centerline{\url{https://github.com/tctsigemura/OSTextBook}}
 \end{frame}
 
+%=========================================================================
 %\begin{frame}
 %  \frametitle
 %  \tableofcontents
 %\end{frame}
 
+%=========================================================================
 \section{時分割多重}
 \begin{frame}
   \frametitle{時分割多重によるCPUの仮想化}
@@ -26,16 +28,19 @@
   \end{itemize}
 \end{frame}
 
+%=========================================================================
 \begin{frame}
   \frametitle{CPUの構造（参考）}
   \fig{scale=0.6}{cpuBlock-crop.pdf}
 \end{frame}
 
+%=========================================================================
 \begin{frame}
   \frametitle{プロセスの構造（参考）}
   \fig{scale=0.5}{procOrganization-crop.pdf}
 \end{frame}
 
+%=========================================================================
 \section{プロセスの状態}
 \begin{frame}
   \frametitle{プロセスの状態遷移}
@@ -46,12 +51,14 @@
   \end{itemize}
 \end{frame}
 
+%=========================================================================
 \section{プロセスの切換え}
 \begin{frame}
   \frametitle{プロセスの切換え}
   \fig{scale=0.33}{procSwitch-crop.pdf}
 \end{frame}
 
+%=========================================================================
 \begin{frame}
   \frametitle{オペレーティングシステムの構造（参考）}
   \fig{scale=0.4}{osOrganization-crop.pdf}
@@ -62,11 +69,13 @@
   \end{itemize}
 \end{frame}
 
+%=========================================================================
 \begin{frame}
   \frametitle{プロセスの切換えの例}
   \fig{scale=0.33}{procSwitchInst-crop.pdf}
 \end{frame}
 
+%=========================================================================
 \section{PCB（Process Control Block）}
 \begin{frame}
   \frametitle{PCBの内容}
@@ -88,11 +97,13 @@
 \end{itemize}
 \end{frame}
 
+%=========================================================================
 \begin{frame}
   \frametitle{PCBのリスト}
   \fig{scale=0.4}{procQueue-crop.pdf}
 \end{frame}
 
+%=========================================================================
 \section{TacOSのCPU仮想化}
 \begin{frame}
   \frametitle{TacOSのPCB}
@@ -111,21 +122,25 @@
   \end{itemize}
 \end{frame}
 
+%=========================================================================
 \begin{frame}[fragile]
   \frametitle{TaCのPCB（前半）}
   \lst{language={C},lastline=18,frame=tlr}{pcb.hmm}
 \end{frame}
 
+%=========================================================================
 \begin{frame}[fragile]
   \frametitle{TaCのPCB（後半）}
   \lst{language={C},firstline=20,firstnumber=20,frame=lrb}{pcb.hmm}
 \end{frame}
 
+%=========================================================================
 \begin{frame}
   \frametitle{TacOSのメモリ配置}
   \fig{scale=0.4}{tacosMemMap-crop.pdf}
 \end{frame}
 
+%=========================================================================
 \begin{frame}
   \frametitle{TacOSの実行可能列}
   \begin{itemize}
@@ -136,62 +151,74 @@
   \end{itemize}
 \end{frame}
 
+%=========================================================================
 \begin{frame}[fragile]
   \frametitle{プロセス切換えプログラム（yield()）}
   \lst{lastline=23,frame=tlr}{dispatch.s}
 \end{frame}
 
+%=========================================================================
 \begin{frame}[fragile]
   \frametitle{プロセスの切換えプログラム（dispatch()）}
   \lst{firstline=24,firstnumber=24,frame=lrb}{dispatch.s}
 \end{frame}
 
+%=========================================================================
 \section{スレッド（Thread）}
 \begin{frame}
   \frametitle{マルチプログラミングを用いないWebサーバ}
   \fig{scale=0.6}{singleProcSingleClient-crop.pdf}
 \end{frame}
 
+%=========================================================================
 \begin{frame}
   \frametitle{マルチプログラミングを用いないWebサーバ}
   \fig{scale=0.6}{singleProcMultiClient-crop.pdf}
 \end{frame}
 
+%=========================================================================
 \begin{frame}
   \frametitle{マルチプログラミングを用いるWebサーバ}
   \fig{scale=0.6}{multiProc-crop.pdf}
 \end{frame}
 
+%=========================================================================
 \begin{frame}
   \frametitle{マルチプログラミングを用いるWebサーバ}
   \fig{scale=0.6}{multiThread-crop.pdf}
 \end{frame}
 
+%=========================================================================
 \begin{frame}
   \frametitle{ユーザスレッドとカーネルスレッド}
   \fig{scale=0.5}{kernelThread-crop.pdf}
 \end{frame}
 
+%=========================================================================
 \begin{frame}
   \frametitle{ユーザスレッドとカーネルスレッド}
   \fig{scale=0.5}{userThread-crop.pdf}
 \end{frame}
 
+%=========================================================================
 \begin{frame}
   \frametitle{M個のスレッドで手分けをして合計を計算する様子}
   \fig{scale=0.6}{threadedSum-crop.pdf}
 \end{frame}
 
+%=========================================================================
 \begin{frame}[fragile]
   \frametitle{M個のスレッドで合計を計算する（前半）}
   \lst{language={C},lastline=21,frame=tlr}{threadTest.c}
 \end{frame}
 
+%=========================================================================
 \begin{frame}[fragile]
   \frametitle{M個のスレッドで合計を計算する（後半）}
   \lst{language={C},firstline=22,firstnumber=22,frame=lrb}{threadTest.c}
 \end{frame}
 
+%=========================================================================
 \begin{frame}[fragile]
   \frametitle{M個のスレッドで合計を計算する（後半）}
   \tbl{scale=0.7}{threadTimeTbl.pdf}

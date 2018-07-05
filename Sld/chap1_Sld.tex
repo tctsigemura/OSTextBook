@@ -1,20 +1,23 @@
 %\documentclass[dvipdfmx]{beamer}
-\documentclass[nomag]{beamer}                   % lualatex の場合
+\documentclass{beamer}                   % lualatex の場合
 \usepackage{mySld}
 
 \begin{document}
-\title[OS]{オペレーティングシステム\\第１章 オペレーティングシステムとは}
+\title[オペレーティングシステムとは]
+      {オペレーティングシステム\\第１章 オペレーティングシステムとは}
 \date{}
-
 \begin{frame}
   \titlepage
+  \centerline{\url{https://github.com/tctsigemura/OSTextBook}}
 \end{frame}
 
+%=========================================================================
 %\begin{frame}
 %  \frametitle
 %  \tableofcontents
 %\end{frame}
 
+%=========================================================================
 \section{オペレーティングシステムの役割}
 \subsection{拡張マシンとしてのオペレーティングシステム}
 \begin{frame}
@@ -26,6 +29,7 @@
   \end{itemize}
 \end{frame}
 
+%=========================================================================
 \subsection{ハードウェア管理プログラムとしてのオペレーティングシステム}
 \begin{frame}
   \frametitle{ハードウェア管理プログラムとしての\\オペレーティングシステム}
@@ -37,6 +41,7 @@
   \end{itemize}
 \end{frame}
 
+%=========================================================================
 \section{オペレーティングシステムの歴史}
 \subsection{第１世代（1945〜1955，黎明期）}
 \begin{frame}
@@ -48,6 +53,7 @@
   \end{itemize}
 \end{frame}
 
+%=========================================================================
 \subsection{第２世代（1955〜1965，トランジスタ）}
 \begin{frame}
   \frametitle{第２世代（バッチ処理，その１）}
@@ -63,6 +69,7 @@
   \end{itemize}
 \end{frame}
 
+%=========================================================================
 \begin{frame}
   \frametitle{第２世代（バッチ処理，その２）}
   \photo{scale=0.15}{punchcard.jpg}{}
@@ -73,6 +80,7 @@
   \end{itemize}
 \end{frame}
 
+%=========================================================================
 \subsection{第３世代（1966〜1980，ICとマルチプログラミング）}
 \begin{frame}
   \frametitle{第３世代（メインフレーム）}
@@ -90,6 +98,7 @@
   \end{itemize}
 \end{frame}
 
+%=========================================================================
 \begin{frame}
   \frametitle{第３世代（マルチプログラミング）}
   \fig{scale=0.7}{multiprogramming-crop.pdf}
@@ -101,6 +110,7 @@
   \end{itemize}
 \end{frame}
 
+%=========================================================================
 \begin{frame}
   \frametitle{第３世代（タイムシェアリング : TSS）}
   \fig{scale=0.5}{timesharing-crop.pdf}
@@ -114,6 +124,7 @@
   \end{itemize}
 \end{frame}
 
+%=========================================================================
 \begin{frame}
   \frametitle{次の世代に向けて（DynaBook）}
   \photo{scale=0.28}{Smalltalk-76.png}
@@ -126,6 +137,7 @@
   \end{itemize}
 \end{frame}
 
+%=========================================================================
 \subsection{第４世代（1980〜，PCの時代）}
 \begin{frame}
   \frametitle{IBM PC}
@@ -144,6 +156,7 @@
   \end{itemize}
 \end{frame}
 
+%=========================================================================
 \begin{frame}
   \frametitle{Apple Macintosh}
   \photo{scale=0.2}{Macintosh_128k_transparency.png}
@@ -158,6 +171,7 @@
   \end{itemize}
 \end{frame}
 
+%=========================================================================
 \begin{frame}
   \frametitle{オペレーティングシステムの系統図}
   \fig{scale=0.32}{tree-crop.pdf}

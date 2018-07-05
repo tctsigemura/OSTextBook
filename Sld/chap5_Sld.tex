@@ -3,18 +3,21 @@
 \usepackage{mySld}
 
 \begin{document}
-\title[OS]{オペレーティングシステム\\第５章 プロセス同期}
+\title[プロセス同期]
+      {オペレーティングシステム\\第５章 プロセス同期}
 \date{}
-
 \begin{frame}
   \titlepage
+  \centerline{\url{https://github.com/tctsigemura/OSTextBook}}
 \end{frame}
 
+%=========================================================================
 %\begin{frame}
 %  \frametitle
 %  \tableofcontents
 %\end{frame}
 
+%=========================================================================
 \section{競合（Race Condition，Competition）}
 \begin{frame}
   \frametitle{共有資源}
@@ -28,11 +31,13 @@
   \end{itemize}
 \end{frame}
 
+%=========================================================================
 \begin{frame}
   \frametitle{競合（Race Condition，Competition）}
   \lst{language=}{race.txt}
 \end{frame}
 
+%=========================================================================
 \section{クリティカルセクション（Critical Section）}
 \begin{frame}
   \frametitle{クリティカルセクション（Critical Section）}
@@ -46,6 +51,7 @@
   \end{enumerate}
 \end{frame}
 
+%=========================================================================
 \section{相互排他（mutual exclusion）}
 \begin{frame}
   \frametitle{相互排他（mutual exclusion）}
@@ -57,6 +63,7 @@
   \end{itemize}
 \end{frame}
 
+%=========================================================================
 \begin{frame}
   \frametitle{割込み禁止}
   \lst{language=}{disableInterrupt.txt}
@@ -68,6 +75,7 @@
   \end{itemize}
 \end{frame}
 
+%=========================================================================
 \begin{frame}
   \frametitle{ハードウェア構成}
   \fig{scale=0.41}{hardBlock-crop.pdf}
@@ -77,6 +85,7 @@
   \end{itemize}
 \end{frame}
 
+%=========================================================================
 \begin{frame}
   \frametitle{専用命令（TS命令）}
   TS（Test and Set）命令はSMPシステムでの相互排除に使用できる．\\
@@ -90,11 +99,13 @@
   \end{enumerate}
 \end{frame}
 
+%=========================================================================
 \begin{frame}
   \frametitle{専用命令（TS命令の使用例）}
   \lst{language=}{testAndSet.s}
 \end{frame}
 
+%=========================================================================
 \begin{frame}
   \frametitle{専用命令（SW命令）}
   SW（Swap）命令もSMPシステムでの相互排除に使用できる．\\
@@ -110,11 +121,13 @@
   （$T$ レジスタの存在はプログラムから見えない）
 \end{frame}
 
+%=========================================================================
 \begin{frame}
   \frametitle{専用命令（SW命令の使用例）}
   \lst{language=}{swap.s}
 \end{frame}
 
+%=========================================================================
 \begin{frame}
   \frametitle{専用命令（CAS命令）}
   CAS（Compare And Swap）命令もSMPシステムでの相互排除に使用できる．
@@ -131,11 +144,13 @@
   {\bf ロックフリー（Lock-free）}なアルゴリズム
 \end{frame}
 
+%=========================================================================
 \begin{frame}
   \frametitle{Peterson のアルゴリズム}
   \lst{language=}{peterson.txt}
 \end{frame}
 
+%=========================================================================
 \section{セマフォ（Semaphore）}
 \begin{frame}
   \frametitle{セマフォ（Semaphore）}
@@ -152,6 +167,7 @@
 \fig{scale=0.35}{semaphore-crop.pdf}
 \end{frame}
 
+%=========================================================================
 \begin{frame}
   \frametitle{セマフォ（Semaphore）}
   \begin{itemize}
@@ -169,6 +185,7 @@
 {\bf ビジーウェイティング（Busy Waiting）では無い}のでCPUを無駄遣いすることはない．
 \end{frame}
 
+%=========================================================================
 \begin{frame}
   \frametitle{セマフォ（Semaphore）のP操作}
   {\bf P操作（P(S)）}
@@ -186,6 +203,7 @@
   \end{center}
 \end{frame}
 
+%=========================================================================
 \begin{frame}
   \frametitle{セマフォ（Semaphore）のV操作}
   {\bf V操作（V(S)）}
@@ -203,39 +221,46 @@
   \end{center}
 \end{frame}
 
+%=========================================================================
 \begin{frame}
   \frametitle{セマフォの使用例（相互排除問題）}
   \lst{language={C}}{semMutex.c}
   {\bf 初期値が１のセマフォを用いる．}
 \end{frame}
 
+%=========================================================================
 \begin{frame}
   \frametitle{セマフォの使用例（生産者・消費者問題）}
   \lst{language={C}}{semProducerConsumer.c}
 \end{frame}
 
+%=========================================================================
 \begin{frame}
   \frametitle{セマフォの使用例（複数生産者・複数消費者問題 1/2）}
   \lst{language={C},lastline=17,frame=tlr}{semMultiProducerConsumer.c}
 \end{frame}
 
+%=========================================================================
 \begin{frame}
   \frametitle{セマフォの使用例（複数生産者・複数消費者問題 2/2）}
   \lst{language={C},firstline=18,frame=lrb}{semMultiProducerConsumer.c}
 \end{frame}
 
+%=========================================================================
 \begin{frame}
   \frametitle{セマフォの使用例（リーダ・ライタ問題 1/2）}
   \lst{language={C},lastline=12,frame=tlr}{semReaderWriter.c}
   {\bf 排他ロック（exclusive lock）}
 \end{frame}
 
+%=========================================================================
 \begin{frame}
   \frametitle{セマフォの使用例（リーダ・ライタ問題 2/2）}
   \lst{language={C},firstline=13,frame=lrb}{semReaderWriter.c}
   {\bf 共有ロック（shared lock）}
 \end{frame}
 
+%=========================================================================
 \section{TacOSのセマフォ}
 \begin{frame}
   \frametitle{TacOSのセマフォ構造体（カーネル内）}
@@ -249,6 +274,7 @@
   \end{itemize}
 \end{frame}
 
+%=========================================================================
 \begin{frame}
   \frametitle{TacOSのセマフォ関連データ構造（カーネル内）}
   \fig{scale=0.45}{tacosSemaphore-crop.pdf}
@@ -258,21 +284,25 @@
   \end{itemize}
 \end{frame}
 
+%=========================================================================
 \begin{frame}
   \frametitle{TacOSでのセマフォの架空の使用例}
   \lst{language={C}}{tacosSemUse.cmm}
 \end{frame}
 
+%=========================================================================
 \begin{frame}
   \frametitle{TacOSのセマフォ割当て解放ルーチン（カーネル内）}
   \lst{language={C}}{tacosNewSem.cmm}
 \end{frame}
 
+%=========================================================================
 \begin{frame}
   \frametitle{TacOSのP操作ルーチン（カーネル内）}
   \lst{language={C}}{tacosSemP.cmm}
 \end{frame}
 
+%=========================================================================
 \begin{frame}
   \frametitle{TacOSのV操作ルーチン（1/2）（カーネル内）}
   \lst{language={C},lastline=19,frame=tlr}{tacosSemV.cmm}
@@ -281,6 +311,7 @@
   \end{itemize}
 \end{frame}
 
+%=========================================================================
 \begin{frame}
   \frametitle{TacOSのV操作ルーチン（2/2）（カーネル内）}
   \lst{language={C++},firstline=20,frame=lrb}{tacosSemV.cmm}
@@ -292,6 +323,7 @@
   \end{itemize}
 \end{frame}
 
+%=========================================================================
 \begin{frame}
   \frametitle{TacOSのCPUフラグ操作関数（カーネル内）}
   \lst{language=}{setPri.s}
