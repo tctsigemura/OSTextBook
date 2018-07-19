@@ -1,0 +1,55 @@
+\RequirePackage{luatex85}
+\documentclass[border=1mm]{standalone}
+\usepackage{luatexja}                              % lualatex の場合
+\usepackage[hiragino-pron]{luatexja-preset}        % ヒラギノフォント
+\usepackage{arydshln}
+\usepackage{multirow}
+\begin{document}
+\ttfamily\footnotesize
+\hdashlinewidth=0.1mm
+\hdashlinegap=0.8mm
+\begin{tabular}{r|c:c:c:c:c|}
+%-------------------------------------------------------------------
+                     & \multicolumn{5}{|c|}{}      \\
+...                  & \multicolumn{5}{|c|}{...}   \\
+                     & \multicolumn{5}{|c|}{}      \\\cline{2-6}
+%-------------------------------------------------------------------
+\multirow{7}{*}{3}   &   2 & 12 & D & 1 & "."         \\\cdashline{2-6}
+                     &   2 & 12 & D & 2 & ".."        \\\cdashline{2-6}
+                     &  12 & 12 & D & 3 & "etc"       \\\cdashline{2-6}
+                     &  13 & 12 & D & 3 & "bin"       \\\cdashline{2-6}
+                     &     &    &   &   &             \\
+                     & ... &... &...&...& ...         \\
+                     &     &    &   &   &             \\\cline{2-6}
+%-------------------------------------------------------------------
+                     & \multicolumn{5}{|c|}{}      \\
+...                  & \multicolumn{5}{|c|}{...}   \\
+                     & \multicolumn{5}{|c|}{}      \\\cline{2-6}
+%-------------------------------------------------------------------
+\multirow{7}{*}{123} &  12 & 12 & D & 1 & "."         \\\cdashline{2-6}
+                     &   2 & 12 & D & 2 & ".."        \\\cdashline{2-6}
+                     &  45 & 16 & R & 6 & "passwd"    \\\cdashline{2-6}
+                     &  99 & 16 & R & 5 & "group"     \\\cdashline{2-6}
+                     &     &    &   &   &             \\
+                     & ... &... &...&...& ...         \\
+                     &     &    &    &             \\\cline{2-6}
+%-------------------------------------------------------------------
+                     & \multicolumn{5}{|c|}{}      \\
+...                  & \multicolumn{5}{|c|}{...}   \\
+                     & \multicolumn{5}{|c|}{}      \\\cline{2-6}
+%-------------------------------------------------------------------
+\multirow{7}{*}{456} & \multicolumn{5}{|c|}{}      \\
+                     & \multicolumn{5}{|c|}{}      \\
+                     & \multicolumn{5}{|c|}{/etc/passwd}  \\
+                     & \multicolumn{5}{|c|}{ファイルの}   \\
+                     & \multicolumn{5}{|c|}{内容}         \\
+                     & \multicolumn{5}{|c|}{}      \\
+                     & \multicolumn{5}{|c|}{}      \\\cline{2-6}
+%-------------------------------------------------------------------
+                     & \multicolumn{5}{|c|}{}      \\
+...                  & \multicolumn{5}{|c|}{...}   \\
+                     & \multicolumn{5}{|c|}{}      \\
+\multicolumn{6}{c}{D : ディレクトリ}\\
+\multicolumn{6}{c}{R : 通常ファイル}\\
+\end{tabular}
+\end{document}

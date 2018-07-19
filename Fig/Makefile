@@ -3,7 +3,8 @@
 
 PDFS = memoryHierarchy.pdf masterBootRecord.pdf hddPartition.pdf \
        partitionTable.pdf fatBPB.pdf fatVolume.pdf fatDirEntry.pdf \
-       fatConcept.pdf fatCls.pdf fatDir.pdf fatFat.pdf
+       fatConcept.pdf fatCls.pdf fatDir.pdf fatFat.pdf ufsVolume.pdf \
+       ufsInode.pdf ufsDirEntry.pdf ufsDataBlock.pdf ufsInodeList.pdf
 
 %.pdf : %.tex myfig.sty
 	lualatex $*.tex

@@ -1,0 +1,20 @@
+\RequirePackage{luatex85}
+\documentclass[border=1mm]{standalone}
+\usepackage{luatexja}                              % lualatex の場合
+\usepackage[hiragino-pron]{luatexja-preset}        % ヒラギノフォント
+\newcommand{\inode}{\texttt{i-node}}
+\newcommand{\bs}{\texttt{\char'134}}  % バックスラッシュを表示するコマンド
+\begin{document}
+\ttfamily\begin{tabular}{|c|c|c|c|c|c|}
+\multicolumn{1}{c}{32bit} &
+\multicolumn{1}{c}{16bit} &
+\multicolumn{1}{c}{\scriptsize 8bit} &
+\multicolumn{1}{c}{\scriptsize 8bit} &
+\multicolumn{1}{c}{$l_2$バイト} &
+\multicolumn{1}{c}{詰め物} \\\hline
+\inode 番号 & $l_1$ & 型 & $l_2$ & ファイル名 & \bs0 ... \bs0 \\\hline
+\multicolumn{1}{l}{<--------} &
+\multicolumn{4}{c}{$l_1$バイト} &
+\multicolumn{1}{r}{-------->} \\
+\end{tabular}
+\end{document}

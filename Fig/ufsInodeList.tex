@@ -1,0 +1,26 @@
+\RequirePackage{luatex85}
+\documentclass[border=1mm]{standalone}
+\usepackage{luatexja}                              % lualatex の場合
+\usepackage[hiragino-pron]{luatexja-preset}        % ヒラギノフォント
+\usepackage{multirow}
+\begin{document}
+\ttfamily\footnotesize\begin{tabular}{r |c |}\cline{2-2}
+\multirow{2}{*}{0}   & \multirow{2}{*}{使用しない} \\
+                     &                             \\\cline{2-2}
+\multirow{2}{*}{1}   & \multirow{2}{*}{使用しない} \\
+                     &                             \\\cline{2-2}
+\multirow{2}{*}{2}   & type=ディレクトリ           \\
+                     & 直接ブロック[0]=3           \\\cline{2-2}
+\multirow{2}{*}{...} & \multirow{2}{*}{...}        \\
+                     &                             \\\cline{2-2}
+\multirow{2}{*}{12}  & type=ディレクトリ           \\
+                     & 直接ブロック[0]=123         \\\cline{2-2}
+\multirow{2}{*}{...} & \multirow{2}{*}{...}        \\
+                     &                             \\\cline{2-2}
+\multirow{2}{*}{45}  & type=通常ファイル           \\
+                     & 直接ブロック[0]=456         \\\cline{2-2}
+\multirow{2}{*}{...} & \multirow{2}{*}{...}        \\
+                     &                             \\
+\multicolumn{2}{c}{}\\
+\end{tabular}~
+\end{document}
