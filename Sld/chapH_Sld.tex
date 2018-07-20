@@ -1,0 +1,242 @@
+%\documentclass[dvipdfmx]{beamer}
+\documentclass{beamer}                   % lualatex の場合
+\usepackage{mySld}
+\newcommand{\inode}{\texttt{i-node}}
+\begin{document}
+\title[UNIX ファイルシステム]
+      {オペレーティングシステム\\第１７章 UNIX ファイルシステム}
+\date{}
+\begin{frame}
+  \titlepage
+  \centerline{\url{https://github.com/tctsigemura/OSTextBook}}
+\end{frame}
+
+%\section{}
+%=========================================================================
+%\begin{frame}
+%  \frametitle{}
+%\end{frame}
+
+\section{UNIX ファイルシステム}
+%=========================================================================
+\begin{frame}
+  \frametitle{UNIX ファイルシステム}
+  \begin{itemize}
+  \item UFS（UNIX File System）
+  \item 1979年にリリースされたVersion 7 UNIX のファイルシステムと \\
+    それを改良した多くのファイルシステムを UFS と呼ぶ．
+  \item 第１５章で「UNIXの場合」＝「UFSの場合」だった．
+  \item 多くのファイルシステムがUFSに準拠している．
+    \begin{itemize}
+    \item Windows の NTFS
+    \item macOS の HFS+，APFS
+    \item Linux の ext3，ext4
+    \end{itemize}
+  \end{itemize}
+  \vfill
+\end{frame}
+
+%=========================================================================
+\begin{frame}
+  \frametitle{ボリューム内部の配置}
+  \fig{scale=1.0}{ufsVolume.pdf}
+  \begin{itemize}
+  \item セクタ512B，ブロック16セクタ，\inode 128B
+  \item \inode がファイルを表現する（\inode ＝ ファイル？）
+  \end{itemize}
+  \vfill
+\end{frame}
+
+%=========================================================================
+\begin{frame}
+  \frametitle{\inode （index node）（１）}
+  \fig{scale=0.8}{ufsInodeAndDataBlock-crop.pdf}
+\end{frame}
+
+%=========================================================================
+\begin{frame}
+  \frametitle{\inode （index node）（２）}
+  \begin{itemize}
+  \item \emph{タイプ・モード}\\
+    \begin{itemize}
+    \item \texttt{type/sst/rwxrwxrwx}の16ビット
+    \item \texttt{type}：ファイル型（通常，ディレクトリ，シンボリックリンク等）
+    \item \texttt{ss}(Set-uid,Set-gid)：プログラムファイルを所有者の権限で実行
+    \item \texttt{t}：UNIXのバージョンによりさまざま
+    \item \texttt{rwxrwxrwx}：ファイルの保護モード
+    \end{itemize}
+  \item \emph{リンク数}：ハードリンク数
+  \item \emph{ファイルサイズ}：バイト単位
+  \item \emph{3つの時刻}\\
+    \begin{itemize}
+    \item 最終アクセス時刻
+    \item 変更時刻
+    \item \inode 変更時刻
+    \end{itemize}
+    時刻は，次の2つの32ビット整数で表現する．
+    \begin{itemize}
+    \item 1970年1月1日午前0時（UTC）からの経過秒数
+    \item 秒の小数点以下をナノ秒単位で表現
+    \end{itemize}
+  \end{itemize}
+\end{frame}
+
+%=========================================================================
+\begin{frame}
+  \frametitle{\inode （index node）（３）}
+  \begin{itemize}
+  \item \emph{直接ブロック} \\
+    \begin{itemize}
+    \item ファイル本体のデータ
+    \item $8KiB \times 12 = 96KiB$まで表現（ブロックサイズ8KiB時）
+    \item ファイルの第$0$バイト〜第$96Ki - 1$バイトまでを管理
+    \end{itemize}
+  \item \emph{1重間接ブロック}\\
+    \begin{itemize}
+    \item 直接ブロックだけでは表現できない大きなファイルに使用
+    \item 1重間接ブロックを用いてデータブロックの番号を格納
+    \item 1重間接ブロックに$8KiB \div 4B = 2Ki$個のブロック番号を格納
+    \item 2Ki個のデータブロックは$8KiB \times 2Ki = 16MiB$のデータを格納
+    \item 第$96Ki$バイト〜第$96KiB + 16MiB - 1$バイトの範囲を受け持つ
+    \end{itemize}
+  \item \emph{2重間接ブロック}\\
+    \begin{itemize}
+    \item 1重間接ブロックでも表現できない大きなファイルに使用
+    \item 2重間接ブロックは1重間接ブロックの番号を格納
+    \item 2重間接ブロックに$8KiB \div 4B = 2Ki$個のブロック番号を格納
+    \item 2Ki個の1重間接ブロックは$16MiB \times 2Ki = 32GiB$のデータを格納
+    \end{itemize}
+  \end{itemize}
+  \vfill
+\end{frame}
+
+%=========================================================================
+\begin{frame}
+  \frametitle{\inode （index node）（４）}
+  \begin{itemize}
+  \item \emph{3重間接ブロック}\\
+    \begin{itemize}
+    \item 2重間接ブロックを2Ki個管理できる
+    \item 2Ki個の2重間接ブロックは$32GiB \times 2Ki = 64TiB$のデータを格納
+    \end{itemize}
+  \item \emph{所有者ID}：ファイル所有者のユーザ番号（マルチユーザ）
+  \item \emph{グループID}：ファイルのグループ番号
+  \end{itemize}
+  \vfill
+  \begin{description}
+  \item[インデクス方式]
+    \inode のような構造を使う方式のこと．\\
+    高速なランダムアクセスができる．
+  \item[スパースファイル]
+    途中に穴の空いたファイルのこと．\\
+    インデクス方式はスパースファイルを表現できる．
+  \end{description}
+\end{frame}
+
+%=========================================================================
+\begin{frame}
+  \frametitle{ディレクトリファイル}
+  \begin{itemize}
+  \item ファイルの一種である．→ \inode により表現
+  \item ファイルの型（\texttt{type}）がディレクトリを表す値のもの
+  \item ディレクトリファイルは\emph{ファイル名}と\inode の対応表
+  \item 対応表の１行がディレクトリエントリ
+  \end{itemize}
+  \fig{scale=1.0}{ufsDirEntry.pdf}
+  \begin{itemize}
+  \item \emph{\inode 番号}：ファイルの \inode 番号
+  \item \emph{$l_1$}：ディレクトリエントリの大きさ（4の倍数バイト）
+  \item \emph{型}：ファイルの型（抹消されたディレクトリエントリの表現）
+  \item \emph{$l_2$}：ファイル名のバイト数
+  \item \emph{ファイ名}：255文字以内
+  \item \emph{詰め物}：エントリが4の倍数バイトになるように
+  \end{itemize}
+\end{frame}
+
+%=========================================================================
+\begin{frame}
+  \frametitle{パス名と \inode の対応付け（\texttt{/etc/passwd}を解析）}
+  \fig{scale=0.8}{ufsSample-crop.pdf}
+\end{frame}
+
+%=========================================================================
+\begin{frame}[fragile]
+  \frametitle{パス名と \inode の対応付け（\texttt{/etc/passwd}を解析）}
+  \begin{enumerate}
+  \item[(1)] 絶対パスなのでルートディレクトリから探索を開始する．\\
+    ルートディレクトリの\inode 番号は必ず2と決められている．
+  \item[(2)] ルートディレクトリの\inode から，
+    データブロック3にルートディレクトリの内容が格納されていることが分かる．
+  \item[(3)] データブロック3の3番目のエントリから，
+    \|etc|が12番の\inode に対応すると分かる．
+  \item[(4)] 12番目の\inode から\|etc|はディレクトリファイルであること，
+    内容がデータブロック123に格納されていることが分かる．
+  \item[(5)] データブロック123の3番目のエントリから，
+    \|passwd|が45番の\inode に対応することが分かる．
+  \item[(6)] 45番目の\inode から\|passwd|は普通のファイルであること，
+    ファイルの内容がデータブロック456に格納されていることが分かる．
+  \end{enumerate}
+  \vfill
+\end{frame}
+
+%=========================================================================
+\begin{frame}[fragile]
+  \frametitle{練習問題（１）}
+  \begin{enumerate}
+  \item[1.] 次の言葉の意味を説明しなさい．
+    \begin{itemize}
+    \item ブートブロック
+    \item スーパーブロック
+    \item \inode
+    \item \inode リスト
+    \item インデクス方式
+    \item スパースファイル
+    \item ディレクトリファイル
+    \item ディレクトリエントリ
+    \item 直接ブロック
+    \item 間接ブロック
+    \end{itemize}
+  \end{enumerate}
+\end{frame}
+
+%=========================================================================
+\begin{frame}[fragile]
+  \frametitle{練習問題（２）}
+  \begin{enumerate}
+  \item[2.] ブロックサイズが8セクタ（4KiB）の場合，
+    直接ブロックだけ用いて表現できるファイルの最大サイズを答えなさい．
+  \item[3.] ブロックサイズが8セクタ（4KiB）の場合，
+    1重間接ブロックを用いることによって，
+    直接ブロックだけの場合と比較して，
+    ファイルサイズを最大でどれだけ大きくできるか答えなさい．
+  \item[4.] ブロックサイズが8セクタ（4KiB）の場合，
+    ２重間接ブロックを用いることによって，
+    直接ブロックと１重間接ブロックだけ使用する場合と比較して，
+    ファイルサイズを最大でどれだけ大きくできるか答えなさい．
+  \end{enumerate}
+\end{frame}
+
+%=========================================================================
+\begin{frame}[fragile]
+  \frametitle{練習問題（３）}
+  \begin{enumerate}
+  \item[5.] 4ページの例がスパースファイルを表現しているとする．
+    また，ブロックサイズ等は「ボリューム内部の配置」で示したものと同じとする．
+    次のアドレスはデータブロックが割り当てられいるか答えなさい．
+    \begin{enumerate}
+    \item[(a)] 第\|0x00000000|バイト
+    \item[(b)] 第\|0x00001000|バイト
+    \item[(c)] 第\|0x00010000|バイト
+    \item[(d)] 第\|0x00100000|バイト
+    \item[(e)] 第\|0x01000000|バイト
+    \item[(f)] 第\|0x10000000|バイト
+    \end{enumerate}
+  \end{enumerate}
+\end{frame}
+
+%=========================================================================
+%\begin{frame}[fragile]
+%  \frametitle{}
+%\end{frame}
+
+\end{document}
