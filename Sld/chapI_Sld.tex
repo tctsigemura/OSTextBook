@@ -260,7 +260,55 @@
   \begin{itemize}
   \item 128KiBの間接ブロックはブロックポインタを最大1Ki個格納できる．
   \item $128KiB \times 1Ki = 128MiB$より大きなデーを表現する時は，
-    多重の間接ブロック（最大6レベル）を用いる．
+    多重の間接ブロック（最大6レベル）を用いる．（$2^{64}$バイト以上）
+  \end{itemize}
+  \vfill
+\end{frame}
+
+%=========================================================================
+\begin{frame}[fragile]
+  \frametitle{ストレージプールの全体像}
+  \fig{scale=0.4}{zfsStructure-crop.pdf}
+  \vfill
+\end{frame}
+
+%=========================================================================
+\begin{frame}[fragile]
+  \frametitle{ストレージプールの全体像（MOS layer）}
+  \fig{scale=0.4,clip,trim=0 250 0 0}{zfsStructure-crop.pdf}
+  \begin{itemize}
+  \item Objsetはdnodeの配列を管理する．
+  \item 配列には，ストレージプールプール全体の管理に関する情報や，
+    ファイルシステムやスナップショット等の一覧が格納される．
+  \item master node はストレージプールのコンフィグ，プロパティなど．
+  \item space map はストレージプール内のブロックの割付を管理する．
+  \end{itemize}
+  \vfill
+\end{frame}
+
+%=========================================================================
+\begin{frame}[fragile]
+  \frametitle{ストレージプールの全体像（Object-set layer）}
+  \fig{scale=0.4,clip,trim=0 0 0 250}{zfsStructure-crop.pdf}
+  \begin{itemize}
+  \item ファイルシステムはObjsetのdnode配列で表現する．
+  \item dnodeリストがUFSの\texttt{i-node}リストに相当する．
+  \item master node は root ディレクトリの dnode 番号などの情報．
+  \item 図は，通常ファイルの例とディレクトリファイルの例
+  \end{itemize}
+  \vfill
+\end{frame}
+
+%=========================================================================
+\begin{frame}[fragile]
+  \frametitle{スナップショットの作成}
+  \fig{scale=0.4,clip,trim=0 0 0 200}{zfsSnapshot-crop.pdf}
+  \begin{itemize}
+  \item ファイルシステムを表すObjsetのコピーを作る．
+  \item MOS layer の dnode 配列に登録する．
+  \item スナップショットは一瞬で作成できる．
+  \item 変更がないデータブロックは共用する．
+  \item 内容が書き換わるとCOWで必要最小限のブロックのコピーを作る．
   \end{itemize}
   \vfill
 \end{frame}
