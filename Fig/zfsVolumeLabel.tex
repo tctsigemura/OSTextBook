@@ -1,0 +1,25 @@
+\RequirePackage{luatex85}
+\documentclass[border=1mm]{standalone}
+\usepackage{luatexja}                              % lualatex の場合
+\usepackage[hiragino-pron]{luatexja-preset}        % ヒラギノフォント
+\begin{document}
+\begin{tabular}{|c|}\hline
+%  空白（8KiB）          \\\hline
+%  ブートヘッダ（8KiB）  \\\hline
+                        \\
+                        \\
+  デバイス情報など      \\
+  名前/値ペア           \\
+%  （112KiB）            \\
+  （128KiB）            \\
+                        \\
+                        \\\hline
+  Uberblock[0]（1KiB)   \\\hline
+  Uberblock[1]（1KiB)   \\\hline
+  Uberblock[2]（1KiB)   \\\hline
+                        \\
+  ...                   \\
+                        \\\hline
+  Uberblock[127]（1KiB) \\\hline
+\end{tabular}
+\end{document}

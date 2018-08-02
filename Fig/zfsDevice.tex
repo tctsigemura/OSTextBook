@@ -1,0 +1,18 @@
+\RequirePackage{luatex85}
+\documentclass[border=1mm]{standalone}
+\usepackage{luatexja}                              % lualatex の場合
+\usepackage[hiragino-pron]{luatexja-preset}        % ヒラギノフォント
+\begin{document}
+\begin{tabular}{|c|}
+  \hline
+  $VL_1$（256KiB） \\\hline
+  $VL_2$（256KiB） \\\hline
+  ブートコード(3.5MiB) \\\hline
+                   \\
+  データ領域       \\
+                   \\\hline
+  $VL_3$（256KiB） \\\hline
+  $VL_4$（256KiB） \\\hline
+  \multicolumn{1}{c}{$VL_n$：ボリュームラベル}
+\end{tabular}
+\end{document}
