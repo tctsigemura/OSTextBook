@@ -314,6 +314,116 @@
 \end{frame}
 
 %=========================================================================
+\begin{frame}[fragile]
+  \frametitle{スナップショットとdeadlist}
+  \fig{scale=0.55}{zfsDeadlist1-crop.pdf}
+  \begin{itemize}
+    \item ファイルシステム（\|FileSystem|）は時間とともに変化する．
+    \item ある瞬間の状態を保存したものがスナップショット．
+    \item \|B#N|と続く線はブロックとブロックの寿命を表す．
+    \item \|Snapshot#N|はスナップショットを表す．
+    \item \|deadlist|は使用されなくなったが解放できないブロックのリスト
+  \end{itemize}
+  \vfill
+\end{frame}
+
+%=========================================================================
+\begin{frame}[fragile]
+  \frametitle{ブロックの解放（１）}
+  \fig{scale=0.55}{zfsDeadlist1-crop.pdf}
+  \begin{itemize}
+    \item \|B#1|は\|Snapshot#1|で使用されているので解放できない．
+    \item \|B#2|と\|B#3|もスナップショットで使用されているので解放できない．
+    \item \|B#4|はスナップショットで使用されていないので解放できる．
+    \item 解放できないブロックは\|deadlist|に格納される．
+  \end{itemize}
+  \vfill
+\end{frame}
+
+%=========================================================================
+\begin{frame}[fragile]
+  \frametitle{ブロックの解放（２）}
+  \fig{scale=0.55}{zfsDeadlist2-crop.pdf}
+  \begin{itemize}
+    \item \|Snapshot#2|を削除した状態．
+    \item \|B#1|と\|B#2|は\|Snapshot#1|で使用されているので解放できない．
+    \item \|B#3|は\|Snapshot#2|が削除されたので解放できる．
+    \item \|B#1|と\|B#2|は\|FileSystem|の\|deadlist|に格納される．
+  \end{itemize}
+  \vfill
+\end{frame}
+
+%=========================================================================
+\begin{frame}[fragile]
+  \frametitle{まとめ}
+  ZFSは大きな主記憶と高速なCPUを前提に設計されている．\\
+  以下の特徴を持つ．
+  \begin{itemize}
+  \item COW（Copy On Write）を用い既存のブロックを上書きしない．
+  \item COWのお蔭でシステムのクラッシュでも壊れない構造を実現．
+  \item デバイス上の全てのデータについてチェックサムを持つ．
+  \item スナップショットやクローンを一瞬で作ることができる．
+  \item ボリュームの代わりにストレージプールを使用する．
+  \item ストレージプールに後で新しいデバイスを追加可能．
+  \end{itemize}
+  \vfill
+\end{frame}
+
+%=========================================================================
+\begin{frame}[fragile]
+  \frametitle{練習問題（１）}
+  次の言葉の意味を説明しなさい．
+  分からない言葉は調べなさい．
+  \begin{itemize}
+  \item COW（Copy On Write）
+  \item メタデータ
+  \item チェックサム
+  \item スナップショット
+  \item クローン
+  \item ボリューム
+  \item ストレージプール
+  \item ZPL（ZFS POSIX Layer）
+  \item DMU（Data Management Unit）
+  \item SPA（Storage Pool Allocator）
+  \item VNODE
+  \end{itemize}
+  \vfill
+\end{frame}
+
+%=========================================================================
+\begin{frame}[fragile]
+  \frametitle{練習問題（２）}
+  \begin{itemize}
+  \item Uberblock
+  \item ブロックポインタ
+  \item Dnode
+  \item MOS（Meta Object Set） layer
+  \item Object-set layer
+  \item space map
+  \item master node
+  \end{itemize}
+  \vfill
+\end{frame}
+
+%=========================================================================
+\begin{frame}[fragile]
+  \frametitle{練習問題（３）}
+  \begin{itemize}
+  \item トランザクショングループ番号は64ビットです．
+    毎秒100トランザクショングループを処理したとして，
+    トランザクショングループ番号がオーバーフローするまでに約何年かかるか
+    計算しなさい．
+  \item ZFSで使用できるチェックサム計算アルゴリズムについて調べなさい．
+  \item ファイルを表現するdnodeが間接レベル2の時，
+    最大のファイルサイズは何バイトになるか計算しなさい．
+  \item ブロックにリンクカウントを設け，
+    スナップショットからの参照数を管理することで，
+    ブロックの解放を判断するアイデアの利点と問題点を挙げなさい．
+  \end{itemize}
+  \vfill
+\end{frame}
+
+%=========================================================================
 %\begin{frame}[fragile]
 %  \frametitle{}
 %  \vfill
