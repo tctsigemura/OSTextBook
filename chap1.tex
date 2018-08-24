@@ -51,8 +51,7 @@ OSはハードウェアの機能を\emph{抽象化}した便利な拡張マシ�
   システムコールを通じて入出力も可能である．
   プロセスはCPU，メモリ，入出力を持っているので
   １台のコンピュータと考えることもできる．
-
-  プロセスはコンピュータを\emph{抽象化}したものだとも言える．
+  プロセスはコンピュータを\emph{抽象化}したものとも言える．
   （プロセス＝仮想コンピュータ）
 
 \item[例3] 拡張されたコンピュータ（システムコール） \\
@@ -230,9 +229,20 @@ OS/360を含む第３世代のオペレーティングシステムが
   入出力待ち等で実行できなくなったら他のプログラムを実行する．
   高価なCPUが入出力待ちで停止する可能性を低くすることができた．
 
-  \begin{myfig}{btp}{マルチプログラミングシステム}{multiprogramming}
-    \includegraphics[scale=0.66]{Fig/multiprogramming-crop.pdf}
-  \end{myfig}
+  \begin{figure}[btp]
+    \begin{center}
+      \begin{minipage}{0.49\columnwidth}
+        \centerline{
+          \includegraphics[scale=0.66]{Fig/multiprogramming-crop.pdf}}
+        \caption{マルチプログラミングシステム}\label{fig:multiprogramming}
+      \end{minipage}
+      \begin{minipage}{0.49\columnwidth}
+        \centerline{
+          \includegraphics[scale=0.66]{Fig/timesharing-crop.pdf}}
+        \caption{タイムシェアリングシステム}\label{fig:timesharing}
+      \end{minipage}
+    \end{center}
+  \end{figure}
 
 \item \emph{タイムシェアリング（TSS：Time Sharing System）} \\
   マルチプログラミングの一種である．
@@ -243,10 +253,6 @@ OS/360を含む第３世代のオペレーティングシステムが
   ユーザは自分がコンピュータを独占しているように感じることができる．
   なお，ターミナルは\figref{terminal}のような，
   キーボードと表示装置だけを備えた安価な装置である．
-
-  \begin{myfig}{btp}{タイムシェアリングシステム}{timesharing}
-    \includegraphics[scale=0.66]{Fig/timesharing-crop.pdf}
-  \end{myfig}
 
   \begin{myfig}{btp}{ターミナル}{terminal}
     \includegraphics[scale=0.25]
@@ -298,7 +304,7 @@ OS/360を含む第３世代のオペレーティングシステムが
   Alto上の「暫定ダイナブック環境」（\figref{smalltalk}）は
   既にGUIやマウスを使用していた．
   スティーブ・ジョブスがAltoを見たことが
-  LISA開発きっかけになったと言われている\cite{dynabook}．
+  LISA開発のきっかけになったと言われている\cite{dynabook}．
 
   \begin{myfig}{btp}
     {Alto（Alto エミュレータ）のスクリーンショット}

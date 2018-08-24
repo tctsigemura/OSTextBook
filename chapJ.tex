@@ -1,324 +1,381 @@
-\chapter{セマフォ}
-\label{tacosImpSemaphore}
-TacOSではプロセス同期の基本機構としてセマフォを用いる．
-セマフォ機構はTacOSのマイクロカーネルが提供する．
+\chapter{CPUの仮想化}
+\label{tacosVirtualCPU}
+実例としてTacOS\footnote{TacOSの詳細は
+  \url{https://github.com/tctsigemura/TacOS}
+  を参照のこと．}の例を紹介する．
+TacOSはマルチプロセスのオペレーティングシステムである．
+以下ではCPUの時分割多重に必要なプロセス切換え機構を紹介する．
 
 %==============================================================================
-\section{データ構造}
-TacOSのセマフォはリスト\ref{tacosStructSem}に示す構造体である\footnote{
+\section{PCB}
+PCBはプロセス切換え機構にとっても最も重要なデータ構造である．
+TacOSのPCBはリスト\ref{tacosPCB}に示す
+\|PCB|構造体として定義されている\footnote{
   \url{https://github.com/tctsigemura/TacOS/blob/master/os/kernel/process.hmm}
   の一部である．}．
+\|PCB|構造体の内容を順に説明する．
 
-\lstinputlisting[numbers=none,float=btp,label=tacosStructSem,
-  firstline=99,lastline=104,
-  caption=TacOSのセマフォ構造体]{TacOS/kernel/process.hmm}
+\lstinputlisting[firstline=68,lastline=96,numbers=left,label=tacosPCB,
+  float=btp,caption=TacOSのPCB宣言ソースプログラム]{TacOS/kernel/process.hmm}
 
-\figref{tacosSemaphore}に
-TacOSのセマフォ関連データの構造を示す．
-\|semTbl|はセマフォの一覧である．
-システム起動時に\|SEM_MAX|個（30個）のセマフォを準備し\|semTbl|に登録する．
-\|semInUse|はセマフォが使用中かどうかを記録する論理型の配列である．
-セマフォが必要になった時に，一覧の中から空きセマフォを選んで使用する．
-セマフォは一覧のインデクス（セマフォ番号）で識別するので，
-P操作やV操作を行う関数の引数がセマフォ番号になる．
+\begin{itemize}
+\item 仮想CPU(\|sp|） \\
+  TacOSはプロセスのコンテキストのほとんどをカーネルスタック上に保存する．
+  そして，保存位置を表すスタックポインタ（SP）だけをPCBに保存する．
+  カーネルスタックはプロセス毎に準備されている．
+  PCBに保存されるのは仮想CPUの一部（SP）だけである．
+\item プロセス番号（\|pid|）
+\item 状態（\|stat|） \\
+  TacOSのプロセスの状態は以下の三つである．
+  \begin{enumerate}
+  \item \|P_RUN| \\
+    RunningとReadyの二つを兼用している．
+    プロセスは実行可能プロセスの待ち行列（実行可能列）に挿入される際に
+    \|P_RUN|状態になる．
+    実行中も\|P_RUN|状態のまま変更しない．
+  \item \|P_WAIT| \\
+    Waiting状態のことである．
+  \item \|P_ZOMBIE| \\
+    プロセスが終了したが，終了ステータスを親プロセスに渡していない状態である．
+    終了処理の途中状態と考えるとよい．
+  \end{enumerate}
+\item 優先度（\|nice|，\|enice|） \\
+  ゼロが最も高い優先度を表す．
+  優先度には，
+  本来の優先度（\|nice|）と，
+  実質の優先度（\|enice|）の二つがある．
+  現在の実装ではこの二つは同じ値を持つ．
+  将来，動的に変化する優先度を採用する場合に，
+  \|enice|の値が変化するようにする．
+\item プロセステーブルのインデクス（\|idx|） \\
+  このPCBが登録されているプロセステーブル内の位置である．
+  プロセスが消滅する際にプロセステーブルからPCBを削除するために使用する．
+\item イベント用カウンタとセマフォ（\|evtCnt|，\|evtSem|） \\
+  セマフォはプロセス間の同期に使用する基本的な機構である\footnote{
+    詳しくは後の章で解説する．}．
+  タイマー待ち，子プロセスの終了待ち等で，
+  このセマフォを使用してプロセスを待ち状態にする．
+  カウンタはタイマーの待ち時間を計るため等に使用される．
+\item プロセスのアドレス空間（\|memBase|，\|memLen|） \\
+  TacOSには仮想記憶のような高度な機構は無い．
+  各プロセスは，
+  物理メモリの領域をオペレーティングシステムによって割付けられる．
+  \|memBase|は
+  オペレーティングシステムがプロセスに割当てたメモリ領域の開始アドレス，
+  \|memLen|はメモリ領域のバイト数である．
+\item プロセスの親子関係の情報（\|parent|，\|exitStat|） \\
+  TacOSのプロセスは親プロセスだけ記憶している．
+  \|parent|は親プロセスのPCBを指すポインタである．
+  \|exitStat|は\|P_ZOMBIE|状態になった時，
+  親に渡すべき終了ステータスを保存する領域である．
+\item オープン中のファイル一覧（\|fds|） \\
+  プロセスがオープンしたファイルのファイルディスクリプタ（番号）の
+  一覧を記憶する配列である．
+  TacOSではシステム全体で一意なファイルディスクリプタ（番号）が
+  用いられる\footnote{
+    UNIXのファイルディスクリプタ（番号）はプロセス毎に0番から割振られる．}．
+  \|close()|システムコールは，
+  クローズするファイルディスクリプタが正当なものか調べるために，
+  この配列を使用する．
+  \|exit()|システムコールは，
+  プロセスを終了する前にプロセスの全オープンファイルをクローズするために，
+  この配列を使用する．
+\item PCBリストの管理（\|prev|，\|next|） \\
+  TacOSはプロセスのリストをPCBのリストとして表現する．
+  TacOSのPCBリストは番兵付きの重連結環状リストである
+  （\figref{tacosReadyQueue}参照）．
+  \|prev|，\|next|はリスト上で前後のプロセスのPCBを指すポインタである．
+\item スタックオーバーフローの検知（\|magic|） \\
+  TacOSはPCBの直後にプロセスのカーネルスタックを配置する．
+  万一，カーネルスタックがオーバーフローするとPCBが後ろから破壊される．
+  \|magic|はそれを検知するために使用される．
+  TacOSはPCBを初期化する際に\|magic|に\|0xabcd|を格納する．
+  カーネルスタックがオーバーフローすると，まず，\|magic|領域が破壊される．
+  \|magic|の値が変化していないかチェックすることで，
+  カーネルスタックのオーバーフローを検知することができる．
+\end{itemize}
 
-\begin{myfig}{btp}{TacOSのセマフォ関連データ構造}{tacosSemaphore}
-  \includegraphics[scale=0.6]{Fig/tacosSemaphore-crop.pdf}
+%==============================================================================
+\section{実行可能列}
+TacOSの実行可能列は，
+\figref{tacosReadyQueue}に示すようなPCBの番兵付き重連結環状リスト
+（双方向循環リスト）ある．
+
+\begin{myfig}{btp}{TacOSの実行可能列}{tacosReadyQueue}
+  \includegraphics[scale=0.6]{Fig/tacosReadyQueue-crop.pdf}
 \end{myfig}
 
-セマフォ構造体（\|Sem|構造体型）は，
-セマフォの値（\|cnt|）とプロセスの待ち行列（\|queue|）を持っている．
-システム起動時に番兵PCBを使用した空の重連結環状リストが登録される．
-プロセスの待ち行列の作り方は，
-\figref{tacosReadyQueue}に示した実行可能列と同様である．
-次に，\figref{tacosSemaphore}で表している三つのセマフォについて説明する．
+番兵の次のプロセスが最も優先度が高い実行可能なプロセスである．
+プロセスをディスパッチする際は，番兵の次のプロセスを選択する．
+選択されたプロセスを\|curProc|が指すように変更してからディスパッチする．
+TacOSは，PCBを実行可能列に置いたままプロセスを実行する．
+
+プロセスがブロックする際は，
+\|curProc|を実行可能列から削除しイベントの待ち行列に移動する．
+次回のディスパッチでは，
+再度，実行可能列の優先度が最も高いプロセスを選択し，
+\|curProc|が指すように変更する．
+
+%==============================================================================
+\section{メモリ配置}
+\figref{tacosMemMap}にTacOS実行時のメモリマップを示す．
+図は二つのプロセスが実行中の例である．
+まず「物理メモリ空間」の配置について，
+次に「PCBとカーネルスタック」について説明する．
+
+\begin{myfig}{btp}{TacOSのメモリ配置}{tacosMemMap}
+  \includegraphics[scale=0.6]{Fig/tacosMemMap-crop.pdf}
+\end{myfig}
+
+\begin{enumerate}
+\item[(a)] 物理メモリ空間
+  \begin{itemize}
+  \item カーネル \\
+    カーネルのプログラムとデータ（変数）がこの領域に配置される．
+  \item プロセス＃１のPCBとカーネルスタック \\
+    プロセス１のPCBとカーネルスタックが隣接して配置される．
+    詳細は\figref{tacosMemMap}(b)に示してある．
+  \item プロセス＃２のPCBとカーネルスタック \\
+    プロセス毎にPCBとカーネルスタックが準備される．
+  \item プロセス＃１のメモリ空間 \\
+    プロセス１のプログラム，データ，ヒープ，スタック領域が配置される．
+    ユーザモードのプロセスは，
+    この範囲以外のメモリをアクセスできないように保護すべきである．
+    しかし，TaCはメモリ保護機構を持っていない．
+  \item プロセス＃２のメモリ空間 \\
+    プロセス毎にメモリ空間が準備される．
+  \end{itemize}
+\item[(b)] PCBとカーネルスタック \\
+  PCBとカーネルスタックはプロセスの生成時に隣接して領域が確保される．
+  ユーザプログラム実行中はスタックの内容が空になる
+  （スタックポインタがスタック領域の最大アドレスを指す．）．
+  割込みが発生すると自動的にPSWがカーネルスタックに保存され，
+  実行モードがカーネルモードに切換わる．
+  次に割込みハンドラに制御が移りCPUレジスタをスタックに保存した後，
+  カーネル内ルーチンの実行が始まる．
+  カーネル内ルーチンは，PCBに向かって伸びるカーネルスタックを使用する．
+  そこで，PCBの最もスタック寄りにマジックナンバー（\|0xabcd|）を配置し，
+  スタックが伸びすぎPCBを破壊したことを検知するために使用する．
+\end{enumerate}
+
+%==============================================================================
+\section{割込み処理}
+\label{tacosInterrupt}
+TaCはベクタ方式の割込み機構を持っており，
+割込み原因毎に割込みハンドラを登録することが可能である．
+割込みが発生するとTaCのCPUは次の処理を自動的に行う．
+
+\begin{enumerate}
+\item カーネルスタックにPSWを保存する．
+\item CPUをカーネルモードかつ割込み禁止に設定する．
+\item 対応する割込みベクタに登録されているハンドラにジャンプする．
+\end{enumerate}
+
+以下では，タイマー割込みを例に割込みハンドラの振舞いと，
+割込み発生時のカーネルスタックの状態を説明する．
+リスト\ref{tacosTmr}\footnote{
+  \url{https://github.com/tctsigemura/TacOS/blob/master/os/kernel/kernel.cmm}
+  の一部である．
+}にTacOSのタイマー管理プログラム部分を示す．
+
+\lstinputlisting[firstline=463,lastline=491,numbers=left,label=tacosTmr,
+  float=btp,caption=TacOSのタイマー管理プログラム]{TacOS/kernel/kernel.cmm}
+
+\begin{itemize}
+\item \emph{割込みハンドラの初期化} \\
+  \|tmrInit()|関数はOS起動時に実行され，
+  割込みハンドラ（\|tmrIntr()|）関数を
+  \|0xffe0|番地から始まる割込みベクタに登録し，
+  タイマーのハードウェアを起動する．
+\item \emph{割込みハンドラ} \\
+  \|interrupt|型の\|tmrIntr()|関数が割込みハンドラである．
+  \|interrupt|型の関数は自動的にコンテキストをスタックに保存する．
+  自動的に保存されたコンテキストは\figref{tacosMemMap}(b)に示したものである．
+  多くの場合ユーザモードで実行中に割込みが発生するので，
+  \figref{tacosMemMap}では分かりやすさのためにユーザモードのコンテキストと
+  している．
+
+  \|tmrIntr()|関数はプロセステーブルの全てのプロセスについて（8行），
+  タイマーの残り時間が0以下になるものを起こす（14行）．
+  タイマー待ちのプロセスはPCBの\|evtSem|セマフォを用いてブロックしているので，
+  \|iSemV()|関数\footnote{
+    リスト\ref{tacosSemV}参照
+  }を用いてプロセスを起こす．
+
+  最後に，プロセス切換えの可能性があるなら\|yield()|関数\footnote{
+    \ref{tacosProcSwitch}で詳しく説明する．
+  }を呼び出し，
+  プロセスを切り換えるチャンスを作る．
+  プロセスが切り換わった場合は，20行を実行中の状態でプロセスがブロックする．
+  21行で\|interrupt|関数が終了し，コンテキストが復元され，
+  割込まれたプログラムが再開される．
+\end{itemize}
+
+%==============================================================================
+\section{プロセス切換えプログラム}
+\label{tacosProcSwitch}
+プロセス切換えプログラムは，
+コンテキストを保存する\|yield()|関数\footnote{
+  高級言語から\texttt{yield()}関数を呼出すと，
+  アセンブリ言語の\texttt{\_yield}ルーチンが実行される．
+}と復旧する\|dispatch()|関数\footnote{
+  高級言語から\texttt{dispatch()}関数を呼出すと，
+  アセンブリ言語の\texttt{\_dispatch}ルーチンが実行される．
+}からなる．
+\|dispatch()|関数は実行可能列の先頭にあるプロセスを選択し
+コンテキストを普及する．
+
+\subsection{\texttt{yield()}関数}
+リスト\ref{tacosYield}\footnote{
+  \url{https://github.com/tctsigemura/TacOS/blob/master/os/kernel/dispatcher.s}
+  の一部である．
+}にTaCのアセンブリ言語で記述した\|yield()|関数を示す．
+\|yield()|関数がカーネルモードのコンテキストをカーネルスタックに保存する．
+保存位置は\figref{tacosMemMap}に示した通りである．
+
+\ref{tacosInterrupt}で述べたように割込が発生すると，
+まず，割込みハンドラがユーザモードのコンテキストをカーネルスタックに保存する．
+次に，カーネルモードでカーネル内のプログラムが実行される．
+この時点では，割込み前のプロセスの一部として実行されている．
+最後に，カーネル内プログラムがプロセスを切換えるために\|yield()|を呼出す．
+\|yield()|はカーネルモードのコンテキストをカーネルスタックに追加保存し，
+新しいプロセスの実行に切換える．
+%次回，プロセスの実行が再開されるのは，
+%カーネル内の\|yield()|を呼出した位置になる．
+次にリスト\ref{tacosYield}の内容を解説する．
+
+\lstinputlisting[firstline=45,lastline=77,numbers=left,label=tacosYield,
+  float=btp,caption=TacOSコンテキスト保存プログラム]{TacOS/kernel/dispatcher.s}
 
 \begin{description}
-\item [Sem構造体（\#0）]
-  セマフォ一覧（\|semTbl|）の第0行に登録されている．
-  Sem構造体（\#0）は使用されていないSem構造体を表している．
-  \|semInUse|の対応する要素はFalseになっている．
+\item[5行] プロセスを切換える時にカーネル内で呼出される
+  \|yield()|関数の入口である．
+  \|yield()|関数は，
+  現在プロセスのカーネルモード・コンテキストを保存しCPUを解放する．
+\item[7〜23行] プロセスのカーネルモードのコンテキストを
+  スタックに保存する処理である．
+  \|yield()|が（CALL命令で）呼出された時点でPCはスタックに格納されている．
+  後でRETI命令でPCとFLAGを同時に復旧するのでPCの次にFLAGを格納している
+  （10行，\figref{tacosMemMap}(b)参照））．
+\item[25〜27行] プロセスのカーネルモードのコンテキストを
+  保存したスタックの位置をPCBに保存する．
+  \|_curProc|変数には現在のプロセスのPCBを指すポインタが保存されている
+  （\figref{tacosReadyQueue}参照）．
+  PCB先頭の\|sp|領域（リスト\ref{tacosPCB}参照）に
+  スタックポインタを保存する．
+  ここまでの処理でコンテキストの保存が完了した．
+\item[29〜32行] カーネルスタックがオーバーフローしていないか調べる．
+  PCBの\|magic|フィールドの値をチェックし
+  \|0xabcd|以外の値になっていたら，
+  カーネルスタックが隣接するPCBまで伸びた（オーバーフローした）と判断する．
+  この場合，\|.stkOverFlow|ルーチンにジャンプしシステムを停止する．
+  カーネルのエラーなので復旧は諦める．
+  オーバーフローが検知されない場合は次の行に進む．
+  次の行はリスト\ref{tacosDispatch}1行の\|_dispatch|である．
+  \|jnz|でジャンプしなかった場合はディスパッチャに進み次のプロセスを再開する．
+\end{description}
 
-\item [Sem構造体（\#1）]
-  値が0の時に複数のプロセスがP操作を行った状態である．
-  使用中なので\|semInUse|の対応する要素はTrueになっている．
-  P操作を行いブロックしたプロセスがセマフォの待ち行列に入っている．
-  プロセスは待ち行列の最後（図では右）に追加され，
-  待ち行列の先頭（図では左）から取り出される．
-  同じセマフォについて，プロセスはFCFSのスケジューリングが適用される．
+\subsection{\texttt{dispatch()}関数}
+リスト\ref{tacosDispatch}\footnote{
+  \url{https://github.com/tctsigemura/TacOS/blob/master/os/kernel/dispatcher.s}
+  の一部である．
+}にTaCのアセンブリ言語で記述した\|dispatch()|関数のソースプログラムを示す．
+\|dispatch()|関数がカーネルモードのコンテキストをカーネルスタックから復旧する．
+復旧するコンテキストは\figref{tacosMemMap}に示したように保存されている．
+次にリスト\ref{tacosDispatch}の内容を解説する．
 
-\item [Sem構造体（\#29）]
-  V操作の結果，値が2になっている状態を表している．
-  使用中なので\|semInUse|の対応する要素はTrueになっている．
-  値が1以上の時は，待ち行列が必ず空になる．
+\lstinputlisting[firstline=78,lastline=102,numbers=left,label=tacosDispatch,
+  float=btp,caption=TacOSコンテキスト復旧プログラム]{TacOS/kernel/dispatcher.s}
+
+\begin{description}
+    \item[1行] プロセスにCPUを割り付ける
+      ディスパッチャ（\|dispatch()|関数）の入口である．
+    \item[2〜6行] まず，
+      実行可能列（\|_readyQueue|）の先頭プロセスのPCBアドレスを
+      \|_curProc|変数にセットする．
+      実行可能列は番兵付きの重連結環状リストなので番兵の次が先頭のPCBである
+      （\figref{tacosReadyQueue}参照）．
+      実行可能なプロセスが無い場合はidleプロセスが選択される．
+      \|_curProc|が更新されたので，新しいプロセスが現在のプロセスになった．
+      次に，
+      現在のプロセスの保存してあったスタックポインタ（\|sp|）を復旧する．
+    \item[8〜22行] スタックポインタが復旧されたので，
+      スタックからCPUレジスタを復旧する．
+    \item[24〜25行] RETI命令を用いてPSW（FLAGとPC）を復旧し，
+      前回プロセスが\|yield()|を呼出した位置に戻る．
+      \|yield()|を呼出した位置に戻るためにRET命令ではなく
+      RETI命令を使用するのは，
+      プロセス生成時は例外的に，
+      このRETIで実行モードを切換えてユーザプログラムの実行を
+      開始するからである．
 \end{description}
 
 %==============================================================================
-\section{使用例}
-リスト\ref{tacosSemUse}にTacOSでのセマフォの架空の使用例を示す．
-これは，リスト\ref{semMutex}の例をTacOS用に書き換えたものである．
-
-\lstinputlisting[numbers=left,float=btp,label=tacosSemUse,
-  caption=TacOSでのセマフォの架空の使用例]{TacOS/samples/tacosSemUse.cmm}
-
-\begin{description}
-\item [共有変数と相互排除用のセマフォ]
-  以前の例ではセマフォを\|Semaphore|型の変数として扱っていた．
-  今回の例では，セマフォはカーネル内部に存在し，
-  使用者はセマフォを番号で指定するようになっている．
-  そのため3行は，
-  セマフォ変数の宣言から番号を記憶する整数型変数の宣言に変更された．
-\item [使用するセマフォの割当て]
-  セマフォはカーネル内部で
-  \figref{tacosSemaphore}に示したように管理されている．
-  4行のプロセスの初期化ルーチン\|initProc()|中で，
-  カーネルが提供する関数\|newSem()|を用いてセマフォの割当てを受ける．
-  \|newSem()|関数の引数はセマフォの初期値である．
-\item [P操作とV操作]
-  TacOSで使用できるP操作関数は\|semP()|，
-  V操作関数は\|semV()|である．
-  10行，12行，18行，20行のようにセマフォ番号を引数に使用する．
-\end{description}
-
-%==============================================================================
-\section{割当}
-リスト\ref{tacosNewSem}に
-TacOSカーネル内のセマフォ割当と解放ルーチンを示す\footnote{
+\section{スケジューラ}
+実行可能になったプロセスをスケジューリングするプログラムを
+\emph{スケジューラ}と呼ぶ．
+スケジューラの例として，
+TacOSのスケジューラのソースプログラムをリスト\ref{tacosSch}に示す\footnote{
   \url{https://github.com/tctsigemura/TacOS/blob/master/os/kernel/kernel.cmm}
   の一部である．}．
+TacOSの実行可能列は，
+PCBの番兵付き重連結環状リストとして表現する
+（\figref{tacosReadyQueue}参照）．
 
-\lstinputlisting[numbers=left,float=btp,label=tacosNewSem,
-  firstline=142,lastline=164,
-  caption=TacOSのセマフォ割当て解放ルーチン]{TacOS/kernel/kernel.cmm}
-
-\begin{description}
-\item [データ構造]
-  1行の\|semTbl|，2行の\|semInUse|は，
-  \figref{tacosSemaphore} に描かれている「セマフォ一覧」と
- 「使用中のセマフォ」のことである．
- \|semTbl|はTacOSの起動時に「Sem構造体」や「番兵PCB」で初期化される．
-
-\item [割込み禁止による相互排除]
-  5行の\|newSem()|関数が\|semTbl|から未使用のセマフォを探す．
-  \|newSem()|関数や後述の\|semP()|，\|semV()|関数は，
-  複数のプロセスから並列に呼び出され\|semTbl|や\|semInUse|をアクセスする．
-  これらのデータ構造はプロセス間の共有データである．
-  \|newSem()|関数の内部はこれら共有データのクリティカルセクションに当たるので
-  相互排他が必要である．
-  TaCはシングルプロセッサシステムなので，
-  \ref{disableInterrupt}で紹介した「割込み禁止による相互排除」を行う．
-
-  6行では，
-  現在のフラグ\footnote{CPUのPSWのフラグのこと．}の値を\|r|に保存した後，
-  「割込み禁止（\|DI|）」にしている．
-  \|setPri()|関数はフラグの値を読み出し，
-  同時に引数値をフラグにセットするアセンブリ言語ルーチンである\footnote{
-    \texttt{setPri()}関数の詳細は「\ref{setPri} \texttt{setPri()}関数」を
-    参照のこと}．
-  \|newSem()|関数はカーネルモードで呼出すので，
-  実行モードが変化しないように「カーネルモード（\|KERN|）」も指定している．
-
-  7行からのループで使用されていないセマフォを探す．
-  割込み禁止で実行するので探索の途中でプリエンプションは発生しない．
-  未使用のセマフォが見つかったら12行でそれの番号を返す．
-
-  クリティカルセクションが終わるので，通常は割込みを許可するが，
-  \|newSem()|関数を呼出す前から割込み禁止だった場合もある．
-  11行では6行で保存した\|r|を用いてフラグの状態を復旧している．
-  もともと\|newSem()|が割込み許可状態で呼出された場合だけ
-  割込み許可状態に戻る．
-
-\item [エラー処理]
-  未使用のセマフォが見つからなかった場合は，
-  15行で\|panic()|関数を呼出す．
-  現在のTacOSではセマフォを使用できるのはカーネルとサーバプロセスだけなので，
-  セマフォが不足するようならオペレーティングシステムのバグである．
-  \|panic()|関数はエラーメッセージを表示した後，CPUを停止する．
-  \|panic()|関数は戻ってこないので16行は実行されない．
-
-\item [解放ルーチン]
-  21行の\|freeSem()|は割当てられていたセマフォを解放する．
-  共有変数\|semInUse|配列の書き換えは，
-  単一のストア機械語命令で終了するので割込み禁止にする必要はない\footnote{
-    CPUが機械語命令の途中で割込みを受け付けることはない．}．
-\end{description}
-
-%==============================================================================
-\section{P操作ルーチン}
-リスト\ref{tacosSemP}にTacOSのP操作ルーチンを示す\footnote{
-  \url{https://github.com/tctsigemura/TacOS/blob/master/os/kernel/kernel.cmm}
-  の一部である．}．
-P操作ルールーチンは\|semP()|関数のことである．
-
-\lstinputlisting[numbers=left,float=btp,label=tacosSemP,
-  firstline=171,lastline=186,
-    caption=TacOSのP操作ルーチン]{TacOS/kernel/kernel.cmm}
+\lstinputlisting[numbers=left,firstline=129,lastline=137,
+  float=btp,label=tacosSch,
+  caption=TacOSのスケジューラ・ソースプログラム]{TacOS/kernel/kernel.cmm}
 
 \begin{description}
-\item [割込み禁止による相互排除]
-  \|semP()|関数も，\|semInUse|や，\|semTbl|の配下のSem構造体，
-  PCB構造体等の共有データをアクセスするので相互排除を必要とする．
-  \|semP()|関数の内部は2行と15行の\|setPri()|関数を用いて，
-  割り込み禁止による相互排除を行っている．
-
-\item [セマフォ番号からセマフォ構造体への変換]
-  3行で引数のセマフォ番号が正当なものかチェックしている．
-  不正なものが渡されるようならオペレーティングシステムのバグなので
-  \|panic()|関数を用いてシステムを停止させる．
-  セマフォ番号が正しい場合は，
-  6行で\|semTbl|配列から目的のセマフォを見つける．
-
-\item [セマフォ値のデクリメント]
-  7行でセマフォの値を調べ，1以上なら8行で値を1減らす．
-  この場合は15行で割り込み許可フラグを復元して\|semP()|関数を終了する．
-
-\item [Block(事象待ち)]
-  7行でセマフォの値を調べ，
-  1未満なら10行に進み現在のプロセスをブロック\footnote{
-    プロセスのブロック（Block：事象待ち）については，
-    「\ref{procState}プロセスの状態」を参照のこと．}する．
-  ブロックの手順は次の通りである．
-
-  \begin{enumerate}
-  \item \|delProc()|関数を用いて現在のプロセスを実行可能列から外す．
-  \item 現在のプロセスの状態を「待ち状態（\|P_WAIT|）」に変更する．
-  \item 現在のプロセスをセマフォの待ち行列の最後に追加する\footnote{
-    \texttt{insProc()}関数を用いて番兵PCBの直前に挿入する．
-    環状リストで番兵PCBの直前は最後尾のことになる．}．
-  \item \|yield()|関数を呼出しCPUを解放する．
-    %CPUは他の実行可能なプロセスに切り換わる．
-    後でセマフォがV操作されプロセスが実行可能になったら，
-    \|yield()|関数から実行が再開される．
-  \end{enumerate}
-
-  なお，ここで使用している\|delProc()|と\|insProc()|\footnote{
-  \url{https://github.com/tctsigemura/TacOS/blob/master/os/kernel/kernel.cmm}
-  の一部である．}は，
-  リスト\ref{tacosDelInsProc}のようなPCBリスト操作関数である．
-  \|yield()|関数はリスト\ref{tacosYield}に
-  示したプロセス切換えプログラムである．
-
-  \lstinputlisting[numbers=left,float=btp,label=tacosDelInsProc,
-    firstline=113,lastline=125,
-    caption=TacOSのPCBリスト操作関数]{TacOS/kernel/kernel.cmm}
+\item[1行] \|schProc()|関数がスケジューラである．
+\item[2行] \|setPri()|関数はPSWの割込み許可フラグを操作する\footnote{
+  詳しくは「\ref{setPri} setPri()関数」で説明する．}．
+  \|schProc()|関数はプロセス間の共有資源である実行可能列を操作するので
+  クリティカルセクションである．
+  プロセスがプリエンプションしないように，ここで割り込み禁止にしている．
+\item[3行] \|enice|がプロセスの優先度である．
+  \|enice|は値が小さい方が優先度が高い．
+\item[4行] スケジューラは，
+  実行可能列（\|readyQueue|）を番兵PCBの次のPCBから探索を開始する．
+\item[5〜6行] 挿入するプロセスの\|enice|より大きいものを探す．
+  実行可能列の最後には，常時IdleプロセスのPCBが置かれている
+  （\figref{tacosReadyQueue}参照）．
+  Idleの\|enice|は最大値に設定されているのでループは必ず正常に終了する．
+\item[7行] 大きいものを見つけたら\|insProc()|を使用して，
+  見つけたPCBの直前に新しいプロセスのPCBを挿入する．
 \end{description}
 
-%==============================================================================
-\section{V操作ルーチン}
-リスト\ref{tacosSemV}にTacOSのV操作ルーチンを示す\footnote{
-  \url{https://github.com/tctsigemura/TacOS/blob/master/os/kernel/kernel.cmm}
-  の一部である．}．
-TacOSのV操作ルーチンは\|iSemV()|と\|semV()|の二種類がある．
-\|iSemV()|関数はセマフォにV操作だけ行う．
-\|semV()|関数はセマフォにV操作を行った後で，プロセス切換えを試みる．
-\|semV()|関数を用いると，
-V操作によって実行可能になったプロセスの優先度が
-現在のプロセスの優先度より高い場合に，プロセスが切り換わる．
-\|iSemV()|はカーネルや割込みハンドラ等で
-プリエンプションの発生を避けたい場合に使用する．
-
-\lstinputlisting[numbers=left,float=btp,label=tacosSemV,
-  firstline=188,lastline=220,
-  caption=TacOSのV操作ルーチン]{TacOS/kernel/kernel.cmm}
-
-\begin{description}
-\item [割込み禁止による相互排除]
-  \|iSemV()|関数や\|semV()|関数も相互排除を必要とする．
-  \|semV()|関数は22行と26行の\|setPri()|関数を用いて，
-  割り込み禁止による相互排除を行っている．
-  \|iSemV()|関数は，呼出し側で割り込み禁止にして使用する．
-\item [セマフォ番号からセマフォ構造体への変換]
-  3行でセマフォ番号の妥当性をチェックしてから，
-  7行で\|semTbl|配列から目的のセマフォを見つける．
-\item [セマフォ値のインクリメント]
-  10行で待ち行列の状態を調べる．
-  番兵PCB（\|q|）と番兵直後のPCB（\|p|）が同じなら
-  待ち行列は空である\footnote{
-    \figref{tacosSemaphore}の「Sem構造体（\#29）」を参照のこと．}．
-  待ち行列が空の場合は11行でセマフォの値を1増やし
-  \|false|を返り値として\|iSemv()|関数を終了する．
-\item [Complete(事象完了)]
-  10行で待ち行列を調べ空でないなら13行に進み，
-  待ち行列の先頭のプロセスを起床させる．
-  先頭のプロセスはComplete(事象完了)\footnote{
-    プロセスのComplete(事象完了)については，
-    「\ref{procState}プロセスの状態」を参照のこと．}の状態遷移をする．
-  13行でセマフォの待ち行列から先頭プロセスを外し，
-  14行でプロセスの状態を実行可能（\|P_RUN|）に変更し，
-  15行でスケジューラ（\|schProc()|関数）
-  \footnote{
-    スケジューラ（\texttt{schProc()}関数）は
-    リスト\ref{tacosSch}で定義されている．}
-  に依頼し実行可能列の適切な位置に挿入する．
-  この場合は\|true|を返り値として\|iSemv()|関数を終了する．
-\item [プロセスの切換え]
-  \|semV()|関数は，
-  V操作により実行可能列に新しいプロセスが追加された場合
-  （\|iSemv()|関数がtrueで返った場合）に\|yield()|関数を呼出す．
-  実行可能列に現在のプロセスより優先度の高いものがあった場合，
-  プロセスの切換えが起こる．
-\end{description}
-
-TacOSのプロセス同期機構は全てセマフォに基づいて構成される．
-例えば，メッセージ通信機構もセマフォを利用して構築されている．
-
-%==============================================================================
-\section{setPri()関数}
-\label{setPri}
-割り込み禁止による相互排除で使用した\|setPri()|関数のソースプログラムを
-リスト\ref{tacosSetPri}に示す\footnote{
-  \url{https://github.com/tctsigemura/TacOS/blob/master/os/util/crt0.s}
-  の一部である．}．
-\|setPri()|関数はCPUのPSWのフラグを参照・操作し，
-呼出し前の割込み許可状態を保存すると同時に，新しい値に変更する．
-CPUのPSWのフラグに割込許可ビットがある．
-
-\lstinputlisting[numbers=left,float=btp,label=tacosSetPri,
-  firstline=47,lastline=52,
-  caption=TacOSのフラグ操作ルーチン]{TacOS/util/crt0.s}
-
-\|setPri()|関数はTaCのアセンブリ言語で記述してある．
-{\cmml}から\|setPri|という名前で参照されるためには，
-アセンブリ言語では\|_setPri|というラベルを宣言する必要がある．
-2行は\|setPri()|関数の入口になるラベルを宣言している．
-
-{\cmml}プログラムは関数引数をスタックに積んで渡す\footnote{
-  C言語などで関数に引数を渡す仕組みは同様である}．
-3行では{\cmml}が\|setPri()|関数に渡した引数をG0に読み出している．
-4行で読み出した値をスタックに積み直す．
-
-5行では現在のフラグ値をG0にコピーする．
-{\cmml}では関数の返り値をG0レジスタに入れて返すので\footnote{
-  C言語などで関数値を返す仕組みは同様である}，
-この値は\|setPri()|関数の返り値になる．
-6行のreti機械語命令は，
-スタックからフラグとPCの値を取出し，
-\|setPri()|関数を呼出した場所に制御を戻す．
-この時，4行でスタックに積んだ値がフラグに読み出される．
-
-以上の仕組みで，
-\|setPri()|関数は引数の値をCPUのフラグにセットすると同時に，
-以前のフラグ値を呼出し側に返している．
-
+現在の実装では，\|enice|はプロセス生成時に\|nice|と同じ値に設定され，
+その後は変化しない．
+TacOSは\emph{静的優先度}を用いる
+\emph{優先度順スケジューリング方式}を用いていることになる．
+将来，\|enice|の値を動的に変化させるように変更すれば，
+\emph{動的優先度}方式になる．
 
 %==============================================================================
 \section{まとめ}
+TacOSが時分割多重方式でCPUを仮想化する方法について解説した．
+TacOSでは，PCBとカーネルスタックを合わせてコンテキストの保存が行われる．
+カーネルスタックはプロセス毎に割当てられコンテキストの大半が保存される．
+PCBにはプロセスのSPだけを保存する．
 
-...
-また，TacOSでセマフォがどのように実現されているかを学んだ．
-セマフォ機構はマイクロカーネルによって提供される．
-セマフォはカウンタとPCBの待ち行列を保持する構造体として表現される．
-P操作，V操作などの内部では割込み禁止による相互排除が行われていた．
+また，TacOSのタイマー処理を例に，
+割込みが発生してプロセスが切換わるまでの処理概要を説明した．
+ユーザプログラム実行中に割込みが発生するとカーネルモードに
+切換わり割込みハンドラに制御が移る．
+%{\cmm}言語の\|interrupt|型関数として実装された
+ハンドラはユーザモードのコンテキストをプロセスのカーネルスタックに保存し，
+その後カーネル内で必要な処理を行う．
+処理の結果によりプロセスを切換える場合は\|yield()|関数を呼ぶ．
 
-%==============================================================================
-\section*{練習問題}
-\begin{enumerate}
-  \renewcommand{\labelenumi}{\ttfamily\arabic{chapter}.\arabic{enumi}}
-  \setlength{\leftskip}{1em}
-\item TaCをマルチプロセッサシステムに進化させた時，
-  「リスト\ref{tacosSemP} TacOSのP操作ルーチン」を
-  どのように改造する必要があるか？（\texttt{Sem}構造体を変更しない場合）
-\item TaCをマルチプロセッサシステムに進化させた時，
-  「リスト\ref{tacosSemP} TacOSのP操作ルーチン」を
-  どのように改造する必要があるか？（\texttt{Sem}構造体も変更して良い場合）
-\end{enumerate}
+更に，TacOSのプロセス切替えプログラムについて仕組みを解説した．
+\|yield()|関数はアセンブリ言語で記述されており，
+プロセスのカーネルモードのコンテキストを保存する．
+\|dispatch()|関数もアセンブリ言語で記述されており，
+プロセスのカーネルモードのコンテキストを復旧する．
+コンテキストを復旧すると，
+以前に\|yield()|関数を呼出した次の行からプロセスの実行が再開される．
+
+最後に，TacOSのスケジューラを紹介した．
+\|schProc()|関数は実行可能列のプロセスが
+優先度\|enice|の線形リストになるように新しいプロセスをリストに追加する．
