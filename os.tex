@@ -3,16 +3,16 @@
 % OS 教科書
 %
 %------------------------------------------------------------------------------
-%\documentclass[a4paper,11pt,twocolumn,dvipdfmx]{jsbook}   % platex の場合
 \documentclass[a4paper,11pt,twocolumn]{ltjsbook}     % lualatex の場合
 \usepackage{mySty}
+\newcommand{\ver}{Ver. 0.1.0}
 %------------------------------------------------------------------------------
 % はじまり
 \begin{document}
 \frontmatter
 %------------------------------------------------------------------------------
 % 表紙
-\title{オペレーティングシステム\\Ver. 0.0.0}
+\title{オペレーティングシステム\\{\ver}}
 \author{徳山工業高等専門学校\\情報電子工学科}
 \date{}
 \maketitle
@@ -24,12 +24,16 @@
 ~
 \vfill
 \begin{flushleft}
-Copyright \copyright ~~ 2017 by \\
+Copyright \copyright ~~ 2017-2018 by \\
 Dept. of Computer Science and Electronic Engineering, \\
 Tokuyama College of Technology, JAPAN
 \end{flushleft}
-
 \vspace{0.8cm}
+
+本ドキュメントは JSPS 科研費 22500833 および 16K0099 の助成を受けて
+作成しました．
+\vspace{0.8cm}
+
 本ドキュメントはCC-BY-SA 4.0 ライセンスによって許諾されています。
 
 本ドキュメントは
@@ -43,7 +47,7 @@ CC-BY-SA 4.0 ライセンス全文は
 \url{https://creativecommons.org/licenses/by-sa/4.0/deed.ja}で確認できます．）
 
 %------------------------------------------------------------------------------
-% 目次
+%目次
 \setcounter{tocdepth}{2}
 \tableofcontents
 
@@ -75,11 +79,18 @@ CC-BY-SA 4.0 ライセンス全文は
 \include{chapG} % UFS
 \include{chapH} % ZFS
 
-\include{bibliography} % 参考文献
+\part{TacOSの実装例}
+\include{chapI} % CPUの仮想化
+\include{chapJ} % セマフォ
+\include{chapK} % メッセージ通信機構
+\include{chapL} % メモリ割付け
+\include{chapM} % ファイルシステム
+
+\part{資料と文献}
 \appendix
 \include{appA}  % 付録A：TaCに関する資料
-\include{appB}  % 付録B：メモリ割付けプログラムの例
-\include{appC}  % 付録C：FATファイルシステムの実装例
+\include{appB}  % 付録B：TacOSのファイルフォーマット
+\include{bibliography} % 文献
 
 %------------------------------------------------------------------------------
 % 発行元
@@ -90,9 +101,9 @@ CC-BY-SA 4.0 ライセンス全文は
 \vfill\vfill\vfill
 \begin{center}
 \fbox{\parbox{10cm}{ \vspace{0.3cm}
-\large{\emph{オペレーティングシステム Ver. 0.0.0}} \\
+\large{\emph{オペレーティングシステム {\ver}}} \\
 \\
-　発行年月　２０１７年１０月　Ver.0.0.0 \\
+　発行年月　２０１８年９月　{\ver} \\
 　発　　行　独立行政法人国立高等専門学校機構 \\
 　　　　　　徳山工業高等専門学校 \\
 　　　　　　情報電子工学科　重村哲至 \\

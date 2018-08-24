@@ -1,4 +1,0 @@
-public int exec(char[] path, char[][] argv) {
-  int r=sndrec(pmLink,EXEC,_AtoI(path),_AtoI(argv),0);
-  return r;                                         // 新しい子の PID を返す
-}

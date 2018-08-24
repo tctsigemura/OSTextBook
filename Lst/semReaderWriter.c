@@ -1,6 +1,5 @@
 Data      records;                  // 共有するデータ
 Semaphore rwSem = 1;                // リーダとライタの排他用セマフォ
-
 void writerThread() {               // ライタスレッド（複数のスレッドで並列実行する）
   for ( ; ; ) {                     // ライタスレッドは以下を繰り返す
     Data d = produce();             // 新しいデータを作る
@@ -9,10 +8,8 @@ void writerThread() {               // ライタスレッド（複数のスレ�
     V( &rwSem );                    // 共有データのロックを外す
   }
 }
-    
 int       cnt = 0;                  // リーダ間の共有変数（読出し中のリーダ数）
 Semaphore cntSem = 1;               // cnt の排他制御用セマフォ
-
 void readerThread() {               // リータスレッド（複数のスレッドで並列実行する）
   for ( ; ; ) {                     // リーダスレッドは以下を繰り返す
     P( &cntSem );                   // cnt にロックを掛ける

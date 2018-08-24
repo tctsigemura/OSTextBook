@@ -1,9 +1,0 @@
-// プロセスマネージャサーバのメインルーチン
-public void pmMain() {
-  pmLink = newLink();                               // リンクを生成する
-  while (true) {                                    // システムコールを待つ
-    Link l = receive(pmLink);                       // システムコールを受信
-    int r=pmSysCall(l.op,l.prm1,l.prm2,l.prm3,l.client);// システムコール実行
-    send(pmLink, r);                                // 結果を返す
-  }
-}

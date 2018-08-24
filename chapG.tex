@@ -273,6 +273,8 @@ UFSボリュームの構造は概念のみを示し，
 \newpage
 \section*{練習問題}
 \begin{enumerate}
+  \renewcommand{\labelenumi}{\ttfamily\arabic{chapter}.\arabic{enumi}}
+  \setlength{\leftskip}{1em}
 \item 次の言葉の意味を説明しなさい．
   \begin{itemize}
   \item ブートブロック
@@ -286,25 +288,20 @@ UFSボリュームの構造は概念のみを示し，
   \item 直接ブロック
   \item 間接ブロック
   \end{itemize}
-
 \item ブロックサイズが8セクタ（4KiB）の場合，
   直接ブロックだけ用いて表現できるファイルの最大サイズを答えなさい．
-
 \item ブロックサイズが8セクタ（4KiB）の場合，
   1重間接ブロックを用いることによって，
   直接ブロックだけの場合と比較して，
   ファイルサイズを最大でどれだけ大きくできるか答えなさい．
-
 \item ブロックサイズが8セクタ（4KiB）の場合，
   ２重間接ブロックを用いることによって，
   直接ブロックと１重間接ブロックだけ使用する場合と比較して，
   ファイルサイズを最大でどれだけ大きくできるか答えなさい．
-
 \item \figref{ufsInodeAndDataBlock}の例がスパースファイルを表現しているとする．
   また，ブロックサイズ等は「\ref{ufsVolumeLayout}ボリューム内部の配置」で
   示したものと同じとする．
   次のアドレスはデータブロックが割り当てられいるか答えなさい．
-
   \begin{enumerate}
     \item 第\|0x00000000|バイト
     \item 第\|0x00001000|バイト
@@ -313,5 +310,4 @@ UFSボリュームの構造は概念のみを示し，
     \item 第\|0x01000000|バイト
     \item 第\|0x10000000|バイト
   \end{enumerate}
-
 \end{enumerate}

@@ -3,7 +3,7 @@
 
 PDFS = os.pdf
 
-%.pdf : %.tex *.sty
+%.pdf : %.tex
 	lualatex $*.tex
 	open $*.pdf
 

@@ -6,7 +6,7 @@ OSのシステムディスクに使用された．
 それ以降のWindowsではシステムディスク用には使用されていないが，
 仕様が公開\footnote{
   \url{http://www.microsoft.com/whdc/system/platform/firmware/fatgen.mspx
-}等から入手できる．}されているので，
+  }等から入手できる．}されているので，
 USBメモリやメモリカードのファイルシステムとして広く使用されている．
 
 %============================================================================
@@ -21,7 +21,7 @@ PC以外でも音楽プレーヤ，デジカメ，デジタルテレビ，
 ファイル名は，半角8文字に加え3文字の拡張子を合わせた最大11文字で表現する．
 英字のアルファベットは大文字のみ使用できる．
 デジカメの写真データが\|IMG_1234.JPG|\footnote{
-キャノンのデジカメはこのような名前を使用する．}
+  キャノンのデジカメはこのような名前を使用する．}
 のようなファイル名になっているのは，
 FATファイルシステムの仕様に合わせているためと考えられる．
 
@@ -250,8 +250,9 @@ macOSでFAT16ファイルシステム上にディレクトリ\|A|を作成し，
 1KiBの\|\SAMPLE.DAT|の二つのファイルが書き込まれた状態を
 \figref{fatFileSystem}に示す．
 
-\myfigure{bp}{scale=1.0}{Fig/fatFileSystem-crop.pdf}
-         {FATファイルシステムにファイルを格納した例}{fatFileSystem}
+\begin{myfig}{bp}{FATファイルシステムにファイルを格納した例}{fatFileSystem}
+  \includegraphics[scale=1.0]{Fig/fatFileSystem-crop.pdf}
+\end{myfig}
 
 \begin{itemize}
 \item \emph{ルートディレクトリ}\\
@@ -338,6 +339,8 @@ FATファイルシステムをサポートしているので，
 %==============================================================================
 \section*{練習問題}
 \begin{enumerate}
+  \renewcommand{\labelenumi}{\ttfamily\arabic{chapter}.\arabic{enumi}}
+  \setlength{\leftskip}{1em}
 \item 次の言葉の意味を説明しなさい．
   \begin{itemize}
   \item BPB
@@ -348,13 +351,10 @@ FATファイルシステムをサポートしているので，
   \item クラスタチェイン
   \item ディレクトリファイル
   \end{itemize}
-
 \item リスト\ref{fatDirDump}を
   \figref{fatDirEntry}と比較しながら解析しなさい．
-
 \item \figref{fatFileSystem}の\|ABCDEFGH.TXT|ファイルの
   第\|0x00002000|バイトが格納されるクラスタの番号を答えなさい．
-
 \item 前問と同様に，
   第\|0x00004000|，\|0x00008000|，\|0x00010000|
   バイトに付いて答えなさい．

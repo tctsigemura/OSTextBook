@@ -8,13 +8,14 @@
 その結果，
 タイミングに依存した発見の難しいバグを持ったプログラムが作成される．
 そこで，プログラミング言語と一体になり\footnote{
-本章の話題はオペレーティングシステムではなくプログラミング言語である．}，
+  本章の話題はオペレーティングシステムではなくプログラミング言語である．}，
 プログラマに同期機構を強制的に利用させる仕組みが考案された．
-そのような仕組みの一つとして{\bf モニタ（Monitor）}を紹介する．
+そのような仕組みの一つとして\emph{モニタ（Monitor）}を紹介する．
 
+%==============================================================================
 \section{概要}
 モニタはリソース管理用の機能と制約を持った
-{\bf 抽象データ型}\cite{AbstractDataType}である．
+\emph{抽象データ型}\cite{AbstractDataType}である．
 C++やJavaなどを学んだことのある人なら，
 「抽象データ型はクラスのこと」と言えば分かりやすいと思われる．
 
@@ -22,8 +23,6 @@ C++やJavaなどを学んだことのある人なら，
 プロセス（スレッド）間の同期を行う機構が予め組込まれ，
 その制約の下で使用するものである．
 モニタの特長を以下に箇条書きにする．
-% その中で，最初の二つは抽象データ型に一般的な特長である．
-% 最後の一つはモニタ独特の特長である．
 
 \begin{itemize}
 \item プログラマが定義できる型である．（抽象データ型で一般的）
@@ -31,16 +30,15 @@ C++やJavaなどを学んだことのある人なら，
 \item 同期のための機能が組込まれている．（モニタ独特）
 \end{itemize}
 
-なお，
-Javaのクラスは同期のための機構も持っており，
+なお，Javaのクラスは同期のための機構も持っており，
 一定のルールに従って使用すればモニタに近い使用もできる．
-%（ただし，完全ではモニタない．）
 モニタをサポートするプログラミング言語は Concurrent Pascal が有名である．
 
+%==============================================================================
 \section{構成要素}
 モニタは次の要素を持つ抽象データ型である．
 \figref{monitor}にモニタの模式図\footnote{
-\figref{monitor}では，初期化プログラムが省略してある．}を示す．
+  \figref{monitor}では，初期化プログラムが省略してある．}を示す．
 
 \begin{itemize}
 \item 資源（データ，変数）
@@ -49,7 +47,9 @@ Javaのクラスは同期のための機構も持っており，
 \item 条件変数
 \end{itemize}
 
-\myfigure{btp}{scale=0.6}{Fig/monitor-crop.pdf}{モニタの模式図}{monitor}
+\begin{myfig}{btp}{モニタの模式図}{monitor}
+  \includegraphics[scale=0.6]{Fig/monitor-crop.pdf}
+\end{myfig}
 
 \subsection{資源（データ，変数）}
 複数のスレッドによって共有される変数のことである．
@@ -60,7 +60,7 @@ Javaのクラスは同期のための機構も持っており，
 外部から呼び出されるプログラムである．
 モニタの内部に必要に応じて名前付きで定義する．
 モニタの外部から資源にアクセスできるインタフェースは手続きだけである．
-手続きの実行は{\bf ガード}の働きにより排他的に行われ，
+手続きの実行は\emph{ガード}の働きにより排他的に行われ，
 同時に実行される手続きは必ず一つ以内である．
 
 \subsection{ガード}
@@ -73,9 +73,9 @@ Javaのクラスは同期のための機構も持っており，
 \subsection{条件変数}
 モニタの内部に必要に応じて名前付きで宣言する．
 条件変数にはwaitとsignalの二つの操作ができる．
-wait操作を行ったスレッドは{\bf ガードを外して}条件変数の待ち行列に入る．
+wait操作を行ったスレッドは\emph{ガードを外して}条件変数の待ち行列に入る．
 signal操作は条件変数の待ち行列から一つのスレッドを選んで実行可能にする．
-実行可能になったスレッドは{\bf ただちに}実行を再開する．
+実行可能になったスレッドは\emph{ただちに}実行を再開する．
 待ち行列にスレッドが複数ある時，
 どのスレッドが実行可能になるか明確な決まりはない．
 
@@ -83,70 +83,64 @@ signal操作は条件変数の待ち行列から一つのスレッドを選ん�
 モニタのインスタンスを作成する時に，
 初期化のために実行されるプログラムである．
 
+%==============================================================================
 \section{相互排除問題の解}
 前出の架空の銀行口座管理プログラムの例をモニタに置換える．
 残高がスレッド間で共有される変数である．
 共有変数をスレッド間で安全に共有させるためにモニタを用いる．
 
 \subsection{共有変数の記述}
-\figref{monAccount}にJava風の仮想言語による銀行口座の記述を示す．
+リスト\ref{monAccount}にJava風の仮想言語による銀行口座の記述を示す．
 本物の口座は他にも情報を持っているだろうが，
 ここでは口座は残高だけ持っていることにする．
 
-\begin{myfig}{btp}{モニタによる相互排除の実現（仮想言語版）}{monAccount}
-\lstinputlisting[numbers=left]{Lst/MonAccount.jama}
-\end{myfig}
+\lstinputlisting[numbers=left,float=btp,label=monAccount,
+  caption=モニタによる相互排除の実現（仮想言語版）]{Lst/MonAccount.jama}
 
 \begin{description}
 \item [2行]
-この仮想言語では，Java の class 定義に似た monitor 定義ができるものとす
-
+  この仮想言語では，Javaの class 定義に似た monitor 定義ができるものとする．
 \item [3〜4行]
-{\bf 資源}の例である．
-この例では残高を表すスレッド間の共有変数（{\tt money}）が資源である．
-
+  \emph{資源}の例である．
+  この例では残高を表すスレッド間の共有変数（\texttt{money}）が資源である．
 \item [5〜8行]
-{\bf 初期化プログラム}の例である．
-モニタのインスタンス生成時に残高を引数で初期化する．
-
+  \emph{初期化プログラム}の例である．
+  モニタのインスタンス生成時に残高を引数で初期化する．
 \item [9〜15行]
-{\bf 手続き}の例である．
-手続きは共有資源を書換えるので{\bf クリティカルセクション}であるが，
-自動的に{\bf ガード}をロックし排他的に実行されるので
-{\bf 明示的な相互排除を行う必要はない}．
+  \emph{手続き}の例である．
+  手続きは共有資源を書換えるので\emph{クリティカルセクション}であるが，
+  自動的に\emph{ガード}をロックし排他的に実行されるので
+  \emph{明示的な相互排除を行う必要はない}．
 \end{description}
 
 \subsection{共有変数の利用}
-\figref{monAccountMain}に，
-\figref{monAccount}で定義した\|MonAccount|モニタを
+リスト\ref{monAccountMain}に，
+リスト\ref{monAccount}で定義した\|MonAccount|モニタを
 利用した相互排除問題の解を示す．
 
-\begin{myfig}{btp}{モニタによる相互排除の利用（仮想言語版）}{monAccountMain}
-\lstinputlisting[numbers=left]{Lst/MonAccountMain.jama}
-\end{myfig}
+\lstinputlisting[numbers=left,float=btp,label=monAccountMain,
+  caption=モニタによる相互排除の利用（仮想言語版）]{Lst/MonAccountMain.jama}
 
 \begin{description}
 \item [2行]
-\figref{monAccount}に示した\|MonAccount|モニタ型のインスタンスを生成する．
-
+  リスト\ref{monAccount}に示した\|MonAccount|モニタ型のインスタンスを生成する．
 \item [3〜8行]
-入金管理スレッドが実行するメソッドである．
-入金額を受信し口座に入金する．
-
+  入金管理スレッドが実行するメソッドである．
+  入金額を受信し口座に入金する．
 \item [9〜13行]
-引落し管理スレッドが実行するメソッドである．
-支払い金額を受信し口座から引落す．
-
+  引落し管理スレッドが実行するメソッドである．
+  支払い金額を受信し口座から引落す．
 \item [14〜17行]
-プログラムは\|main()|から実行を開始する．
-\|main()|では「入金管理スレッド」と「引落し管理スレッド」を起動する．
-これらのスレッドがそれぞれ，
-\|receiveThread()|メソッドと\|payThread()|メソッドを実行するものとする．
+  プログラムは\|main()|から実行を開始する．
+  \|main()|では「入金管理スレッド」と「引落し管理スレッド」を起動する．
+  これらのスレッドがそれぞれ，
+  \|receiveThread()|メソッドと\|payThread()|メソッドを実行するものとする．
 \end{description}
 
+%==============================================================================
 \section{生産者と消費者問題の解}
-この問題で{\bf 資源}はデータを保管するFIFO構造のバッファである．
-このバッファを以下では{\bf キュー}と呼ぶことにする．
+この問題で\emph{資源}はデータを保管するFIFO構造のバッファである．
+このバッファを以下では\emph{キュー}と呼ぶことにする．
 キューとキューを操作する手続きは，
 全てモニタの中にまとめられる．
 キューを使用するユーザプログラムには，
@@ -159,285 +153,243 @@ signal操作は条件変数の待ち行列から一つのスレッドを選ん�
 次に，キューを使用する生産者スレッドと消費者スレッド作る．
 
 \subsection{キューの記述}
-\figref{monProducerConsumer}にJava風の仮想言語によるキューの記述例を示す．
+リスト\ref{monProducerConsumer}に
+Java風の仮想言語によるキューの記述例を示す．
 このプログラムは次のようになっている．
 
-\begin{myfig}{btp}{モニタによるキューの実現（仮想言語版）}{monProducerConsumer}
-\lstinputlisting[numbers=left]{Lst/BoundedBuffer.jama}
-\end{myfig}
+\lstinputlisting[numbers=left,float=btp,label=monProducerConsumer,
+  caption=モニタによるキューの実現（仮想言語版）]{Lst/BoundedBuffer.jama}
 
 \begin{description}
 \item [1行] この仮想言語では，
-Javaの\|class|定義に似た\|monitor|定義ができるものとする．
+  Javaの\|class|定義に似た\|monitor|定義ができるものとする．
+\item [2〜5行] \emph{資源}の例である．
+  キューとして使用するリングバッファのデータ構造を宣言している．
+  このモニタの目的は，資源であるキューを管理することである．
+  手続きを介すること無しに資源にアクセスすることは禁止なので，
+  モニタの外部からこれらのデータにアクセスできない．
+  \|N|がバッファの大きさ，
+  \|buf|がバッファ本体，
+  \|first|がバッファ中の次のデータ読みだし位置，
+  \|last|がバッファ中の次のデータ書込み位置，
+  \|cnt|がバッファ中のデータ件数を表す．
+\item [6〜8行] \emph{条件変数}の例である．
+  この仮想言語では，\|Condition|型の変数として条件変数を宣言する．
+  \|empty|は，
+  キューが空の時にデータを取り出そうとしたスレッドが，
+  キューにデータが書き込まれるまで待つために使用する条件変数である．
+  \|full|は，
+  キューが満杯の時にデータを書き込もうとしたスレッドが，
+  キューに空きができるまで待つために使用する条件変数である．
+\item [9〜14行] \emph{初期化プログラム}の例である．
+  モニタのインスタンスを作る際に実行されるものとする．
+  引数はバッファの大きさである．
+\item [15〜30行] \emph{手続き}の例である．
+  手続きはモニタの外部から呼び出し可能なプログラムである．
+  \|append()|はキューにデータを追加する．
+  \|remove()|はキューからデータを取り出す．
+  これらのプログラムが実行される時は\emph{ガード}による排他制御がされる．
+  次にバッファが満杯で待ちが発生する例を考えてみる．
 
-\item [2〜5行] {\bf 資源}の例である．
-キューとして使用するリングバッファのデータ構造を宣言している．
-このモニタの目的は，資源であるキューを管理することである．
-手続きを介すること無しに資源にアクセスすることは禁止なので，
-モニタの外部からこれらのデータにアクセスできない．
-\|N|がバッファの大きさ，
-\|buf|がバッファ本体，
-\|first|がバッファ中の次のデータ読みだし位置，
-\|last|がバッファ中の次のデータ書込み位置，
-\|cnt|がバッファ中のデータ件数を表す．
+  データをキューに追加するために\|append()|を呼出したスレッドは，
+  コメントに\|(1)|と記された行を実行し，
+  キューが満杯の時17行の\|full.wait()|で待ち状態になる．
+  待ち状態になる時はガードを外すので，
+  他のスレッドがモニタに入ることができる．
 
-\item [6〜8行] {\bf 条件変数}の例である．
-この仮想言語では，\|Condition|型の変数として条件変数を宣言する．
-\|empty|は，
-キューが空の時にデータを取り出そうとしたスレッドが，
-キューにデータが書き込まれるまで待つために使用する条件変数である．
-\|full|は，
-キューが満杯の時にデータを書き込もうとしたスレッドが，
-キューに空きができるまで待つために使用する条件変数である．
-
-\item [9〜14行] {\bf 初期化プログラム}の例である．
-モニタのインスタンスを作る際に実行されるものとする．
-引数はバッファの大きさである．
-
-\item [15〜30行] {\bf 手続き}の例である．
-手続きはモニタの外部から呼び出し可能なプログラムである．
-\|append()|はキューにデータを追加する．
-\|remove()|はキューからデータを取り出す．
-これらのプログラムが実行される時は{\bf ガード}による排他制御がされる．
-次にバッファが満杯で待ちが発生する例を考えてみる．
-
-データをキューに追加するために\|append()|を呼出したスレッドは，
-コメントに\|(1)|と記された行を実行し，
-キューが満杯の時17行の\|full.wait()|で待ち状態になる．
-待ち状態になる時はガードを外すので，
-他のスレッドがモニタに入ることができる．
-
-他のスレッドがデータをキューから取り出すために\|remove()|を呼び出すと，
-\|(2)|の行が実行され28行の\|full.signal()|まで進む．
-\|full.signal()|が実行されると待ち状態のスレッドが一つ起床し，
-\|(3)|の行が{\bf ただちに}実行される．
-\|(3)|の実行が終了した後に(4)の行が実行される．
-{\bf \|(2)|から\|(4)|の実行の間，
-ガードは外さないので他のスレッドがモニタに入ることはない．}
-
+  他のスレッドがデータをキューから取り出すために\|remove()|を呼び出すと，
+  \|(2)|の行が実行され28行の\|full.signal()|まで進む．
+  \|full.signal()|が実行されると待ち状態のスレッドが一つ起床し，
+  \|(3)|の行が\emph{ただちに}実行される．
+  \|(3)|の実行が終了した後に(4)の行が実行される．
+  \|(2)|から\|(4)|の実行の間，
+  \emph{ガードは外さないので他のスレッドがモニタに入ることはない．}
 \end{description}
 
 \subsection{生産者と消費者スレッドの記述}
-\figref{monProducerConsumerMain}に
+リスト\ref{monProducerConsumerMain}に
 Java風の仮想言語による生産者と消費者問題の解を示す．
-このプログラムは\figref{monProducerConsumer}で定義したキューを使用する．
+このプログラムはリスト\ref{monProducerConsumer}で定義したキューを使用する．
 
-\begin{myfig}{btp}{モニタによる生産者と消費者問題の解（仮想言語版）}
-{monProducerConsumerMain}
-\lstinputlisting[numbers=left]{Lst/BoundedBufferMain.jama}
-\end{myfig}
+\lstinputlisting[numbers=left,float=btp,label=monProducerConsumerMain,
+  caption=モニタによる生産者と消費者問題の解（仮想言語版）]
+                {Lst/BoundedBufferMain.jama}
 
 \begin{description}
 \item [2行] 
-\figref{monProducerConsumer}に示した
-\|BoundedBuffer|モニタ型のインスタンスである．
-
+  リスト\ref{monProducerConsumer}に示した
+  \|BoundedBuffer|モニタ型のインスタンスである．
 \item [3〜8行]
-生産者スレッドが実行するメソッドである．
-無限にデータを生産し\|queue|に追加し続ける．
-
+  生産者スレッドが実行するメソッドである．
+  無限にデータを生産し\|queue|に追加し続ける．
 \item [9〜14行]
-消費者スレッドが実行するメソッドである．
-\|queue|からデータを取出し処理することを無限に繰り返す．
-
+  消費者スレッドが実行するメソッドである．
+  \|queue|からデータを取出し処理することを無限に繰り返す．
 \item [15〜18行]
-プログラムは\|main()|から実行を開始する．
-\|main()|では「生産者スレッド」と「消費者スレッド」を起動する．
-これらのスレッドがそれぞれ，
-\|producer()|メソッドと\|consumer()|メソッドを実行する．
-
+  プログラムは\|main()|から実行を開始する．
+  \|main()|では「生産者スレッド」と「消費者スレッド」を起動する．
+  これらのスレッドがそれぞれ，
+  \|producer()|メソッドと\|consumer()|メソッドを実行する．
 \end{description}
 
-\section{セマフォによるモニタの実装}
+%==============================================================================
+\section{Javaのセマフォクラスによるモニタの実装}
 モニタの仕組みをより正確に理解するために，
 セマフォによるモニタの実装方法を考えてみる．
-\figref{monProducerConsumer}の仮想言語で記述されたモニタを
+リスト\ref{monProducerConsumer}の仮想言語で記述されたモニタを
 Javaクラスに書換えたものを
-\figref{semProducerBuffer1}と\figref{semProducerBuffer2}に示す．
-モニタをサポートする言語のコンパイラは，
-自動的にこのような変換を行っている．
+リスト\ref{semProducerBuffer1}とリスト\ref{semProducerBuffer2}に示す．
 
-\begin{myfig}{btp}{モニタと同等なキューをセマフォで実現（Java版，前半）}
-{semProducerBuffer1}
-\lstinputlisting[firstline=3,lastline=36]{Lst/SemBoundedBuffer.java}
-\end{myfig}
+\lstinputlisting[firstline=3,lastline=36,numbers=left,float=btp,
+  label=semProducerBuffer1,
+  caption=モニタと同等なキューをセマフォで実現（Java版，前半）]
+                {Lst/SemBoundedBuffer.java}
 
-\begin{myfig}{btp}{モニタと同等なキューをセマフォで実現（Java版，後半）}
-{semProducerBuffer2}
-\lstinputlisting[firstline=37,firstnumber=last]{Lst/SemBoundedBuffer.java}
-\end{myfig}
+\lstinputlisting[firstline=37,firstnumber=last,numbers=left,float=btp,
+  label=semProducerBuffer2,
+  caption=モニタと同等なキューをセマフォで実現（Java版，後半）]
+                {Lst/SemBoundedBuffer.java}
 
 \subsection{モニタ機能のJavaによる実装}
-\figref{semProducerBuffer1}に\|SemBoundedBuffer|クラスが
+リスト\ref{semProducerBuffer1}に\|SemBoundedBuffer|クラスが
 モニタと同等な動作をするために必要な機能の実装を示す．
 
 \begin{description}
 \item [1行]
-\|java.util.concurrent|パッケージの\|Semaphore|クラスを使用する．
-\|Semaphore|クラスはカウンティングセマフォ型である．
-
+  \|java.util.concurrent|パッケージの\|Semaphore|クラスを使用する．
+  \|Semaphore|クラスはカウンティングセマフォ型である．
 \item [2行]
-セマフォを使用したキュークラスを\|SemBoundedBuffer|と名付ける．
-
+  セマフォを使用したキュークラスを\|SemBoundedBuffer|と名付ける．
 \item [3行]
-セマフォ（\|guard|）はモニタのガードの役割りを持っている．
-スレッドは，モニタ（\|SemBoundedBuffer|クラス）内の手続き（メソッド）を実行する前に，
-\|guard|をロックする．
-
+  セマフォ（\|guard|）はモニタのガードの役割りを持っている．
+  スレッドは，
+  モニタ（\|SemBoundedBuffer|クラス）内の手続き（メソッド）を実行する前に，
+  \|guard|をロックする．
 \item [4〜5行]
-モニタの条件変数に\|signal()|操作を行った時，
-条件変数で待っていたスレッドがあれば{\bf ただちに}実行しなければならない．
-待っていたスレッドを先に実行させるために，
-\|signal()|操作を行ったスレッドを待ちにするセマフォ（\|next|）と
-\|next|を待っているスレッドの数を記憶する変数（\|nextCont|）を準備する．
-
+  モニタの条件変数に\|signal()|操作を行った時，
+  条件変数で待っていたスレッドがあれば\emph{ただちに}実行しなければならない．
+  待っていたスレッドを先に実行させるために，
+  \|signal()|操作を行ったスレッドを待ちにするセマフォ（\|next|）と
+  \|next|を待っているスレッドの数を記憶する変数（\|nextCont|）を準備する．
 \item [6行]
-{\bf 条件変数型}（\|Condition|）を内部クラスとして定義する．
-
+  \emph{条件変数型}（\|Condition|）を内部クラスとして定義する．
 \item [7〜8行]
-条件変数にwait操作を行った時に
-スレッドを待ち状態にするためのセマフォ（\|sem|）と
-待っているスレッドの数をカウントする変数（\|count|）である．
-
+  条件変数にwait操作を行った時に
+  スレッドを待ち状態にするためのセマフォ（\|sem|）と
+  待っているスレッドの数をカウントする変数（\|count|）である．
 \item [9行]
-\|await()|は条件変数のwait操作を行うメソッドである．
-Javaの\|Object|クラスに別の\|wait()|メソッドが定義さているので，
-名前を\|await|にした．
-
+  \|await()|は条件変数のwait操作を行うメソッドである．
+  Javaの\|Object|クラスに別の\|wait()|メソッドが定義さているので，
+  名前を\|await|にした．
 \item [11〜15行]
-\|release()|はセマフォにV操作を行う．
-%\|Semaphore|クラスのインスタンスメソッドである．
-\|nextCont|は\|signal()|中で待っているスレッドの数である．
-待っているスレッドがある場合は起こす．
-そうでなければモニタのガードを外す．
-
+  \|release()|はセマフォにV操作を行う．
+  %\|Semaphore|クラスのインスタンスメソッドである．
+  \|nextCont|は\|signal()|中で待っているスレッドの数である．
+  待っているスレッドがある場合は起こす．
+  そうでなければモニタのガードを外す．
 \item [16行]
-\|acquireUninterruptibly()|はセマフォにP操作を行う．
-%\|Semaphore|クラスのインスタンスメソッドである．
-\|sem|は初期値0のセマフォなので，
-\|await()|を呼出したスレッドがここでブロックする．
-
+  \|acquireUninterruptibly()|はセマフォにP操作を行う．
+  %\|Semaphore|クラスのインスタンスメソッドである．
+  \|sem|は初期値0のセマフォなので，
+  \|await()|を呼出したスレッドがここでブロックする．
 \item [19行]
-条件変数にsignal操作を行うメソッドである．
-
+  条件変数にsignal操作を行うメソッドである．
 \item [20〜25行]
-条件変数を待っているスレッドの数（\|count|）を調べ，
-1以上なら22行で起床させる．
-自身は23行でブロックし，
-起床したスレッドが\|exitProc()|を実行しモニタを出るのを待つ．
-
+  条件変数を待っているスレッドの数（\|count|）を調べ，
+  1以上なら22行で起床させる．
+  自身は23行でブロックし，
+  起床したスレッドが\|exitProc()|を実行しモニタを出るのを待つ．
 \item [28行]
-モニタ手続きの最後の行で呼び出すメソッドである．
-\|signal()|中の23行でブロックしているスレッドがあれば起床させる．
-なければモニタのガードを外す．
-
+  モニタ手続きの最後の行で呼び出すメソッドである．
+  \|signal()|中の23行でブロックしているスレッドがあれば起床させる．
+  なければモニタのガードを外す．
 \end{description}
 
 \subsection{モニタ機能の使用}
-\figref{semProducerBuffer2}に\|SemBoundedBuffer|クラスの後半を示す．
+リスト\ref{semProducerBuffer2}に\|SemBoundedBuffer|クラスの後半を示す．
 ここでは，\|SemBoundedBuffer|クラスの前半で定義したモニタ機能を使用している．
 
 \begin{description}
 \item [35〜38行]
-{\bf 資源}（リングバッファ）を表現するための変数を宣言する．
-モニタ（クラス）の外部から資源を隠蔽するために
-\|private|修飾子を付けて宣言する．
-
+  \emph{資源}（リングバッファ）を表現するための変数を宣言する．
+  モニタ（クラス）の外部から資源を隠蔽するために
+  \|private|修飾子を付けて宣言する．
 \item [39〜41行]
-{\bf 条件変数}は
-前半で定義した\|Condition|クラスのインスタンス変数である．
-
+  \emph{条件変数}は
+  前半で定義した\|Condition|クラスのインスタンス変数である．
 \item [42〜47行]
-{\bf 初期化}はクラスのコンストラクタとして実装する．
-
+  \emph{初期化}はクラスのコンストラクタとして実装する．
 \item [48〜67行]
-{\bf 手続き}は仮想言語で定義したものに，
-50行と59行の「ガード取得」，
-56行と65行の「手続きの出口処理」が追加されている．
-
+  \emph{手続き}は仮想言語で定義したものに，
+  50行と59行の「ガード取得」，
+  56行と65行の「手続きの出口処理」が追加されている．
 \end{description}
 
-% \section{Javaのモニタ風機構によるリーダ・ライタ問題の解}
-% モニタについて理解を深めるために，
-% 仮想言語によるリーダ・ライタ問題の解を示す．
-% 
-% \begin{myfig}{btp}{モニタによるリータ・ライタの問題（仮想言語版）}
-% {monProducerConsumerMain}
-% \lstinputlisting[numbers=left]{Lst/BoundedBufferMain.jama}
-% \end{myfig}
-
+%==============================================================================
 \section{Javaのモニタ風機構による生産者と消費者問題の解}
 Java言語はモニタに似た同期機構をサポートしている．
-\figref{javaMonProducerConsumer}にJavaによる生産者と消費者問題の解を示す．
-Javaには{\bf 条件変数}に相当するものが無い．
+リスト\ref{javaMonProducerConsumer}に
+Javaによる生産者と消費者問題の解を示す．
+Javaには\emph{条件変数}に相当するものが無い．
 
-\begin{myfig}{btp}{Javaのモニタ風機構による生産者と消費者問題の解}
-{javaMonProducerConsumer}
-\lstinputlisting[numbers=left]{Lst/MonBoundedBuffer.java}
-\end{myfig}
+\lstinputlisting[numbers=left,float=btp,label=javaMonProducerConsumer,
+  caption=Javaのモニタ風機構による生産者と消費者問題の解]
+                {Lst/MonBoundedBuffer.java}
 
 \begin{description}
 \item [1行]
-Javaのモニタ風機構を利用したキュークラスを\|MonBoundedBuffer|と名付ける．
-
+  Javaのモニタ風機構を利用したキュークラスを\|MonBoundedBuffer|と名付ける．
 \item [2〜5行]
-{\bf 資源}（リングバッファ）を表現するための変数を宣言する．
-クラスの外部から資源を隠蔽するために\|private|修飾子を付けて宣言する．
-
+  \emph{資源}（リングバッファ）を表現するための変数を宣言する．
+  クラスの外部から資源を隠蔽するために\|private|修飾子を付けて宣言する．
 \item [6〜11行]
-{\bf 初期化}をコンストラクタとして実装する．
-
+  \emph{初期化}をコンストラクタとして実装する．
 \item [13行]
-クラスの内部だけで呼び出す\|private|なメソッドである．
-\|await()|メソッドは条件変数の\|wait()|に似た働きをする．
-
+  クラスの内部だけで呼び出す\|private|なメソッドである．
+  \|await()|メソッドは条件変数の\|wait()|に似た働きをする．
 \item [14行]
-\|await()|メソッドは\|Object|クラスの\|wait()|メソッドを呼び出す．
-Javaオブジェクトは暗黙の条件変数が一つあるような構造になっている．
-\|wait()|メソッドは暗黙の条件変数の待ち行列\footnote{
-Javaでは待機セットと呼ぶ．}にスレッドを入れる．
-\|wait()|メソッドは割込みなどでも終了するのでtry-catch構文で使用する．
-
+  \|await()|メソッドは\|Object|クラスの\|wait()|メソッドを呼び出す．
+  Javaオブジェクトは暗黙の条件変数が一つあるような構造になっている．
+  \|wait()|メソッドは暗黙の条件変数の待ち行列\footnote{
+    Javaでは待機セットと呼ぶ．}にスレッドを入れる．
+  \|wait()|メソッドは割込みなどでも終了するのでtry-catch構文で使用する．
 \item [16，23行]
-外部から呼び出すことができるメソッドは\|synchronized|修飾子を付けて定義する．
-\|synchronized|メソッドは{\bf モニタの手続き}と同様に，
-オブジェクトの{\bf ガード}をロックした\footnote{
-Javaではモニタを所有すると言う．}スレッドだけが実行できる．
-オブジェクトのガードをロックできない場合はガードの待ち行列に入る．
-
+  外部から呼び出すことができるメソッドは\|synchronized|修飾子を付けて定義する．
+  \|synchronized|メソッドは\emph{モニタの手続き}と同様に，
+  オブジェクトの\emph{ガード}をロックした\footnote{
+    Javaではモニタを所有すると言う．}スレッドだけが実行できる．
+  オブジェクトのガードをロックできない場合はガードの待ち行列に入る．
 \item [17行]
-バッファが満杯の場合に\|await()|を用いて暗黙の条件変数で待ち状態になる．
-\|await()|は割込みなど別の理由でも終了するので，
-バッファに空きができるまで繰り返し\|await()|を呼び出す．
-
+  バッファが満杯の場合に\|await()|を用いて暗黙の条件変数で待ち状態になる．
+  \|await()|は割込みなど別の理由でも終了するので，
+  バッファに空きができるまで繰り返し\|await()|を呼び出す．
 \item [21行]
-\|notify()|は暗黙の条件変数の\|signal()|に相当する．
-暗黙の条件変数は一つしかないので，
-スレッドが\|remove()|で待ちになっている可能性ある
-（直前までバッファが空だった）場合だけ\|notify()|するようにしている．
-無条件に\|notify()|を実行するようにすると，
-\|append()|で複数のスレッドが待ちになっている場合に，
-それらを起床させてしまう．
-
+  \|notify()|は暗黙の条件変数の\|signal()|に相当する．
+  暗黙の条件変数は一つしかないので，
+  スレッドが\|remove()|で待ちになっている可能性ある
+  （直前までバッファが空だった）場合だけ\|notify()|するようにしている．
+  無条件に\|notify()|を実行するようにすると，
+  \|append()|で複数のスレッドが待ちになっている場合に，
+  それらを起床させてしまう．
 \item [24行]
-バッファが空の場合に\|await()|を用いて暗黙の条件変数で待ち状態になる．
-
+  バッファが空の場合に\|await()|を用いて暗黙の条件変数で待ち状態になる．
 \item [28行]
-暗黙の条件変数は一つしかないので，
-スレッドが\|append()|で待ちになっている可能性ある
-（直前までバッファが満杯だった）場合だけ\|notify()|するようにしている．
-
+  暗黙の条件変数は一つしかないので，
+  スレッドが\|append()|で待ちになっている可能性ある
+  （直前までバッファが満杯だった）場合だけ\|notify()|するようにしている．
 \item [29行]
-取り出したデータを呼出し側に返す．
-16行から28行の右端に書いてあるコメントは\figref{monProducerConsumer}と同様に，
-生産者スレッドが17行でブロックした後，
-消費者スレッドが28行で生産者スレッドを起床させるときの実行順である．
-これまでの例と比較して29行が異なっている．
-Javaの\|notify()|はモニタの\|signal()|と異なり，
-\|synchronized|メソッドの最後まで実行した後，
-スレッドの切換えが起こるからである．
+  取り出したデータを呼出し側に返す．
+  16行から28行の右端に書いてあるコメントは
+  リスト\ref{monProducerConsumer}と同様に，
+  生産者スレッドが17行でブロックした後，
+  消費者スレッドが28行で生産者スレッドを起床させるときの実行順である．
+  これまでの例と比較して29行が異なっている．
+  Javaの\|notify()|はモニタの\|signal()|と異なり，
+  \|synchronized|メソッドの最後まで実行した後で，
+  スレッドの切換えを起こすからである．
 \end{description}
 
+%==============================================================================
 \section{まとめ}
 モニタについて学んだ．
 モニタはスレッド間の同期と相互排除に使用できる
@@ -459,49 +411,38 @@ Java言語はモニタに似た機能をサポートする言語であるが，
 \|signal()|を実行した後手続きの最後まで実行されること
 等が異なる．
 
+%==============================================================================
 \section*{練習問題}
 \begin{enumerate}
-\renewcommand{\labelenumi}{\tt \arabic{chapter}.\arabic{enumi}}
- \setlength{\leftskip}{1em}
-
-\item {\bf 抽象データ型}の定義を調べなさい．
-
-\item \figref{monProducerConsumer}のプログラムにおいて，
-{\tt cnt}なしにキュー（リングバッファ）を記述できるか？
-
-\item \figref{monProducerConsumer}のプログラムにおいて，
-キューが空のとき一つのスレッドが{\tt remove()}を実行した．
-その後，別のスレッドが{\tt append()}を実行した．
-この時の{\tt append()}，{\tt remove()}内が実行される順を答えなさい．
-
-\item \figref{monProducerConsumer}のプログラムは，
-複数生産者と複数消費者問題の解に使用できるか？
-
+  \renewcommand{\labelenumi}{\ttfamily\arabic{chapter}.\arabic{enumi}}
+  \setlength{\leftskip}{1em}
+\item \emph{抽象データ型}の定義を調べなさい．
+\item リスト\ref{monProducerConsumer}のプログラムにおいて，
+  \texttt{cnt}なしにキュー（リングバッファ）を記述できるか？
+\item リスト\ref{monProducerConsumer}のプログラムにおいて，
+  キューが空のとき一つのスレッドが\texttt{remove()}を実行した．
+  その後，別のスレッドが\texttt{append()}を実行した．
+  この時の\texttt{append()}，\texttt{remove()}内が実行される順を答えなさい．
+\item リスト\ref{monProducerConsumer}のプログラムは，
+  複数生産者と複数消費者問題の解に使用できるか？
 \item Java風仮想言語のモニタを用いてリーダ・ライタ問題の解を示しなさい．
-
 \item Java風仮想言語のモニタを用いてセマフォを記述しなさい．
-
-\item {\tt semBoundedBuffer}
-（\figref{semProducerBuffer1}，\figref{semProducerBuffer2}）を
-実際に実行しなさい．
-メインルーチンを含むソースプログラムは以下から入手できる． \\
-\url{https://github.com/tctsigemura/OSTextBook/blob/master/SampleCode/SemBoundedBuffer/}
-
-\item {\bf \|signal()|は手続きの最後でしか使用できないことにすると}，
-{\tt semBoundedBuffer}
-（\figref{semProducerBuffer1}，\figref{semProducerBuffer2}）は
-どのように簡略化できるか．
-
-\item {\tt MonBoundedBuffer}（\figref{javaMonProducerConsumer}）を
-実際に実行しなさい．
-メインルーチンを含むソースプログラムは以下から入手できる．\\
-\url{https://github.com/tctsigemura/OSTextBook/blob/master/SampleCode/MonBoundedBuffer/}
-
-\item \figref{monProducerConsumer}のプログラムと，
-\figref{javaMonProducerConsumer}でコメントに示すように実行順序が異なる．
-Javaのモニタ風機構と従来のモニタのどのような違いによるものか？
-
+\item \texttt{semBoundedBuffer}
+  （リスト\ref{semProducerBuffer1}，リスト\ref{semProducerBuffer2}）を
+  実際に実行しなさい．
+  メインルーチンを含むソースプログラムは以下から入手できる． \\
+  \url{https://github.com/tctsigemura/OSTextBook/blob/master/SampleCode/SemBoundedBuffer/}
+\item \|signal()|は\emph{手続きの最後でしか使用できないことにすると}，
+  \texttt{semBoundedBuffer}
+  （リスト\ref{semProducerBuffer1}，リスト\ref{semProducerBuffer2}）は
+  どのように簡略化できるか．
+\item \texttt{MonBoundedBuffer}（リスト\ref{javaMonProducerConsumer}）を
+  実際に実行しなさい．
+  メインルーチンを含むソースプログラムは以下から入手できる．\\
+  \url{https://github.com/tctsigemura/OSTextBook/blob/master/SampleCode/MonBoundedBuffer/}
+\item リスト\ref{monProducerConsumer}のプログラムと，
+  リスト\ref{javaMonProducerConsumer}でコメントに示すように実行順序が異なる．
+  Javaのモニタ風機構と従来のモニタのどのような違いによるものか？
 \item その他に従来のモニタとJavaのモニタ風機構の違いは何があるか？
-
 \item モニタの signal と、セマフォのV操作の違いは何があるか？
 \end{enumerate}

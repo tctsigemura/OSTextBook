@@ -1,6 +1,7 @@
 \chapter{TaCに関する資料}
 \label{appTac}
 
+%==============================================================================
 \section{CPUの概要}
 TaCで使用できるデータの形式，
 CPU内部のレジスタ構成，
@@ -16,13 +17,13 @@ CPU内部のレジスタ構成，
 メモリやI/Oの8ビットデータにアクセスする場合は，
 CPUレジスタの下位8ビットが使用される．
 
-\myfigure{btp}{scale=0.7}{Tbl/TaC7a-instruction-p1-1-crop.pdf}
-{データ形式}{tacData}
+\begin{myfig}{btp}{データ形式}{tacData}
+  \includegraphics[scale=0.7]{Tbl/TaC7a-instruction-p1-1-crop.pdf}
+\end{myfig}
 
 \subsection{CPUレジスタとPSW}
 \figref{tacRegPsw}にCPU内部のレジスタなどを示す．
 レジスタはどれも16ビット幅である．
-
 CPUレジスタは，
 汎用のG0からG11，
 フレームポインタとして使用するFP，
@@ -45,12 +46,13 @@ PSWはPCとFLAGからなる．
 PCはプログラムカウンタのことである．
 FLAGには，計算結果で変化するV，C，S，Zと，
 割込み許可E，カーネルモードPの各ビットがある．
-割込みが発生すると割込みが禁止された上でカーネルモードに切り換わり
-（Eビットが0，Pビットが1になる），
-PC，FLAGの順にカーネルスタックにPUSHされる．
+割込みが発生するとPCとFLAGが順にカーネルスタックにPUSHされた後で，
+割込みが禁止された上でカーネルモードに切り換わる
+（Eビットが0，Pビットが1になる）．
 
-\myfigure{btp}{scale=0.7}{Tbl/TaC7a-instruction-p1-3-crop.pdf}
-{CPU内部の記憶装置}{tacRegPsw}
+\begin{myfig}{btp}{CPU内部の記憶装置}{tacRegPsw}
+  \includegraphics[scale=0.7]{Tbl/TaC7a-instruction-p1-3-crop.pdf}
+\end{myfig}
 
 \subsection{機械語命令}
 \figref{tacInsTbl}にTaCの機械語命令の一覧表を示す．
@@ -64,13 +66,16 @@ Direct，Indexed，Immediateの
 
 Byte Register Indirect アドレッシング・モードだけが，
 メモリの8ビットデータをアクセスする．
-ST命令ではCPUレジスタの下位8ビットがメモリに書き込まれる．
+Byte Register Indirect アドレッシング・モードの
+ST命令はCPUレジスタの下位8ビットがメモリに書き込まれる．
 その他の命令ではメモリから読み出した8ビットデータの上位に
-{\tt 00h}を付加した16ビットデータに変換して使用する．
+\|00h|を付加した16ビットデータに変換して使用する．
 
-\myfigure{btp}{scale=0.86}{Tbl/TaC7a-instruction-p2-crop.pdf}
-{命令表}{tacInsTbl}
+\begin{myfig}{btp}{命令表}{tacInsTbl}
+  \includegraphics[scale=0.94]{Tbl/TaC7a-instruction-p2-crop.pdf}
+\end{myfig}
 
+%==============================================================================
 \newpage
 \section{メモリマップとI/Oマップ}
 \figref{tacMap}にTaCのメモリマップとI/Oマップを示す．
@@ -80,30 +85,30 @@ ST命令ではCPUレジスタの下位8ビットがメモリに書き込まれ�
 16ビットデータは偶数アドレスを指定してアクセスしなければならない．
 
 \subsection{メモリ空間}
-TaCのメモリ空間は{\tt 0000h}から{\tt FFFFh}の64KiBである．
+TaCのメモリ空間は\|0000h|から\|FFFFh|の64KiBである．
 16ビットデータは偶数アドレスからの2バイトに配置され，
 偶数アドレスを指定してアクセスする．
 16ビットデータにアクセスするには，
-Byte Register Indirect モード以外のアドレッシング・モードを用いる．
+Byte Register Indirect モード\emph{以外}のアドレッシング・モードを用いる．
 8ビットデータにアクセスするには，
 Byte Register Indirect モードを用いる．
 
 メモリ空間の最初から56KiBは自由に使用できるメモリであり，
 ここにTacOSのカーネルやユーザプロセスがロードされる．
-{\tt E000h}から{\tt EFFFh}まではVRAMが配置されている．
+\|E000h|から\|EFFFh|まではVRAMが配置されている．
 VRAMにASCIIコードを書き込むと対応する文字がディスプレイに表示される．
 VRAMのアドレスがディスプレイの表示位置に対応する．
-{\tt F000h}から{\tt FFDFh}はIPL（ROM）が配置される．
+\|F000h|から\|FFDFh|はIPL（ROM）が配置される．
 IPLはマイクロSDカードからTacOSを読み出して起動する．
-{\tt FFE0h}から{\tt FFFFh}は割込みベクタ領域である．
+\|FFE0h|から\|FFFFh|は割込みベクタ領域である．
 16種類の割込みに対応するハンドラの入口番地をTacOSがセットする．
 
 \subsection{I/O空間}
-TaCのI/O空間は{\tt 00h}から{\tt FFh}の256Bである．
+TaCのI/O空間は\|00h|から\|FFh|の256Bである．
 I/O空間のアドレス幅は8ビットだが，
 IN，OUT命令ではI/Oアドレスが16ビットで表現される．
-そこで，I/Oアドレスの上位8ビットは{\tt 00h}になるようにする．
-上位8ビットが{\tt 00h}以外になった場合の動作は保証されない．
+I/Oアドレスの上位8ビットは\|00h|になるようにする．
+上位8ビットが\|00h|以外になった場合の動作は保証されない．
 
 メモリ空間と同様に8ビットデータと16ビットデータの両方を読み書きできる．
 8ビットデータと16ビットデータの区別は，
@@ -111,4 +116,6 @@ IN，OUT命令のアドレッシングモードにより行う．
 I/Oの8ビットデータにアクセスするには，
 Byte Register Indirect モードを用いる．
 
-\myfigure{btp}{scale=0.8}{Tbl/TaC7a-instruction-p4-crop.pdf}{メモリマップとI/Oマップ}{tacMap}
+\begin{myfig}{btp}{メモリマップとI/Oマップ}{tacMap}
+  \includegraphics[scale=0.8]{Tbl/TaC7a-instruction-p4-crop.pdf}
+\end{myfig}

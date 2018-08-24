@@ -1,4 +1,5 @@
 \chapter{仮想記憶}
+\label{virtualMemory}
 仮想記憶は，
 システムに実装されたよりも多くのメモリをプロセスが使用できるようにする．
 仮想記憶を実現するために使用できるメモリ管理機構として，
@@ -13,7 +14,7 @@
 現代のオペレーティングシステムはページングによる仮想記憶を使用している．
 この章ではページングに基づく仮想記憶方式について勉強する．
 
-%==========================================================================
+%==============================================================================
 \section{基本概念}
 ページングでは，
 ページテーブルのVビットを使用して仮想アドレス空間にフレームが
@@ -26,7 +27,7 @@ Vビットが0の状態を上手く使うことで，
 \figref{virtualMemoryBasic}に示すように，
 ページの内容はフレームかディスク（\emph{バッキングストア}）に格納する．
 ページの内容がフレームに置かれている時は
-ページテーブルの対応するエントリのビットを1（V=1）にする．
+ページテーブルの対応するエントリのVビットを1（V=1）にする．
 フレームに置かれていない時はV=0とする．
 V=0のページにアクセスするとページ不在割込みが発生する．
 ページ不在の理由と対処方法は，
@@ -42,14 +43,16 @@ V=0のページにアクセスするとページ不在割込みが発生する�
   → フレームを割当て内容をディスクから復旧した後，プロセスを再開する．
 \end{enumerate}
 
-\myfigure{btp}{scale=0.66}{Fig/virtualMemoryBasic-crop.pdf}
-         {仮想記憶の基本}{virtualMemoryBasic}
+\begin{myfig}{btp}{仮想記憶の基本}{virtualMemoryBasic}
+  \includegraphics[scale=0.66]{Fig/virtualMemoryBasic-crop.pdf}
+\end{myfig}
 
 プロセス生成時にバッキングストアに仮想アドレス空間のイメージを作成する．
 フレームはまだ割当てない．
 プログラムが動作を開始するとページ不在割込みが発生し，
 その都度，必要なページをバッキングストアから読み込む．
 
+%==============================================================================
 \section{デマンドページング}\label{demandPaging}
 ページングよる仮想記憶を用いると，
 プロセス実行開始時にプログラム全体をメモリに読み込まなくても良い．
@@ -90,8 +93,9 @@ swap-out用のバッキングストアを準備する必要はない．
 プログラムの起動を素早く行うことができる．
 このアイデアを\figref{virtualMemoryWithZMagic}を用いて説明する．
 
-\myfigure{btp}{scale=0.66}{Fig/virtualMemoryWithZMagic-crop.pdf}
-         {デマンドページング}{virtualMemoryWithZMagic}
+\begin{myfig}{btp}{デマンドページング}{virtualMemoryWithZMagic}
+  \includegraphics[scale=0.66]{Fig/virtualMemoryWithZMagic-crop.pdf}
+\end{myfig}
 
 \begin{enumerate}
 \item \emph{実行可能形式ファイルの構造} \\
@@ -179,12 +183,13 @@ swap-inされてから書き換わることはない．
 次回必要になった時に復元できるようにする．
 \end{enumerate}
 
+%==============================================================================
 \section{Copy on Write}
 UNIXのforkシステムコールはプロセスのコピー（子プロセス）を作る．
 多くの場合，
 子プロセスはすぐにexecveシステムコールを発行し新しい
 プログラムの実行を開始するので，
-せっかくコピーした仮想アドレス空間は余り活用されないまま廃棄される．
+せっかくコピーした仮想アドレス空間はあまり活用されないまま廃棄される．
 これでは効率が悪いのでアドレス空間を親子で共有するvforkシステムコールが
 提供されるようになった．
 vforkシステコールを用いる場合，
@@ -198,15 +203,14 @@ forkシステムコールを用いても無駄なメモリコピーが起こら�
 \item[fork直後の様子]
   \figref{virtualMemoryFork}に示すように，
   Copy on Write を用いる場合，
-  fork直後は親子プロセスでアドレス空間を共有する．
+  fork直後は親子プロセスでフレームを共有する．
   この時点ではメモリのコピーはしない．
   その代わり，
   書き込み可能であるはずのデータ，ヒープ，スタック領域の
   メモリ保護を読み出し専用に設定する．
-
-  \myfigure{btp}{scale=0.66}{Fig/virtualMemoryFork-crop.pdf}
-           {fork直後の親子プロセス}{virtualMemoryFork}
-
+  \begin{myfig}{btp}{fork直後の親子プロセス}{virtualMemoryFork}
+    \includegraphics[scale=0.66]{Fig/virtualMemoryFork-crop.pdf}
+  \end{myfig}
 \item[Copy on Writeの手順]
   どちらかのプロセスがスタックを書き換えようとした場合を例に，
   Copy on Write が働く手順を説明する．
@@ -214,7 +218,6 @@ forkシステムコールを用いても無駄なメモリコピーが起こら�
   メモリ保護割込みが発生しオペレーティングシステムに切り換わる．
   その後，オペレーティングシステムが次に述べる操作を行い，
   \figref{virtualMemoryCOW}に示す状態になる．
-
   \begin{enumerate}
   \item 新しいフレームを割当て，スタック領域フレームの内容をコピーする．
   \item 片方のプロセスのスタック領域に新しいフレームをマッピングする．
@@ -222,14 +225,16 @@ forkシステムコールを用いても無駄なメモリコピーが起こら�
   \item 両プロセスのスタック領域の保護情報を読み書き（RW-）に変更する．
   \item 割込みを発生した命令の再実行からプロセスを再開する．
   \end{enumerate}
-
-  \myfigure{btp}{scale=0.66}{Fig/virtualMemoryCOW-crop.pdf}
-      {スタックでCopy on Writeが発生した時の親子プロセス}{virtualMemoryCOW}
+  \begin{myfig}{btp}
+    {スタックでCopy on Writeが発生した時の親子プロセス}{virtualMemoryCOW}
+    \includegraphics[scale=0.66]{Fig/virtualMemoryCOW-crop.pdf}
+  \end{myfig}
 \end{description}
 
 以上のように書き込みが起こった時点でメモリがコピーされるので
 Copy on Write と呼ばれる．
 
+%==============================================================================
 \section{メモリマップドファイル}
 仮想記憶機構を用いてファイルを読み書きする手段を提供する．
 仮想アドレス空間をファイルにマッピングすることで，
@@ -307,8 +312,10 @@ UNIXのmmapシステムコールで\|MAP_FILE|フラグと
 二つのプロセスは同じフレームを共用し，
 共有メモリを持った状態でもある．
 
-\myfigure{btp}{scale=0.66}{Fig/virtualMemoryWithMmap-crop.pdf}
-         {プロセス間で共有したメモリマップドファイル}{virtualMemoryWithMmap}
+\begin{myfig}{btp}
+  {プロセス間で共有したメモリマップドファイル}{virtualMemoryWithMmap}
+  \includegraphics[scale=0.66]{Fig/virtualMemoryWithMmap-crop.pdf}
+\end{myfig}
 
 \figref{virtualMemoryWithMmap}は，
 ファイルの内容がフレームに読み込まれた状態を表している．
@@ -343,8 +350,9 @@ mmapはページとファイルを関連付けるが，
 read/writeシステムコールを使用する場合のデータの流れを模式的に示す．
 メモリコピーは一般に重い処理である．
 
-\myfigure{btp}{scale=0.66}{Fig/mmapVsReadWrite-crop.pdf}
-         {read/writeシステムコールのデータコピー}{mmapVsReadWrite}
+\begin{myfig}{btp}{read/writeシステムコールのデータコピー}{mmapVsReadWrite}
+  \includegraphics[scale=0.66]{Fig/mmapVsReadWrite-crop.pdf}
+\end{myfig}
 
 また，read/writeの場合はデータの読み書きの度にシステムコールを発行する．
 一方でメモリマップドファイルの場合，
@@ -370,9 +378,10 @@ UNIXのmmapシステムコールで\|MAP_PRIVATE|フラグを使用した場合�
 プロセス毎に別のコピーが参照されるようにマッピングする．
 \end{itemize}
 
-\myfigure{btp}{scale=0.66}{Fig/virtualMemoryWithPrivateMap-crop.pdf}
-         {プロセスにローカルなメモリマップドファイル}
-         {virtualMemoryWithPrivateMap}
+\begin{myfig}{btp}
+  {プロセスにローカルなメモリマップドファイル}{virtualMemoryWithPrivateMap}
+  \includegraphics[scale=0.66]{Fig/virtualMemoryWithPrivateMap-crop.pdf}
+\end{myfig}
 
 \subsection{無名メモリのマッピング}
 \figref{virtualMemoryWithAnonymousMap}に，
@@ -383,8 +392,9 @@ UNIXのmmapシステムコールで\|MAP_PRIVATE|フラグを使用した場合�
 メモリマップドファイルのプロセスにローカルなマッピングと同様な管理を受ける．
 UNIXのmmapシステムコールでは\|MAP_ANON|フラグを使用して無名メモリを割り付ける．
 
-\myfigure{btp}{scale=0.66}{Fig/virtualMemoryWithAnonymousMap-crop.pdf}
-         {無名メモリのマッピング例}{virtualMemoryWithAnonymousMap}
+\begin{myfig}{btp}{無名メモリのマッピング例}{virtualMemoryWithAnonymousMap}
+  \includegraphics[scale=0.66]{Fig/virtualMemoryWithAnonymousMap-crop.pdf}
+\end{myfig}
 
 \subsection{プログラムの実行とメモリマップドファイル}
 メモリマップドファイルの仕組みと，
@@ -411,6 +421,7 @@ BSD UNIX では実際にメモリマップドファイルと同じ
   無名メモリ（\|RW-|，\|MAP_ANNON|）割り当てる．
 \end{itemize}
 
+%==============================================================================
 \section{ページ置換えアルゴリズム}
 ページングによる仮想記憶では，
 以下の三つの重要なアルゴリズムを定める必要がある．
@@ -425,7 +436,7 @@ BSD UNIX では実際にメモリマップドファイルと同じ
   \ref{frameAllocation}で学ぶ．
 \end{enumerate}
 
-デマンドページングによりがページを読み込まれるにつれ，
+デマンドページングによりページが読み込まれるにつれ，
 システムの空きフレームが少なくなっていく．
 大量のメモリを使用するプロセスや，
 同時に多数のプロセスが実行される状況では，
@@ -450,8 +461,9 @@ swap-outしたページが直後にswap-inされることになり，
 また，アクセスが集中するページは時刻によって変化していく．
 その様子を\figref{locality}に示す．
 
-\myfigure{btp}{scale=0.60}{Fig/locality-crop.pdf}
-         {局所性・ワーキングセット・フェーズ化}{locality}
+\begin{myfig}{btp}{局所性・ワーキングセット・フェーズ化}{locality}
+  \includegraphics[scale=0.60]{Fig/locality-crop.pdf}
+\end{myfig}
 
 \begin{description}
 \item[局所性]
@@ -500,8 +512,9 @@ CPUはメモリアクセス毎に値がインクリメントされる十分に�
 ページテーブルにはカウンタの値を保存できる「最終アクセス時刻」フィールドが
 追加されている．
 
-\myfigure{btp}{scale=0.66}{Fig/pagingLRU-crop.pdf}
-         {LRU方式のためのハードウェア}{pagingLRU}
+\begin{myfig}{btp}{LRU方式のためのハードウェア}{pagingLRU}
+  \includegraphics[scale=0.66]{Fig/pagingLRU-crop.pdf}
+\end{myfig}
 
 \begin{enumerate}
 \item メモリアクセス毎に，
@@ -559,8 +572,9 @@ $cnt \leftarrow cnt \div 2$
 特別なハードウェアを用いることなく，ソフトウェアだけで実現できる．
 \figref{pagingFIFO}のようなリストを用いるアルゴリズムである．
 
-\myfigure{btp}{scale=0.66}{Fig/pagingFIFO-crop.pdf}
-         {FIFOアルゴリズムが用いるリスト}{pagingFIFO}
+\begin{myfig}{btp}{FIFOアルゴリズムが用いるリスト}{pagingFIFO}
+  \includegraphics[scale=0.66]{Fig/pagingFIFO-crop.pdf}
+\end{myfig}
 
 \begin{enumerate}
 \item swap-in する度にフレームをリストの最後（図の右側）に追加していく．
@@ -593,8 +607,9 @@ Beladyの異常な振る舞いとは，
 データ構造に加えてページテーブルのRビットも使用する．
 次のようなアルゴリズムである．
 
-\myfigure{btp}{scale=0.66}{Fig/pagingClock-crop.pdf}
-         {Clockアルゴリズムが用いる環状リスト}{pagingClock}
+\begin{myfig}{btp}{Clockアルゴリズムが用いる環状リスト}{pagingClock}
+  \includegraphics[scale=0.66]{Fig/pagingClock-crop.pdf}
+\end{myfig}
 
 \begin{enumerate}
 \item swap-inする度にフレームを環状リストに挿入していく．
@@ -626,8 +641,9 @@ Beladyの異常な振る舞いとは，
 また，ページテーブルのRビットとDビットも使用する．
 次のようなアルゴリズムである．
 
-\myfigure{btp}{scale=0.66}{Fig/pagingWSClock-crop.pdf}
-         {WSClockアルゴリズムが用いる環状リスト}{pagingWSClock}
+\begin{myfig}{btp}{WSClockアルゴリズムが用いる環状リスト}{pagingWSClock}
+  \includegraphics[scale=0.66]{Fig/pagingWSClock-crop.pdf}
+\end{myfig}
 
 \begin{enumerate}
 \item swap-inする度にフレームを環状リストに挿入していく．
@@ -655,6 +671,7 @@ Beladyの異常な振る舞いとは，
   \end{description}
 \end{enumerate}
 
+%==============================================================================
 \section{フレーム割付け方式}\label{frameAllocation}
 ページングシステムでは全てのフレームが同等なので，
 どのフレームを，どのプロセスの，どのページに使用しても良い．
@@ -673,8 +690,11 @@ CPUと同じノードのメモリより低速なアクセスしかできない�
 かつ，
 同じプロセスのスレッドは同じノードのCPUが実行するようにする．
 
+%==============================================================================
 \section*{練習問題}
 \begin{enumerate}
+  \renewcommand{\labelenumi}{\ttfamily\arabic{chapter}.\arabic{enumi}}
+  \setlength{\leftskip}{1em}
 \item 次の言葉の意味を説明しなさい．
   \begin{itemize}
   \item 仮想記憶

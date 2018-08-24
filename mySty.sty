@@ -1,12 +1,12 @@
 % 自分のスタイルファイル
 \ProvidesPackage{mySty}
 \usepackage{graphicx}
+\usepackage{subcaption}
 \usepackage{amsmath}
 \usepackage{framed}
 \usepackage{listings}
 \usepackage{lltjp-tascmac}
 %\usepackage{ascmac}
-%\usepackage{listings,jlistings}                      % platex の場合
 %\usepackage[usenames]{color}
 %\usepackage{arydshln}
 %\usepackage{multirow}
@@ -25,11 +25,6 @@
 %\usepackage{pxjahyper}                                 % platex の場合
 
 %------------------------------------------------------------------------------
-% この文書独特のキーワード等
-\newcommand{\inode}{\texttt{i-node}}
-\newcommand{\cmm}{\texttt{C--}}
-
-%------------------------------------------------------------------------------
 % 便利マクロ
 \newcommand{\lw}[1]{\smash{\lower2.0ex\hbox{#1}}}
 \newcommand{\figref}[1]{図~\ref{fig:#1}}
@@ -38,16 +33,16 @@
 \def\|{\verb|} %|
 
 %------------------------------------------------------------------------------
-% 図コマンド
-\newcommand{\myfigure}[5]{
-\begin{figure}[#1]
-\begin{center}
-\includegraphics[#2]{#3}
-\caption{#4}
-\label{fig:#5}
-\end{center}
-\end{figure}
-}
+% 固有名詞
+\newcommand{\inode}{\texttt{i-node}}
+\newcommand{\cmm}{\texttt{C--}}
+\newcommand{\cmml}{{\cmm}言語}
+\newcommand{\util}{\texttt{Util--}}
+\newcommand{\as}{\texttt{as--}}
+\newcommand{\ld}{\texttt{ld--}}
+\newcommand{\objbin}{\texttt{objbin--}}
+\newcommand{\objexe}{\texttt{objexe--}}
+\newcommand{\size}{\texttt{size--}}
 
 %------------------------------------------------------------------------------
 % 図環境

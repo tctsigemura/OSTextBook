@@ -21,9 +21,8 @@ void *thread(void *arg) {         // 自スレッドの担当部分のデータ�
 
 int main() {                      // mainスレッドの実行はここから始まる
   // 擬似的なデータを生成する
-  for (int i=0; i<M*N; i++) {                     // 配列 a　を初期化
+  for (int i=0; i<M*N; i++)                       // 配列 a　を初期化
     a[i] = i+1;
-  }
   // M個のスレッドを起動する
   for (int m=0; m<M; m++) {                       // 各スレッドについて
     Args *p = malloc(sizeof(Args));               //   引数領域を確保

@@ -17,7 +17,7 @@
 %============================================================================
 \section{ファイルの名前付け}
 ファイルは木構造の\emph{ディレクトリシステム}に格納される\footnote{
-現代のオペレーティングシステムでは，ほとんどの場合，そうである．}．
+  現代のオペレーティングシステムでは，ほとんどの場合，そうである．}．
 \figref{dirTree}に木構造の例を示す．
 ディレクトリ\footnote{WindowsやmacOSではフォルダとも呼ぶ．}は，
 他のディレクトリやファイルの名前とファイル本体へのポインタ\footnote{
@@ -27,8 +27,9 @@
 階層構造を持った名前（\emph{パス}）を用いる．
 パスには絶対パスと相対パスの二種類がある．
 
-\myfigure{btp}{scale=.8}{Fig/dirTree-crop.pdf}
-         {木構造のディレクトリシステム}{dirTree}
+\begin{myfig}{btp}{木構造のディレクトリシステム}{dirTree}
+  \includegraphics[scale=.8]{Fig/dirTree-crop.pdf}
+\end{myfig}
 
 \begin{itemize}
 \item \emph{絶対パス} \\
@@ -60,13 +61,13 @@
 次のような状態である．
 
 \begin{center}
-\begin{tabular}{l l}
-%\multicolumn{1ファイル名
-\texttt{2017\_06\_30.log}   & 2017年6月30日のファイル \\
-\texttt{2017\_07\_01.log}   & 2017年7月1日のファイル  \\
-\texttt{2017\_07\_02.log}   & 2017年7月2日のファイル  \\
-\texttt{today.log}          & 現時点では2017年7月2日のファイルの別名
-\end{tabular}
+  \begin{tabular}{l l}
+    %\multicolumn{1ファイル名
+    \texttt{2017\_06\_30.log}   & 2017年6月30日のファイル \\
+    \texttt{2017\_07\_01.log}   & 2017年7月1日のファイル  \\
+    \texttt{2017\_07\_02.log}   & 2017年7月2日のファイル  \\
+    \texttt{today.log}          & 現時点では2017年7月2日のファイルの別名
+  \end{tabular}
 \end{center}
 
 このような別名の仕組みとして大きく3つの方式が考えられる．
@@ -154,7 +155,7 @@
     更に，拡張属性を使用してエイリアスを表現している．
 
     \lstinputlisting[caption=FATファイルシステム上のmacOSのエイリアス,
-        numbers=left,label=aliasOnFAT,float=btp]{Lst/aliasOnFAT.txt}
+      numbers=left,label=aliasOnFAT,float=btp]{Lst/aliasOnFAT.txt}
 
   \end{itemize}
 \end{itemize}
@@ -169,8 +170,9 @@
 別のボリュームのファイルもパスで指定できる必要がある．
 \figref{mount}に以下で説明する二種類の方式を模式的に示す．
 
-\myfigure{btp}{scale=.6}{Fig/mount-crop.pdf}
-         {マウント方式とドライブレター方式}{mount}
+\begin{myfig}{btp}{マウント方式とドライブレター方式}{mount}
+  \includegraphics[scale=.6]{Fig/mount-crop.pdf}
+\end{myfig}
 
 \begin{itemize}
 \item \emph{マウント方式} \\
@@ -315,20 +317,20 @@ OSカーネルは通常ファイルのデータがバイトストリームであ
 
 %\begin{enumerate}
 \begin{description}
-%\item \emph{オープン}\\
+  %\item \emph{オープン}\\
 \item[オープン]
   openシステムコールはファイルのパスと
   ファイルに行う操作（読む・書く）等を引数に発行される．
   ファイルの保護属性と照らし合わせ，
   要求された操作が可能な場合のみファイルをオープンする．
-%\item \emph{読み書き}\\
+  %\item \emph{読み書き}\\
 \item[読み書き]
   ファイルをオープンした後，
   read/writeシステムコールを使用してファイルを先頭から
   最後に向けて\emph{シーケンシャルアクセス}することができる．
   読み書き位置を自由に変更できるlseekシステムコールを組合せることで，
   read/writeシステムコールは\emph{ランダムアクセス}にも使用できる．
-%\item \emph{クローズ}\\
+  %\item \emph{クローズ}\\
 \item[クローズ]
   closeシステムコールを用いてファイルをクローズする．
   ファイルがオープンされている間は，
@@ -337,11 +339,11 @@ OSカーネルは通常ファイルのデータがバイトストリームであ
   ファイルの本体は削除されない．
   ファイルを消してもディスクの空き領域が増えない場合は，
   どれかプロセスがファイルをオープンしている可能性がある．
-%\item \emph{切り詰め}\\
+  %\item \emph{切り詰め}\\
 \item[切り詰め]
   truncateシステムコールや\|O_TRUNC|フラグ付きで実行したopenシステムコールは
   ファイルの長さを短く切り詰める．
-%\item \emph{プログラムの実行}\\
+  %\item \emph{プログラムの実行}\\
 \item[プログラムの実行]
   execveシステムコールはファイルに格納されているプログラムを実行する．
   ファイルのフォーマットはexecveシステムコールが
@@ -351,11 +353,11 @@ OSカーネルは通常ファイルのデータがバイトストリームであ
     \texttt{path}で指定されたインタープリタを起動し，
     ファイルの内容を実行させる．
   }．
-%\item \emph{属性の読み書き}\\
+  %\item \emph{属性の読み書き}\\
 \item[属性の読み書き]
   chmodシステムコール等でファイルの属性を書き換えることができる．
   また，statシステムコールはファイル属性の読み出しに使用できる．
-%\end{enumerate}
+  %\end{enumerate}
 \end{description}
 
 \begin{mytable}{btp}{求められるファイル操作}{fileOperations}
@@ -425,8 +427,8 @@ UNIXではchdirシステムコールを用いて
 「正常にファイルシステムがアンマウントされた」印が残る．
 次回のシステム起動時に，印が付いていないファイルシステムについて
 fsck\footnote{
-UNIXのfsckにあたるコマンドは，
-Windows では chkdsk や scandisk，macOS では Disk First Aid 等である．
+  UNIXのfsckにあたるコマンドは，
+  Windows では chkdsk や scandisk，macOS では Disk First Aid 等である．
 }コマンドが自動的に実行される．
 
 fsckコマンドは，使用中の\inode やディレクトリの内容等を突き合わせ
@@ -437,14 +439,14 @@ fsckコマンドは，使用中の\inode やディレクトリの内容等を突
 fsckコマンドは，チェック結果からファイルシステムの修復を行う．
 
 この方式は\emph{メタデータ}\footnote{
-ファイルシステムの構造を管理するデータのこと．
-FATファイルシステムのディレクトリやFAT，
-UNIXの\inode やディレクトリエントリ等が該当する．}
+  ファイルシステムの構造を管理するデータのこと．
+  FATファイルシステムのディレクトリやFAT，
+  UNIXの\inode やディレクトリエントリ等が該当する．}
 の矛盾を解消するが元通りにする分けではない．
 メタデータに矛盾があったファイルやディレクトリが失われたり，
 更新したはずのファイルが更新途中の状態になったりする可能性がある．
 また，fsckが終了するまで\footnote{
-一貫性のチェックには数分かかる場合も多い．その間，システムが使用できない．}
+  一貫性のチェックには数分かかる場合も多い．その間，システムが使用できない．}
 システムが起動しない．
 
 \subsection{ジャーナリング・ファイルシステム}
@@ -465,21 +467,22 @@ HFS+\footnote{macOS のファイルシステムである．}等は
 \figref{journaling}にジャーナリングファイルシステムの仕組みを，
 以下におおよその動作原理を示す．
 
-\myfigure{btp}{scale=.75}{Fig/journaling-crop.pdf}
-{ジャーナリングファイルシステムの仕組み}{journaling}
+\begin{myfig}{btp}{ジャーナリングファイルシステムの仕組み}{journaling}
+  \includegraphics[scale=.75]{Fig/journaling-crop.pdf}
+\end{myfig}
 
 \begin{enumerate}
 \item システムコールによる一連の操作はトランザクションとして
-ログ領域\footnote{同一ディスクの別領域の場合と別ディスクの場合がある．
-}に記録する．
+  ログ領域\footnote{同一ディスクの別領域の場合と別ディスクの場合がある．
+  }に記録する．
 \item トランザクションの書込み完了でシステムコールは完了し，
-ユーザプロセスは次の処理を開始できる．
+  ユーザプロセスは次の処理を開始できる．
 \item OSはバックグラウンド処理でログ領域からトランザクションを順に取り出し，
-ファイルシステム本体に適用する．
+  ファイルシステム本体に適用する．
 \item システムがクラッシュした場合，
-ログ領域への書込みが完了していたトランザクションは
-再実行しファイルシステム本体に完全に反映する．
-書込み途中だったトランザクションは無視する．
+  ログ領域への書込みが完了していたトランザクションは
+  再実行しファイルシステム本体に完全に反映する．
+  書込み途中だったトランザクションは無視する．
 \end{enumerate}
 
 トランザクションはログ領域にシーケンシャルに書き込まれる．
@@ -535,6 +538,8 @@ WindowsのショートカットやmacOSのエイリアスがそれに該当す�
 %============================================================================
 \section*{練習問題}
 \begin{enumerate}
+  \renewcommand{\labelenumi}{\ttfamily\arabic{chapter}.\arabic{enumi}}
+  \setlength{\leftskip}{1em}
 \item 次の言葉の意味を説明しなさい．
   \begin{enumerate}
   \item ディレクトリシステム
@@ -545,7 +550,6 @@ WindowsのショートカットやmacOSのエイリアスがそれに該当す�
   \item マウント，ドライブレター
   \item 拡張属性，ACL
   \end{enumerate}
-
 \item 自分が使用しているオペレーティングシステムについて調査しなさい．\\
   （GUIではなく，CLIのコマンドを用いるとより詳しい観察ができる場合がある．）
   \begin{enumerate}
@@ -556,21 +560,20 @@ WindowsのショートカットやmacOSのエイリアスがそれに該当す�
   \item USBメモリにはどのようなパスで到達できるか？
   \item ファイルシステムの一貫性をチェックするコマンドは何か？
   \end{enumerate}
-
 \item 自分が使用しているオペレーティングシステムで試してみなさい．
   \begin{enumerate}
   \item ショートカット（Windows）やエイリアス（macOS）を作成し，
     予定通りに働くかGUIとCLIの両方で試してみなさい．
-\begin{lstlisting}
+    \begin{lstlisting}
       # macOSの場合の実行例
       $ echo aaa > a.txt
       $ open a.txt
       $ open a.txtのエイリアス      <--- エイリアスはGUIで作る
       $ cat a.txt
       $ cat a.txtのエイリアス
-\end{lstlisting} %$
+    \end{lstlisting} %$
   \item UNIXやmacOSで実行して結果が異なる理由を考察しなさい．
-\begin{lstlisting}
+    \begin{lstlisting}
       # ハードリンクの場合          # シンボリックリンクの場合
       $ echo aaa > a.txt          $ echo aaa > a.txt
       $ echo bbb > b.txt          $ echo bbb > b.txt
@@ -578,10 +581,9 @@ WindowsのショートカットやmacOSのエイリアスがそれに該当す�
       $ mv a.txt d.txt            $ mv a.txt d.txt
       $ mv b.txt a.txt            $ mv b.txt a.txt
       $ cat c.txt                 $ cat c.txt
-\end{lstlisting} %$
+    \end{lstlisting} %$
   \item ショートカットやエイリアスの振る舞いを調べる．\\
     （リンク先ファイルを削除・移動・別ファイルに置換えした場合など）
   \item ACLの追加・削除とその効果を確認する．
   \end{enumerate}
-
 \end{enumerate}

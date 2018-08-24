@@ -6,7 +6,7 @@
 「生産者と消費者の問題」や「リーダ・ライタ問題」の具体的な解を得るためには，
 プロセス間で情報を共有することが必要である．
 プロセス間で情報を共有する代表的な機構として，
-{\bf 共有メモリ}と{\bf メッセージ通信}がある．
+\emph{共有メモリ}と\emph{メッセージ通信}がある．
 
 複数のプロセスが情報を共有し協調して処理を進めることで，
 次のようなメリットが期待できる．
@@ -17,17 +17,19 @@
 \item システムを見通しの良いモジュール化された構造で構築できる．
 \end{itemize}
 
+%==============================================================================
 \section{共有メモリ}
 共有メモリは\figref{ipcShearedMemory}に示すように，
 プロセス間で同じ物理メモリを共有する方式である．
 プロセス１とプロセス２は同じ物理メモリ（共有メモリ）を，
 それぞれの仮想メモリ空間に貼り付けている．
 
-\myfigure{btp}{scale=0.6}{Fig/ipcShearedMemory-crop.pdf}{共有メモリ}
-{ipcShearedMemory}
+\begin{myfig}{btp}{共有メモリ}{ipcShearedMemory}
+  \includegraphics[scale=0.6]{Fig/ipcShearedMemory-crop.pdf}
+\end{myfig}
 
 メモリ管理のハードウェア（Memory Management Unit : MMU）\footnote{
-MMUに付いては「メモリ管理」の章で解説する．}を適切に設定することで，
+  MMUに付いては「メモリ管理」の章で解説する．}を適切に設定することで，
 複数のプロセスの仮想メモリ空間に同じ物理メモリを貼り付ける．
 メモリを貼り付ける操作はシステムコールを用いて行う．
 貼り付けが完了した後は，
@@ -39,66 +41,62 @@ UNIXの共有メモリ関連のシステムコールとライブラリ関数を
 \figref{ipcUnixShearedMemory}に紹介する．
 
 \begin{myfig}{btp}{UNIXの共有メモリ関連システムコールとライブラリ関数}
-{ipcUnixShearedMemory}
-\lstinputlisting[numbers=none]{Lst/ipcUnixShearedMemory.txt}
+  {ipcUnixShearedMemory}
+  \lstinputlisting[numbers=none]{Lst/ipcUnixShearedMemory.txt}
 \end{myfig}
 
 \begin{quote}
-\begin{description}
-\item [{\tt ftok()}ライブラリ関数]
-{\tt ftok()}は，{\tt path}と{\tt id}の組合せからから，
-システム内で一意かつ唯一の{\tt key}値を生成する．
+  \begin{description}
+  \item [\texttt{ftok()}ライブラリ関数]
+    \|ftok()|は，\|path|と\|id|の組合せからから，
+    システム内で一意かつ唯一の\|key|値を生成する．
 
-\item [{\tt shmget}システムコール]
-{\tt key}値で識別される共有メモリセグメントのID返す．
-{\tt key}値で識別される共有メモリセグメントが存在しない場合は，
-{\tt size}バイトのものを新しく作ることも可能である．
-{\tt flag}の値は共有メモリのアクセス許可ビット（{\tt rwxrwxrwx}）と，
-\|IPC_CREAT|等のフラグである．
+  \item [\texttt{shmget}システムコール]
+    \|key|値で識別される共有メモリセグメントのID返す．
+    \|key|値で識別される共有メモリセグメントが存在しない場合は，
+    \|size|バイトのものを新しく作ることも可能である．
+    \|flag|の値は共有メモリのアクセス許可ビット（\|rwxrwxrwx|）と，
+    \|IPC_CREAT|等のフラグである．
 
-\item [{\tt shmat}システムコール]
-共有メモリセグメントをID（{\tt shmId}）で指定し，
-プロセスの仮想アドレス空間に貼り付ける．
+  \item [\texttt{shmat}システムコール]
+    共有メモリセグメントをID（\|shmId|）で指定し，
+    プロセスの仮想アドレス空間に貼り付ける．
 
-\item [{\tt shmdt}システムコール]
-共有メモリセグメントをID（{\tt shmId}）で指定し，
-プロセスの仮想アドレス空間から取り除く．
+  \item [\texttt{shmdt}システムコール]
+    共有メモリセグメントをID（\|shmId|）で指定し，
+    プロセスの仮想アドレス空間から取り除く．
 
-\item [{\tt shmctl}システムコール]
-共有メモリセグメントをID（{\tt shmId}）で指定し操作する．
-共有メモリセグメントの削除等の操作ができる．
-\end{description}
+  \item [\texttt{shmctl}システムコール]
+    共有メモリセグメントをID（\|shmId|）で指定し操作する．
+    共有メモリセグメントの削除等の操作ができる．
+  \end{description}
 \end{quote}
 
 \subsection{UNIXの共有メモリ使用例}
 共有メモリセグメントを作成し，
 そこから定期的にデータを読み出し表示するサーバプログラムの例を
-\figref{ipcUnixShearedMemoryServer}に示す\footnote{
-ここで示すプログラムは macOS 10.13.2 で動作確認してあるが，
-他のUNIXでも動作するはずである．}．
+リスト\ref{ipcUnixShearedMemoryServer}に示す\footnote{
+  ここで示すプログラムは macOS 10.13.2 で動作確認してあるが，
+  他のUNIXでも動作するはずである．}．
 また，サーバプログラムが作成した共有メモリセグメントにデータを書き込む
 クライアントプログラムの例を
-\figref{ipcUnixShearedMemoryClient}に示す．
+リスト\ref{ipcUnixShearedMemoryClient}に示す．
 
-\begin{myfig}{btp}{UNIXの共有メモリサーバ例}
-{ipcUnixShearedMemoryServer}
-\lstinputlisting{Lst/ipcUnixShearedMemoryServer.c}
-\end{myfig}
+\lstinputlisting[numbers=left,float=btp,label=ipcUnixShearedMemoryServer,
+  caption=UNIXの共有メモリサーバ例]{Lst/ipcUnixShearedMemoryServer.c}
 
-\begin{myfig}{btp}{UNIXの共有メモリクライアント例}
-{ipcUnixShearedMemoryClient}
-\lstinputlisting{Lst/ipcUnixShearedMemoryClient.c}
-\end{myfig}
+\lstinputlisting[numbers=left,float=btp,label=ipcUnixShearedMemoryClient,
+  caption=UNIXの共有メモリクライアント例]{Lst/ipcUnixShearedMemoryClient.c}
 
 サーバプログラムでは，
-28行の{\tt printf()}が共有メモリ（{\tt data}）から文字列を読み出し表示する．
-文字列が{\tt end}ならプログラムを終了する．
+28行の\|printf()|が共有メモリ（\|data|）から文字列を読み出し表示する．
+文字列が\|end|ならプログラムを終了する．
 クライアントプログラムでは，
-27行の{\tt fgets()}が共有メモリ（{\tt data}）に文字列を書き込む．
+27行の\|fgets()|が共有メモリ（\|data|）に文字列を書き込む．
 これらのプログラムでは，
-共有メモリが普通の文字配列のように{\tt printf()}や{\tt fgets()}に渡されている．
+共有メモリが普通の文字配列のように\|printf()|や\|fgets()|に渡されている．
 共有メモリなので，
-{\tt fgets()}が書き込んだ内容を{\tt printf()}が読み出すことになる．
+\|fgets()|が書き込んだ内容を\|printf()|が読み出すことになる．
 
 実行例は\figref{ipcUnixShearedMemoryTest}のようになる．
 図は二つのターミナルを開いて操作した状態を示している．
@@ -115,28 +113,30 @@ UNIXの共有メモリ関連のシステムコールとライブラリ関数を
 共有メモリの内容を定期的に表示する．
 
 \begin{myfig}{btp}{UNIXのメモリ共有プログラム実行例}{ipcUnixShearedMemoryTest}
-\lstinputlisting[numbers=none]{Lst/ipcUnixShearedMemoryTest.txt}
+  \lstinputlisting[numbers=none]{Lst/ipcUnixShearedMemoryTest.txt}
 \end{myfig}
 
 ここに紹介した簡単なプログラムでは，
 クライアントプロセスがデータを書き換え中に，
 サーバプロセスがデータを読み出す可能性がある．
-{\bf このようなプログラムを使用してはならない．}
+\emph{このようなプログラムを使用してはならない．}
 実際に使用する場合は書き換え中のデータを読み出さないように，
 セマフォ等\footnote{UNIXではセマフォも使用できる．}を
 用いて相互排除を行う必要がある．
-原理の確認以外の目的に{\bf このプログラムを使用してはならない．}
+原理の確認以外の目的に\emph{このプログラムを使用してはならない．}
 
+%==============================================================================
 \section{メッセージ通信}
 メッセージ通信は\figref{ipcMessagePassing}に示すように，
 システムコールを用いてプロセス間で情報をコピーする方式である．
-プロセス１は{\tt send()}システムコールを用いて
+プロセス１は\|send()|システムコールを用いて
 プロセス２へメッセージを送る．
-プロセス２は{\tt receive()}システムコールを用いて
+プロセス２は\|receive()|システムコールを用いて
 プロセス１からメッセージを受取る．
 
-\myfigure{btp}{scale=0.6}{Fig/ipcMessagePassing-crop.pdf}
-{メッセージ通信}{ipcMessagePassing}
+\begin{myfig}{btp}{メッセージ通信}{ipcMessagePassing}
+  \includegraphics[scale=0.6]{Fig/ipcMessagePassing-crop.pdf}
+\end{myfig}
 
 メッセージ通信は，
 データを送る度にシステムコールを使用するのでオーバーヘッドが大きいが，
@@ -146,43 +146,47 @@ UNIXの共有メモリ関連のシステムコールとライブラリ関数を
 システムコールでメッセージの通信相手を指定する方式が二つある．
 
 \begin{quote}
-\begin{description}
-\item[直接指定方式]
-相手プロセスを直接指定する方式である．
-\figref{ipcDirect}は直接指定方式を表している．
+  \begin{description}
+  \item[直接指定方式]
+    相手プロセスを直接指定する方式である．
+    \figref{ipcDirect}は直接指定方式を表している．
 
-\myfigure{btp}{scale=0.6}{Fig/ipcDirect-crop.pdf}{直接指定方式}{ipcDirect}
+    \begin{myfig}{btp}{直接指定方式}{ipcDirect}
+      \includegraphics[scale=0.6]{Fig/ipcDirect-crop.pdf}
+    \end{myfig}
 
-{\tt send()}，{\tt receive()}システムコールの引数は，
-{\bf 相手プロセス}と{\bf メッセージ}になる．
-{\bf 相手プロセス}として{\tt ANY}のような記述を許すことで，
-多対多の通信も可能である．
-また，受信したメッセージをいくつか貯めることが可能な，
-バッファ付きの通信方式もあり得る．
+    \|send()|，\|receive()|システムコールの引数は，
+    \emph{相手プロセス}と\emph{メッセージ}になる．
+    \emph{相手プロセス}として\|ANY|のような記述を許すことで，
+    多対多の通信も可能である．
+    また，受信したメッセージをいくつか貯めることが可能な，
+    バッファ付きの通信方式もあり得る．
 
-\item[間接指定方式]
-{\bf リンク（ポート，ソケット，チャネルとも呼ばれる）}を作成し，
-通信先としてリンクの名前を用いる方式である．
-\figref{ipcIndirect}は間接指定方式を表している．
+  \item[間接指定方式]
+    \emph{リンク（ポート，ソケット，チャネルとも呼ばれる）}を作成し，
+    通信先としてリンクの名前を用いる方式である．
+    \figref{ipcIndirect}は間接指定方式を表している．
 
-\myfigure{btp}{scale=0.6}{Fig/ipcIndirect-crop.pdf}{間接指定方式}{ipcIndirect}
+    \begin{myfig}{btp}{間接指定方式}{ipcIndirect}
+      \includegraphics[scale=0.6]{Fig/ipcIndirect-crop.pdf}
+    \end{myfig}
 
-{\tt send()}，{\tt receive()}システムコールの引数は，
-{\bf リンク}と{\bf メッセージ}になる．
-同じリンクを共有する複数のプロセスが存在すると，
-自然に多対多の通信方式が実現できる．
-リンクにメッセージをいくつか貯めるバッファ機能を持たせる場合が多い．
-%UNIXのソケットやパイプはこの方式によく似ている．
-\end{description}
+    \|send()|，\|receive()|システムコールの引数は，
+    \emph{リンク}と\emph{メッセージ}になる．
+    同じリンクを共有する複数のプロセスが存在すると，
+    自然に多対多の通信方式が実現できる．
+    リンクにメッセージをいくつか貯めるバッファ機能を持たせる場合が多い．
+    %UNIXのソケットやパイプはこの方式によく似ている．
+  \end{description}
 \end{quote}
 
 \subsection{バッファリング（Buffering）}
 直接指定方式か間接指定方式かに関わりなく，
 メッセージを格納するバッファを用意することができる．
 送信プロセスはバッファに空きがあれば待ち時間なしに
-{\tt send()}システムコールを完了できる．
+\|send()|システムコールを完了できる．
 受信プロセスはバッファにメッセージがあれば待ち時間なしに
-{\tt receive()}システムコールを完了できる．
+\|receive()|システムコールを完了できる．
 
 間接指定方式ではリンクがバッファを持つと考え，
 リンクを作成する時点でバッファの大きさを指定する場合が多い．
@@ -192,134 +196,130 @@ UNIXの共有メモリ関連のシステムコールとライブラリ関数を
 通信に用いられるメッセージの形式には次のような選択肢がある．
 
 \begin{quote}
-\begin{description}
-\item [メッセージ長] {\bf 固定長方式}または{\bf 可変長方式}
-\item [メッセージ形式] {\bf タグ付き}または{\bf タグなし}
-\end{description}
+  \begin{description}
+  \item [メッセージ長] \emph{固定長方式}または\emph{可変長方式}
+  \item [メッセージ形式] \emph{タグ付き}または\emph{タグなし}
+  \end{description}
 \end{quote}
 
-{\bf タグ}は種類を表すためにメッセージに付加されるデータのことである．
+\emph{タグ}は種類を表すためにメッセージに付加されるデータのことである．
 タグ付きのメッセージ通信機構では，
 送信側はメッセージにタグを付加する．
 受信側はタグを指定してメッセージを選択的に受信することができる．
 
 \subsection{同期方式（Synchronization）}
-{\bf 非同期方式（ノンブロッキング：Nonblocking）}と
-{\bf 同期方式（ブロッキング：Blocking）}の二つがある．
-同期式の特別な場合としてバッファを用いない{\bf ランデブー方式}も考えられる．
+\emph{非同期方式（ノンブロッキング：Nonblocking）}と
+\emph{同期方式（ブロッキング：Blocking）}の二つがある．
+同期式の特別な場合としてバッファを用いない\emph{ランデブー方式}も考えられる．
 
 \begin{quote}
-\begin{description}
-\item [非同期方式]
-{\tt send()}はバッファに空きがない場合エラーで終了する．
-{\tt receive()}はバッファにメッセージがない場合エラーで終了する．
-\item [同期方式]
-{\tt send()}はバッファに空きがない場合ブロックし，空きができるのを待つ．
-{\tt receive()}はバッファにメッセージがない場合ブロックし，
-メッセージが届くのを待つ．
-\item [ランデブー方式]
-{\tt send()}は受信プロセスが{\tt receive()}を実行するまでブロックする．
-{\tt receive()}は送信プロセスが{\tt send()}を実行するまでブロックする．
-両方のプロセスが{\tt send()}と{\tt receive()}を
-実行したらプロセス間でメッセージをコピーする．
-プロセス間で直にメッセージをコピーするので，
-バッファは不要である．
-\end{description}
+  \begin{description}
+  \item [非同期方式]
+    \|send()|はバッファに空きがない場合エラーで終了する．
+    \|receive()|はバッファにメッセージがない場合エラーで終了する．
+  \item [同期方式]
+    \|send()|はバッファに空きがない場合ブロックし，空きができるのを待つ．
+    \|receive()|はバッファにメッセージがない場合ブロックし，
+    メッセージが届くのを待つ．
+  \item [ランデブー方式]
+    \|send()|は受信プロセスが\|receive()|を実行するまでブロックする．
+    \|receive()|は送信プロセスが\|send()|を実行するまでブロックする．
+    両方のプロセスが\|send()|と\|receive()|を
+    実行したらプロセス間でメッセージをコピーする．
+    プロセス間で直にメッセージをコピーするので，
+    バッファは不要である．
+  \end{description}
 \end{quote}
 
 \subsection{UNIXのメッセージ通信システムコール}
 UNIXでは複数種類のメッセージ通信機構が利用可能である．
 ここでは，System V 系のUNIXを起原とする方式を紹介する．
-この方式は，{\bf 間接指定方式}，{\bf バッファリングあり}，
-{\bf 可変長}，{\bf タグ付き}の方式である．
+この方式は，\emph{間接指定方式}，\emph{バッファリングあり}，
+\emph{可変長}，\emph{タグ付き}の方式である．
 システムコールの引数によって，
-{\bf 同期方式}と{\bf 非同期方式}のどちらにも対応することができる．
+\emph{同期方式}と\emph{非同期方式}のどちらにも対応することができる．
 UNIXのメッセージ通信関連のシステムコール等を\figref{ipcUnixMessage}に示す．
 
 \begin{myfig}{btp}{UNIXのメッセージ通信関連システムコールとデータ構造}
-{ipcUnixMessage}
-\lstinputlisting[numbers=none]{Lst/ipcUnixMessage.txt}
+  {ipcUnixMessage}
+  \lstinputlisting[numbers=none]{Lst/ipcUnixMessage.txt}
 \end{myfig}
 
 \begin{quote}
-\begin{description}
-\item [{\tt msgBuf}構造体]
-ユーザが宣言する構造体である．
-必ず，long型の{\tt mtype}フィールドから始める必要がある．
-このフィールドが{\bf タグ}の役割を持つ．
-{\tt mtext}はメッセージの本体を格納する領域であり，
-ユーザが自由に大きさや用途を決めることができる．
+  \begin{description}
+  \item [\texttt{msgBuf}構造体]
+    ユーザが宣言する構造体である．
+    必ず，long型の\|mtype|フィールドから始める必要がある．
+    このフィールドが\emph{タグ}の役割を持つ．
+    \|mtext|はメッセージの本体を格納する領域であり，
+    ユーザが自由に大きさや用途を決めることができる．
 
-\item [{\tt msgget()}システムコール]
-リンク（メッセージキューと呼ぶ）のIDを返す．
-{\tt key}は，共有メモリの場合と同様に{\tt ftok()}関数を用いて生成した値である．
-メッセージキューを識別するために用いる．
-{\tt msgflg}に\|IPC_CREAT|を指定することで，
-メッセージキューを新規に作成することもできる．
+  \item [\texttt{msgget()}システムコール]
+    リンク（メッセージキューと呼ぶ）のIDを返す．
+    \|key|は，共有メモリの場合と同様に\|ftok()|関数を用いて生成した値である．
+    メッセージキューを識別するために用いる．
+    \|msgflg|に\|IPC_CREAT|を指定することで，
+    メッセージキューを新規に作成することもできる．
 
-\item [{\tt msgsnd()}システムコール]
-メッセージキューにメッセージを送信する．
-{\tt msgp}に送信するメッセージを格納した{\tt msgBuf}構造体のポインタを渡す．
-メッセージは{\bf 可変長方式}なので{\tt msgsz}で長さを指定する．
-{\tt msgsz}は構造体全体ではなく，構造体の{\tt mtext}部分のバイト数である．
-{\tt msgflg}に\|IPC_NOWAIT|フラグを指定すると{\bf 非同期方式}になり，
-指定しないと{\bf 同期方式}になる．
+  \item [\texttt{msgsnd()}システムコール]
+    メッセージキューにメッセージを送信する．
+    \|msgp|に送信するメッセージを格納した\|msgBuf|構造体のポインタを渡す．
+    メッセージは\emph{可変長方式}なので\|msgsz|で長さを指定する．
+    \|msgsz|は構造体全体ではなく，構造体の\|mtext|部分のバイト数である．
+    \|msgflg|に\|IPC_NOWAIT|フラグを指定すると\emph{非同期方式}になり，
+    指定しないと\emph{同期方式}になる．
 
-\item [{\tt msgrcv()}システムコール]
-メッセージキューからメッセージを受信する．
-{\tt msgp}に受信したメッセージを格納する{\tt msgBuf}構造体のポインタを渡す．
-{\tt msgsz}は受信可能な{\tt mtext}の最大バイト数である．
-{\tt msgtyp}に受信したいメッセージの{\tt mtype}を指定し，
-{\bf タグ}が合致するメッセージを選択的に受信できる．
-{\tt msgflg}に\|IPC_NOWAIT|フラグを指定すると{\bf 非同期方式}になる．
+  \item [\texttt{msgrcv()}システムコール]
+    メッセージキューからメッセージを受信する．
+    \|msgp|に受信したメッセージを格納する\|msgBuf|構造体のポインタを渡す．
+    \|msgsz|は受信可能な\|mtext|の最大バイト数である．
+    \|msgtyp|に受信したいメッセージの\|mtype|を指定し，
+    \emph{タグ}が合致するメッセージを選択的に受信できる．
+    \|msgflg|に\|IPC_NOWAIT|フラグを指定すると\emph{非同期方式}になる．
 
-\item [{\tt msgclt()}システムコール]
-メッセージキューに対して操作を行う．
-{\tt cmd}に操作の種類（コマンド），
-{\tt buf}にパラメータを渡す．
-\|IPC_RMID|コマンドを指定するとメッセージキューの削除ができる．
-\end{description}
+  \item [\texttt{msgclt()}システムコール]
+    メッセージキューに対して操作を行う．
+    \|cmd|に操作の種類（コマンド），
+    \|buf|にパラメータを渡す．
+    \|IPC_RMID|コマンドを指定するとメッセージキューの削除ができる．
+  \end{description}
 \end{quote}
 
 \subsection{UNIXのメッセージ通信プログラム例}
-メッセージを表現する構造体の例を\figref{ipcUnixMessageH}に示す\footnote{
-ここで紹介するプログラムはmacOS 10.13.2 で動作確認した．
-macOSのオンラインマニュアルには，
-ここで紹介するメッセージ通信方式について記載がないが，
-試してみると使用できた．}．
-メッセージ本体の長さは{\tt MAXMSG}に定義している．
+メッセージを表現する構造体の例をリスト\ref{ipcUnixMessageH}に示す\footnote{
+  ここで紹介するプログラムはmacOS 10.13.2 で動作確認した．
+  macOSのオンラインマニュアルには，
+  ここで紹介するメッセージ通信方式について記載がないが，
+  試してみると使用できた．}．
+メッセージ本体の長さは\|MAXMSG|に定義している．
 以下のプログラムは，メッセージ長をこの値に固定した例になっている．
 
-\begin{myfig}{btp}{UNIXのメッセージ通信プログラム例（メッセージ構造体）}
-{ipcUnixMessageH}
-\lstinputlisting{Lst/ipcUnixMessage.h}
-\end{myfig}
+\lstinputlisting[caption=UNIXのメッセージ通信プログラム例（メッセージ構造体）,
+  numbers=left,float=btp,label=ipcUnixMessageH]{Lst/ipcUnixMessage.h}
 
-\figref{ipcUnixMessageWriter}に
+リスト\ref{ipcUnixMessageWriter}に
 メッセージキューを作成しメッセージを書き込むプログラムの例を示す．
 このプログラムは入力した文字列をメッセージ本体に格納して
 メッセージキューに送信する．
-タグの役割を持つ{\tt mtype}は常に1にしている．
+タグの役割を持つ\|mtype|は常に1にしている．
 
-\begin{myfig}{btp}{UNIXのメッセージ通信プログラム例（メッセージ送信側）}
-{ipcUnixMessageWriter}
-\lstinputlisting{Lst/ipcUnixMessageWriter.c}
-\end{myfig}
+\lstinputlisting[numbers=left,float=btp,label=ipcUnixMessageWriter,
+  caption=UNIXのメッセージ通信プログラム例（メッセージ送信側）]
+                {Lst/ipcUnixMessageWriter.c}
 
-\figref{ipcUnixMessageReader}に，
+リスト\ref{ipcUnixMessageReader}に，
 メッセージキューからメッセージを読み込み内容を表示するプログラムの例を示す．
-22行で{\tt msgtyp}を0にして{\tt msgrcv()}を実行している．
-{\tt msgtyp}が0の場合は，
-メッセージの{\tt mtype}（タグ）を無視して
+22行で\|msgtyp|を0にして\|msgrcv()|を実行している．
+\|msgtyp|が0の場合は，
+メッセージの\|mtype|（タグ）を無視して
 メッセージキューの先頭から順にメッセージを受信する．
-26行で{\tt mtype}と{\tt mtext}の内容を表示している．
+26行で\|mtype|と\|mtext|の内容を表示している．
 送信側のプログラムがメッセージキューを削除すると
 22行でエラーが発生し24行で終了する．
 
-\begin{myfig}{btp}{UNIXのメッセージ通信プログラム例（メッセージ受信側）}
-{ipcUnixMessageReader}
-\lstinputlisting{Lst/ipcUnixMessageReader.c}
-\end{myfig}
+\lstinputlisting[numbers=left,float=btp,label=ipcUnixMessageReader,
+  caption=UNIXのメッセージ通信プログラム例（メッセージ受信側）]
+                {Lst/ipcUnixMessageReader.c}
 
 \subsection{UNIXのメッセージ通信プログラムの実行例}
 メッセージ通信プログラムの実行例を
@@ -333,243 +333,56 @@ macOSのオンラインマニュアルには，
 この状態で左のターミナルに入力した文字列が，
 メッセージ通信を用いて右のターミナルで実行中のプログラムに送信される．
 右のターミナルには
-受信したメッセージの{\tt mtype}と{\tt mtext}の内容が表示される．
+受信したメッセージの\|mtype|と\|mtext|の内容が表示される．
 
 \begin{myfig}{btp}{UNIXのメッセージ通信プログラム実行例}{ipcUnixMessageTest}
-\lstinputlisting[numbers=none]{Lst/ipcUnixMessageTest.txt}
+  \lstinputlisting[numbers=none]{Lst/ipcUnixMessageTest.txt}
 \end{myfig}
 
-\section{TacOSのメッセージ通信機構}
-\label{tacosIPC}
-TacOSではマイクロカーネルがメッセージ通信機構を提供し，
-ユーザ・プロセスとサーバプロセス，
-サーバプロセスとサーバプロセスの通信にメッセージを用いる．
-TacOSのメッセージ通信は，
-クライアントプロセスがサーバプロセスの機能を利用する，
-クライアント・サーバの通信に特化したものである．
-\figref{tacosMessage}にTacOSのメッセージ通信の様子を示す．
-メッセージ通信の手順は次のようになる．
+%==============================================================================
+\section{メッセージ通信機構の実装例}
+第\ref{tacosIPC}章に
+TacOSにおけるメッセージ通信機構の実装例を紹介する．
+TacOSのメッセージ通信機構はセマフォを利用して実装されている．
 
-\myfigure{btp}{scale=0.6}{Fig/tacosMessage-crop.pdf}{TacOSのメッセージ通信}
-{tacosMessage}
-
-\begin{enumerate}
-\item サーバプロセスが{\bf リンク}を所有し他プロセスからの通信を待ち受ける．
-\item クライアントプロセスは
-{\tt sndrec()}関数を用いてリンクに処理内容をメッセージとして送信する．
-\item サーバプロセスは{\tt receive()}関数を用いてメッセージを受信する．
-\item サーバプロセスはメッセージの内容に合った処理を行う．
-\item サーバプロセスは処理結果を{\tt send()}関数を用いて返信する．
-\item {\tt sndrec()}関数が完了し，クライアントプロセスは処理結果を受取る．
-\end{enumerate}
-
-TacOSのメッセージ通信機構は，
-{\bf 間接指定方式}，{\bf 固定長}，{\bf ランデブー方式}と言える．
-クライアントプロセスとサーバプロセスが並列に処理することができないが，
-%マイクロカーネル方式であるので
-サービスモジュールをサーバプロセスにすることができ，
-オペレーティングシステムを構築するためのプログラミングを容易にしている．
-
-\subsection{リンク構造体}
-\figref{tacosLink}にTacOSのリンク構造体の宣言を示す\footnote{
-%\figref{tacosLink}はTacOSのソースコード
-\url{https://github.com/tctsigemura/TacOS/blob/master/os/kernel/process.hmm}
-の一部である．}．
-{\tt Link}構造体はランデブー用のリンクを定義している．
-{\tt server}はリンクを所有するサーバプロセスのPCB，
-{\tt client}はリンクを使用中のクライアントプロセスのPCBである．
-{\tt s1}，{\tt s2}，{\tt s3}は
-相互排除と同期のために使用されるセマフォである．
-TacOSのリンクはセマフォを基盤にしている．
-{\tt op}，{\tt prm1}，{\tt prm2}，{\tt prm3}が固定長のメッセージ本体になる．
-
-\begin{myfig}{btp}{TacOSのリンク構造体}{tacosLink}
-\lstinputlisting{Lst/tacosLink.hmm}
-\end{myfig}
-
-\subsection{リンクの作成}
-\figref{tacosNewLink}に，
-TacOSのマイクロカーネル内にある，
-リンク作成ルーチンを示す\footnote{
-%\figref{tacosNewLink}はTacOSのソースコード
-\url{https://github.com/tctsigemura/TacOS/blob/master/os/kernel/kernel.cmm}の
-一部である．}．
-{\tt newLink()}関数はサーバプロセスがリンクを作り所有するために呼出す．
-TacOSのサーバプロセスはカーネルモードで実行され，
-カーネル内ルーチンを呼出すことができる．
-複数のプロセスが{\tt newLink()}関数を呼出す可能性があるので，
-6行から15行の範囲は割込み禁止による相互排除を行っている．
-
-\begin{myfig}{btp}{TacOSのリンク作成ルーチン}{tacosNewLink}
-\lstinputlisting{Lst/tacosNewLink.cmm}
-\end{myfig}
-
-空きリンクは7行で管理している．
-リンクの廃棄手段は準備されていないので，
-空きリンクの管理は単純である．
-11行でリンクを所有するサーバプロセスを記録する．
-12，13，14行で，三つのセマフォをリンクに割当てている．
-16行では作成したリンクの番号を返している．
-
-\subsection{サーバ用のメッセージ通信ルーチン}
-\figref{tacosSendReceive}に，
-TacOSのマイクロカーネル内にある，
-サーバプロセス用のメッセージ通信プログラムを示す\footnote{
-%\figref{tacosSendReceive}はTacOSのソースコード
-\url{https://github.com/tctsigemura/TacOS/blob/master/os/kernel/kernel.cmm}
-の一部である．}．
-2行の{\tt receive()}関数はメッセージの受信に使用する．
-引数{\tt num}は{\tt newLink()}が返したリンク番号である．
-4行でリンクの所有者を調べている．
-所有者が自身ではないならオペレーティングシステムのバグなので
-{\tt panic()}関数を用いてシステムを停止する．
-5行で初期値0のセマフォ（{\tt s1}）にP操作を行い，
-クライアントがリンクにデータを書き込むのを待つ．
-6行でデータが書き込まれたリンクを返す．
-
-\begin{myfig}{btp}{TacOSのメッセージ通信ルーチン（サーバ用）}{tacosSendReceive}
-\lstinputlisting{Lst/tacosSendReceive.cmm}
-\end{myfig}
-
-10行の{\tt send()}関数は，
-クライアントプロセスにメッセージを返信するために使用する．
-引数{\tt num}はリンク番号，{\tt res}は返信するデータである．
-サーバが行った処理の結果を16ビット（2バイト）で表現する．
-12行では{\tt receive()}関数と同様にリンクの所有者を調べている．
-13行で処理結果をリンクに書込み，
-14行でクライアントが待ち合わせているセマフォ（{\tt s3}）にV操作を行う．
-これでクライアントが処理結果を受取り処理を再開する．
-
-\subsection{サーバプロセスの例}
-\figref{tacosPmMain}にサーバプロセスの例として，
-プロセスマネージャのメインルーチンを示す\footnote{
-%\figref{tacosPmMain}はTacOSのソースコード
-\url{https://github.com/tctsigemura/TacOS/blob/master/os/pm/pm.cmm}の
-一部である．}．
-プロセスマネージャはexecシステムコール等を処理するサーバプロセスである．
-3行でリンクを作成し{\tt pmLink}グローバル変数\footnote{
-\url{https://github.com/tctsigemura/TacOS/blob/master/os/pm/pm.hmm}
-で宣言されている．}に記録する．
-5行でクライアントプロセスからのメッセージを待ち受ける．
-メッセージを受信したら6行に進み，
-リンクに書き込まれていた内容とクライアントプロセスのPCBを引数に，
-プロセスマネージャのシステムコール処理ルーチンを実行する．
-処理結果は7行の{\tt send()}関数を用いてクライアントプロセスに返信する．
-
-\begin{myfig}{btp}{TacOSのメッセージ通信使用例（サーバ側）}{tacosPmMain}
-\lstinputlisting{Lst/tacosPmMain.cmm}
-\end{myfig}
-
-\subsection{クライアント用のメッセージ通信ルーチン}
-\figref{tacosSndRec}にTacOSのクライアントプロセス用の
-メッセージ通信プログラム（{\tt sndrec()}）を示す\footnote{
-%\figref{tacosSndRec}はTacOSのソースコード
-\url{https://github.com/tctsigemura/TacOS/blob/master/os/kernel/kernel.cmm}の
-一部である．}．
-{\tt sndrec()}関数はサーバプロセスのリンクにメッセージを書込み，
-サーバプロセスに処理を依頼する．
-サーバプロセスが処理を完了したら，
-{\tt sendrec()}関数は処理結果を返り値として終了する．
-
-\begin{myfig}{btp}{TacOSのメッセージ通信ルーチン（クライアント用）}
-{tacosSndRec}
-\lstinputlisting{Lst/tacosSndRec.cmm}
-\end{myfig}
-
-4行では初期値1のセマフォ（{\tt s2}）を用いてリンクをロックし，
-他のクライアントプロセスとの相互排除を行っている．
-6行から9行でリンクにメッセージを書き込む．
-{\tt iSemV()}関数を使用するために，
-10行から13行まで割込み禁止による相互排除を行っている．
-11行でメッセージを書き込んだことをサーバに知らせ，
-12行で初期値0のセマフォ（{\tt s3}）にP操作を行いサーバが処理を終了するのを待つ．
-サーバの処理が終了したら14行に進み
-サーバがリンクに書き込んだ処理結果を取り出す．
-15行でリンクのロックを解除し16行で処理結果を持って関数を終了する．
-
-\subsection{クライアントプロセスの例}
-\figref{tacosPmExec}にクライアントプロセスの例として，
-プロセスマネージャ（サーバプロセス）に
-execシステムコールの処理を依頼するプログラムを示す\footnote{
-%\figref{tacosPmExec}はTacOSのソースコード
-\url{https://github.com/tctsigemura/TacOS/blob/master/os/pm/pm.cmm}の
-一部である．}．
-TacOSのexecシステムコールは，
-新しいプロセスを作ってプログラムを実行させる．
-引数はプログラムファイルのパス名（{\tt path}）と，
-新しいプログラムの{\tt main()}関数に渡すコマンド行引数（{\tt argv}）である．
-
-1行はクライアントプロセスのexecシステコールの入口になる．
-カーネルモードで動作する他のサーバプロセスは{\tt exec()}関数を直に呼出す．
-ユーザモードで動作するユーザプロセスはSVC機械語命令で割込みを発生し，
-SVC割込みハンドラから{\tt exec()}関数を呼出す．
-割込みハンドラは現在のプロセスのコンテキストで実行されるので，
-{\tt exec()}関数はカーネルモードに切り換わった状態の
-ユーザプロセスによって実行されることになる．
-
-2行でプロセスマネージャ（サーバプロセス）とランデブーを行う．
-{\tt pmLink}は\figref{tacosPmMain}で
-プロセスマネージャが生成したリンクである．
-{\tt EXEC}がシステムコールの種類を表している．
-システムコールの二つの引数は\|_AtoI()|関数を用いてint型に変換して渡している．
-処理結果は子プロセスのプロセス番号（PID）である．
-3行でPIDを呼出し側に返す．
-
-\begin{myfig}{btp}{TacOSのメッセージ通信使用例（クライアント側）}{tacosPmExec}
-\lstinputlisting{Lst/tacosPmExec.cmm}
-\end{myfig}
-
+%==============================================================================
 \section{まとめ}
 この章ではプロセス間通信（IPC）について学んだ．
 IPCには共有メモリとメッセージ通信の二種類があった．
 UNIXの共有メモリとメッセージ通信についてプログラム例を示した．
-TacOSのメッセージ通信について，
-それを実現するカーネル内プログラムと利用例を示した．
 
+%==============================================================================
 \section*{練習問題}
 \begin{enumerate}
-\renewcommand{\labelenumi}{\tt \arabic{chapter}.\arabic{enumi}}
- \setlength{\leftskip}{1em}
+  \renewcommand{\labelenumi}{\ttfamily\arabic{chapter}.\arabic{enumi}}
+  \setlength{\leftskip}{1em}
 
 \item プロセス間の共有メモリとスレッド間の共有変数の違いは何か？
-
 \item UNIXの共有メモリ使用例
-（\figref{ipcUnixShearedMemoryServer}，\figref{ipcUnixShearedMemoryClient}）
-を実際に実行し動作確認しなさい．
-なお，ソースプログラムは以下から入手可能である． \\
-\url{https://github.com/tctsigemura/OSTextBook/blob/master/Lst/ipcUnixShearedMemoryServer.c} （サーバ側）\\
-\url{https://github.com/tctsigemura/OSTextBook/blob/master/Lst/ipcUnixShearedMemoryClient.c} （クライアント側）
-
+  （リスト\ref{ipcUnixShearedMemoryServer}，
+    リスト\ref{ipcUnixShearedMemoryClient}）
+  を実際に実行し動作確認しなさい．
+  なお，ソースプログラムは以下から入手可能である． \\
+  \url{https://github.com/tctsigemura/OSTextBook/blob/master/Lst/ipcUnixShearedMemoryServer.c} （サーバ側）\\
+  \url{https://github.com/tctsigemura/OSTextBook/blob/master/Lst/ipcUnixShearedMemoryClient.c} （クライアント側）
 \item 動作確認したプログラムでは，
-サーバプログラムは共有メモリが変更されたことを確認しないで，
-一定の時間間隔で共有メモリの内容を表示している．
-\begin{enumerate}
-\item どのような不都合が予想されるか？
-\item クライアントとサーバで同期をする方法はあるか？
-\end{enumerate}
-
-\item メッセージ通信でバッファを大きくすることのメリットは何か？
-
-\item UNIXのメッセージ通信プログラム例（\figref{ipcUnixMessageH}，
-\figref{ipcUnixMessageWriter}，\figref{ipcUnixMessageReader}）
-を実際に実行し動作確認しなさい．
-なお，ソースプログラムは以下から入手可能である． \\
-\url{https://github.com/tctsigemura/OSTextBook/blob/master/Lst/ipcUnixMessage.h}（ヘッダファイル）\\
-\url{https://github.com/tctsigemura/OSTextBook/blob/master/Lst/ipcUnixMessageWriter.c}（送信側）\\
-\url{https://github.com/tctsigemura/OSTextBook/blob/master/Lst/ipcUnixMessageReader.c}（受信側）
-
-\item UNIXのメッセージ通信プログラム例は生産者と消費者の問題の解になっている．
-複数生産者と複数消費者の問題の解にもなっているか？
-
-\item UNIXのメッセージ通信プログラム例が
-複数生産者と複数消費者の問題の解にもなっているか，
-動作確認する手順を説明しなさい．
-
-\item TacOSのメッセージ通信機構について正しいか正しくないか答えなさい．
+  サーバプログラムは共有メモリが変更されたことを確認しないで，
+  一定の時間間隔で共有メモリの内容を表示している．
   \begin{enumerate}
-  \item メッセージの形式に柔軟性がある．
-  \item リンクに三つのセマフォが含まれる．
-  \item TacOSのメッセージ通信機構は相互排除と同期にセマフォだけを用いている．
-  \item 複数生産者と複数消費者の問題の解に使用できる．
+  \item どのような不都合が予想されるか？
+  \item クライアントとサーバで同期をする方法はあるか？
   \end{enumerate}
+\item メッセージ通信でバッファを大きくすることのメリットは何か？
+\item UNIXのメッセージ通信プログラム例（リスト\ref{ipcUnixMessageH}，
+  リスト\ref{ipcUnixMessageWriter}，リスト\ref{ipcUnixMessageReader}）
+  を実際に実行し動作確認しなさい．
+  なお，ソースプログラムは以下から入手可能である． \\
+  \url{https://github.com/tctsigemura/OSTextBook/blob/master/Lst/ipcUnixMessage.h}（ヘッダファイル）\\
+  \url{https://github.com/tctsigemura/OSTextBook/blob/master/Lst/ipcUnixMessageWriter.c}（送信側）\\
+  \url{https://github.com/tctsigemura/OSTextBook/blob/master/Lst/ipcUnixMessageReader.c}（受信側）
+\item UNIXのメッセージ通信プログラム例は生産者と消費者の問題の解になっている．
+  複数生産者と複数消費者の問題の解にもなっているか？
+\item UNIXのメッセージ通信プログラム例が
+  複数生産者と複数消費者の問題の解にもなっているか，
+  動作確認する手順を説明しなさい．
 \end{enumerate}
