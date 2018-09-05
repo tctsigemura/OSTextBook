@@ -23,9 +23,9 @@ PC以外でも音楽プレーヤ，デジカメ，デジタルテレビ，
 デジカメの写真データが\|IMG_1234.JPG|\footnote{
   キャノンのデジカメはこのような名前を使用する．}
 のようなファイル名になっているのは，
-FATファイルシステムの仕様に合わせているためと考えられる．
+FATファイルシステムの仕様に合わせたためと考えられる．
 
-4種類のFATファイルシステムがある．
+四種類のFATファイルシステムがある．
 それぞれの特徴を\tabref{fatVariety}にまとめる．
 その中で，FAT12，FAT16，FAT32の3つは仕様が無料で入手できるが
 exFATはそうではない．
@@ -80,8 +80,8 @@ FATファイルシステムは，
   エントリ数として記録されている．
   1エントリは32バイトなので，
   \tabref{fatBpbParam}の例では
-  ルートディレクトリサイズは$32 \times 512 = 16KiB$になる．
-  これをセクタ数に換算すると$16KiB \div 512 = 32セクタ$ になる．
+  ルートディレクトリサイズは$32B \times 512 = 16KiB$になる．
+  これをセクタ数に換算すると$16KiB \div 512B = 32セクタ$ になる．
 
 \item \emph{データ領域}\\
   ボリュームの残り領域はファイルの内容データを記録するために使用される．
@@ -150,7 +150,7 @@ FATファイルシステムは，
   ディレクトリファイルの場合は 0 にする．
 \end{itemize}
 
-\lstinputlisting[float=btp,caption=TacOS/dirAccess.cmm/readFname(),
+\lstinputlisting[float=btp,caption=ファイル名を読み出すプログラム,
   firstline=86,lastline=94,
   numbers=none,label=tacosReadFname]{TacOS/fs/dirAccess.cmm}
 
@@ -159,7 +159,6 @@ FATファイルシステムは，
 FATは\figref{fatConcept}のような表である．
 \figref{fatFileSystem}のように，
 FATのエントリがデータ領域のクラスタと一対一に対応する
-
 エントリには，ファイル中で次のクラスタの番号を格納する．
 同一ファイルのデータ領域は，
 FAT中に表現されたクラスタのチェインにより辿ることができる．
@@ -203,11 +202,6 @@ FAT中に表現されたクラスタのチェインにより辿ることがで�
 
 \begin{table}[btp]
   \centering
-  \begin{minipage}{0.5\textwidth}
-    \caption{FATエントリ値の意味}
-    \label{tab:fatClsNum}
-    \centerline{\includegraphics[scale=1.0]{Tbl/fatClsNum.pdf}}
-  \end{minipage}
   \begin{minipage}[c]{0.4\textwidth}
     \makeatletter
     \def\@captype{figure}
@@ -215,6 +209,11 @@ FAT中に表現されたクラスタのチェインにより辿ることがで�
     \centerline{\includegraphics[scale=1.0]{Fig/fatConcept.pdf}}
     \caption{FATの仕組み}
     \label{fig:fatConcept}
+  \end{minipage}
+  \begin{minipage}{0.5\textwidth}
+    \caption{FATエントリ値の意味}
+    \label{tab:fatClsNum}
+    \centerline{\includegraphics[scale=1.0]{Tbl/fatClsNum.pdf}}
   \end{minipage}
 \end{table}
 
@@ -318,8 +317,9 @@ macOSでFAT16ファイルシステム上にディレクトリ\|A|を作成し，
 
 %============================================================================
 \section{実装例}
-付録\ref{tacosFAT}にTacOSの場合の実装例を示す．
-この例は，FAT16専用のファイルシステムを{\cmm}言語で実装したものである．
+第\ref{tacosFAT}章にTacOSのファイルシステムサーバ（fs）の実装例を示す．
+この例は，FAT16専用のファイルシステム管理プログラムを
+{\cmml}で実装したものである．
 
 %============================================================================
 \section{まとめ}
@@ -333,8 +333,8 @@ FATファイルシステムをサポートしているので，
 この章では特にFAT16ファイルシステムについてかなり踏み込んだ解説を行った．
 ボーリューム内部の配置，ディレクトリエントリ，FAT，
 ディレクトリファイルを具体的な値を示しながら説明した．
-また，付録\ref{tacosFAT}にはTacOSのFAT16ファイルシステムの実装例を
-掲載している．
+また，付録\ref{tacosFAT}にはTacOSのFAT16ファイルシステムサーバの
+実装例を掲載している．
 
 %==============================================================================
 \section*{練習問題}
@@ -342,7 +342,7 @@ FATファイルシステムをサポートしているので，
   \renewcommand{\labelenumi}{\ttfamily\arabic{chapter}.\arabic{enumi}}
   \setlength{\leftskip}{1em}
 \item 次の言葉の意味を説明しなさい．
-  \begin{itemize}
+  \begin{enumerate}
   \item BPB
   \item ルートディレクトリ
   \item クラスタ
@@ -350,7 +350,7 @@ FATファイルシステムをサポートしているので，
   \item FAT
   \item クラスタチェイン
   \item ディレクトリファイル
-  \end{itemize}
+  \end{enumerate}
 \item リスト\ref{fatDirDump}を
   \figref{fatDirEntry}と比較しながら解析しなさい．
 \item \figref{fatFileSystem}の\|ABCDEFGH.TXT|ファイルの

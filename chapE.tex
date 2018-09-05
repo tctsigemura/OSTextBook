@@ -98,7 +98,7 @@
   格納した特別なファイルだと考えられる．
   シンボリックリンクファイルはOSカーネルが特別な扱いをする．
 
-  シンボリックリンクを使う時に，毎回，格納されたパスを評価し直すので，
+  シンボリックリンクは，使用時に格納されたパスを評価し直すので，
   オリジナルファイルの名前を変更するとリンク切れ状態になる．
   同じ名前で新たに別のファイルが作られると，それへのリンクに変わる．
   リンク先が存在しないシンボリックリンクを作ることもできる．
@@ -131,7 +131,7 @@
     拡張属性をエイリアスの実現に利用しているだけで，
     エイリアス専用の機能をファイルシステムが持つ訳ではない．
     リスト\ref{aliasOnHFS}にHFS+ファイルシステム上のエイリアスの例を示す．
-    3，4行からファイル\|a.textのエイリアス|が
+    3，4行からファイル「\|a.txtのエイリアス|」が
     32バイトの拡張属性\|com.apple.FinderInfo|を持つことが分かる．
 
     \lstinputlisting[caption=HFP+ファイルシステム上のmacOSのエイリアス,
@@ -143,7 +143,7 @@
     FATファイルシステムに格納するデータはFATの規約違反にならないようにして，
     ファイルシステム内容の解釈時点で拡張属性を実現している．
     リスト\ref{aliasOnFAT}にFATファイルシステム上のエイリアスの例を示す．
-    4，5行からファイル「\|a.textのエイリアス|」が
+    4，5行からファイル「\|a.txtのエイリアス|」が
     32バイトの拡張属性\|com.apple.FinderInfo|を持つことが分かる．
     リスト\ref{aliasOnFAT}の2行のようにFATファイルシステムには，
     「\|._a.txtのエイリアス|」という名前の隠しファイル\footnote{
@@ -171,7 +171,20 @@
 \figref{mount}に以下で説明する二種類の方式を模式的に示す．
 
 \begin{myfig}{btp}{マウント方式とドライブレター方式}{mount}
-  \includegraphics[scale=.6]{Fig/mount-crop.pdf}
+    \begin{minipage}{0.49\columnwidth}
+      \begin{center}
+        \includegraphics[scale=0.6]{Fig/mountTree-crop.pdf}
+        \subcaption{マウント方式}
+        \label{fig:mountTree}
+      \end{center}
+    \end{minipage}
+    \begin{minipage}{0.49\columnwidth}
+      \begin{center}
+        \includegraphics[scale=0.6]{Fig/mountDrive-crop.pdf}
+        \subcaption{ドライブレター方式}
+        \label{fig:mountDrive}
+      \end{center}
+    \end{minipage}
 \end{myfig}
 
 \begin{itemize}
@@ -185,15 +198,17 @@
     \texttt{UNTITLED}の名前を付けて初期化されていることが多い．
   }の位置にUSBメモリの内容が見えるようにマウントされる．
   新しいボリュームが追加されても，単一の木に全てが格納される．
-  \figref{mount}の例では「C言語のソース」ファイルは，
+  \figref{mountTree}の例では「C言語のソース」ファイルは，
   \|/Volumes/NO NAME/hello.c|のパスで参照できる．
 \item \emph{ドライブレター方式} \\
   Windowsではボリューム毎に新しい木を作りドライブレターで木を区別する．
-  例えば，オペレーティングシステムがインストールされたドライブをCドライブ，
+  \figref{mountDrive}の例では，
+  オペレーティングシステムがインストールされたドライブをCドライブ，
   USBメモリをDドライブのように決め，
   Cドライブのファイルは\|C:\Home\hello.c|のようなパス\footnote{
     Windowsではパスの区切りに使用する記号が
-    「\texttt{/}」ではなく「\texttt{\bs}」になる．
+    「\texttt{/}」ではなく「\texttt{\bs}」になる．\\
+    （日本語版のWindowsでは「\texttt{\bs}」が「\texttt{¥}」になる．）
   }で，Dドライブのファイルは\|D:\hello.c|のようなパスで表現する．
 \end{itemize}
 
@@ -232,7 +247,7 @@
   セキュリティに関する追加属性のような情報のこと．
   OSカーネルが使い方を定めておらず，
   アプリケーション等が名前を付けて書き込める小さめのデータである．
-  リスト\ref{extendedAttr}にmacOSの実行例を示す．
+  リスト\ref{extendedAttr}にmacOSの例を示す．
 
   \lstinputlisting[numbers=left,float=btp,
     caption=拡張属性の例,label=extendedAttr]{Lst/extendedAttr.txt}
@@ -246,9 +261,8 @@
 %============================================================================
 \section{アクセス制御}
 ファイルの保護属性に基づいたアクセス制御ができる．
-UNIXでは\|rwxrwxrwx|のビット表現の保護モードで表現される．
-9ビットでファイルの所有者，グループ，その他のユーザの三者が
-Read/Write/eXecuteのどれをしても良いか表現する．
+UNIXでは\|rwxrwxrwx|の9ビットでファイルの「所有者」，「グループ」，
+「その他のユーザ」の三者がRead/Write/eXecuteのどれをしても良いか表現する．
 
 より一般的な方式として\emph{ACL(Access Control List)}がある．
 ファイル毎にどのユーザ（またはグループ）が何（\|rwx|より詳細）を
@@ -351,7 +365,7 @@ OSカーネルは通常ファイルのデータがバイトストリームであ
     ファイルはUNIXの実行可能な機械語形式かインタープリタに渡すデータである．
     ファイルの先頭が\texttt{\#!path}で始まる場合は
     \texttt{path}で指定されたインタープリタを起動し，
-    ファイルの内容を実行させる．
+    ファイルの内容を解釈・実行させる．
   }．
   %\item \emph{属性の読み書き}\\
 \item[属性の読み書き]
@@ -459,9 +473,8 @@ HFS+\footnote{macOS のファイルシステムである．}等は
 
 システムがクラッシュした後でも，
 ジャーナリングファイルシステムの状態は，
-システムコールが完了した後か，
-システムコールを実行し始める前か，
-どちらかの状態に落ち着く．
+システムコールが完了した後かシステムコールを実行し始める前か，
+どちらかに落ち着く．
 システムコールを実行する途中の中途半端な状態になりファルシステムが
 壊れることはない．
 \figref{journaling}にジャーナリングファイルシステムの仕組みを，
@@ -549,6 +562,10 @@ WindowsのショートカットやmacOSのエイリアスがそれに該当す�
   \item ショートカット，エイリアス
   \item マウント，ドライブレター
   \item 拡張属性，ACL
+  \item 拡張子
+  \item 共有ロック・排他ロック
+  \item 一貫性チェック
+  \item ジャーナリング・ファイルシステム
   \end{enumerate}
 \item 自分が使用しているオペレーティングシステムについて調査しなさい．\\
   （GUIではなく，CLIのコマンドを用いるとより詳しい観察ができる場合がある．）

@@ -263,8 +263,8 @@ Javaクラスに書換えたものを
 \item [3行]
   セマフォ（\|guard|）はモニタのガードの役割りを持っている．
   スレッドは，
-  モニタ（\|SemBoundedBuffer|クラス）内の手続き（メソッド）を実行する前に，
-  \|guard|をロックする．
+  モニタ（\|SemBoundedBuffer|クラス）内の手続き（メソッド）を
+  実行する前に\|guard|をロックする．
 \item [4〜5行]
   モニタの条件変数に\|signal()|操作を行った時，
   条件変数で待っていたスレッドがあれば\emph{ただちに}実行しなければならない．
@@ -416,13 +416,22 @@ Java言語はモニタに似た機能をサポートする言語であるが，
 \begin{enumerate}
   \renewcommand{\labelenumi}{\ttfamily\arabic{chapter}.\arabic{enumi}}
   \setlength{\leftskip}{1em}
+\item 次の言葉の意味を説明しなさい．
+  \begin{enumerate}
+  \item 抽象データ型
+  \item 資源
+  \item 手続き
+  \item ガード
+  \item 条件変数
+  \end{enumerate}
 \item \emph{抽象データ型}の定義を調べなさい．
 \item リスト\ref{monProducerConsumer}のプログラムにおいて，
   \texttt{cnt}なしにキュー（リングバッファ）を記述できるか？
 \item リスト\ref{monProducerConsumer}のプログラムにおいて，
   キューが空のとき一つのスレッドが\texttt{remove()}を実行した．
   その後，別のスレッドが\texttt{append()}を実行した．
-  この時の\texttt{append()}，\texttt{remove()}内が実行される順を答えなさい．
+  この時の\texttt{append()}，\texttt{remove()}内の
+  プログラムが実行される順を答えなさい．
 \item リスト\ref{monProducerConsumer}のプログラムは，
   複数生産者と複数消費者問題の解に使用できるか？
 \item Java風仮想言語のモニタを用いてリーダ・ライタ問題の解を示しなさい．

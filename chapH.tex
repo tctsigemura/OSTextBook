@@ -11,7 +11,7 @@ OSでも使用できるようになっている．
 %============================================================================
 \section{特徴}
 ZFSは，
-大きな主記憶と，高速なマルチプロセッサシステムを前提に設計され，
+大きな主記憶と高速なマルチプロセッサシステムを前提に設計され，
 以下のような特徴を持っている．
 
 \begin{itemize}
@@ -32,11 +32,9 @@ ZFSは，
   チェックサムの不整合が見つかった場合，
   データの2重化（ミラー）がされていれば，
   自動的にミラーからデータを修復する．
-
   \begin{myfig}{btp}{全ブロックにわたるチェックサムのイメージ図}{zfsCheckSum}
     \centering{\includegraphics[scale=0.6]{Fig/zfsCheckSum-crop.pdf}}
   \end{myfig}
-
 \item \emph{スナップショット}\footnote{
     ある時点のファイルシステムをコピーして凍結したもの．
     変更ができない．
@@ -48,22 +46,18 @@ ZFSは，
   一瞬で作成が完了する．
   その後は COW の手法を使用し，
   コピーとオリジナルに違いが出た時点で，
-  違いが出たブロックとそれの親だけのコピーが作られる．
+  違いが出たブロックとそれの親だけがコピーされる．
   デバイスの容量も無駄にならない．
-
 \item ボリュームの代わりにストレージプールと呼ばれる
   ソフトウェアの層をデバイスとファイルシステムの間にはさんでいる．
   従来のボリュームを模式的に表したものを\figref{zfsVolume}に，
   ZFSのストレージプールを模式的に表したものを\figref{zfsPool}に示す．
-
   \begin{myfig}{btp}{従来のボリューム}{zfsVolume}
     \centering\includegraphics[scale=0.65]{Fig/zfsVolume-crop.pdf}
   \end{myfig}
-
   \begin{myfig}{btp}{ストレージプール}{zfsPool}
     \centering\includegraphics[scale=0.65]{Fig/zfsPool-crop.pdf}
   \end{myfig}
-  
   従来は，ファイルシステムの初期化以前にボリュームを決定し，
   後で変更することはできなかった．
   ZFSのストレージプールは沢山のデバイスを収容し，
@@ -72,19 +66,16 @@ ZFSは，
   必要な時にメモリを割当てる方式に似ている．
   また，ストレージプールには後でデバイスを
   追加することも可能である．
-
 \item ファイルサイズ等の制約が事実上無くなった．
   ファイルサイズは最大$2^{64}$バイト，
   ストレージプールサイズは最大$2^{70}$バイト\footnote{
     $Zetta = 2^{70}$ がZFSの名前に関係しているらしい．
   }である．
-
 \item ストレージプールは，
   ミラーやRAID-Z\footnote{
     RAID-5の変形版のことである．
   }\cite{RaidzOfFreeBSD}等によりデバイスの故障に対する信頼性・可用性を向上する
   仕組みを持っている．
-
 \item ストレージプールは，
   データ圧縮や重複除去の機能を持っている．
   データを圧縮することで読み書きするデータの量が減少するので，
@@ -111,7 +102,7 @@ ZFSは，
 \end{myfig}
   
 \begin{myfig}{btp}{トランザクションが書き込まれるまで}{zfsTranscation}
-  \centering\includegraphics[scale=0.65]{Fig/zfsTranscation-crop.pdf}
+  \centering\includegraphics[scale=0.7]{Fig/zfsTranscation-crop.pdf}
 \end{myfig}
   
 \begin{enumerate}
@@ -219,7 +210,7 @@ ZFSは，
   この際も，既存のUberblockを上書きするのではなく，
   新しいUberblockを使用する．
   Uberblockにトランザクショングループ番号を書き込むことで，
-  どのUberblockが最新のものか区別できるようになっている．
+  どのUberblockが最新のものか区別できる．
   トランザクショングループ番号は64ビットなので，
   システムが廃棄されるまでオーバーフローする心配はない．
 \end{enumerate}
@@ -229,7 +220,6 @@ Uberblockが正常に更新されるまで新しいデータは全く反映さ�
 どの段階でシステムがクラッシュしても，
 ストレージプールの状態はトランザクションが適用される前か，
 トランザクションが完了した後のどちらかになる．
-
 Uberblockが正常に更新されどこからも指されなくなったブロックは再利用される．
 
 %============================================================================
@@ -237,10 +227,11 @@ Uberblockが正常に更新されどこからも指されなくなったブロ�
 
 \subsection{ブロックポインタ}
 \figref{zfsCheckSum}で，「チェックサム」，「アドレス」と表現した部分は
-\emph{ブロックポインタ}と呼ばれる128バイトのデータである．
+\emph{ブロックポインタ}と呼ばれる128バイトのデータ構造である．
 ブロックポインタはデータ多重化のために最大3組のアドレスを記録できる．
 %以下では1組だけ使用する場合を説明する．
 ブロックポインタには以下の情報が含まれる．
+
 \begin{itemize}
 \item \emph{サイズ}：ブロックの大きさに関する情報である．
 \item \emph{チェックサム}（256ビット）：ブロックのチェックサムである．
@@ -262,12 +253,22 @@ Uberblockが正常に更新されどこからも指されなくなったブロ�
 あらゆるオブジェクトを表現する512バイトのデータ構造である．
 UFSの{\inode}に似ているがdnodeはファイルやディレクトリだけでなく，
 ファイルシステムや，スナップショット，クローンなどの表現にも用いられる．
-dnodeは表現するオブジェクトや，
-付属するデータの大きさによって幾つかの形式を取るが，
+dnodeは，
+表現するオブジェクトや付属するデータの大きさによって幾つかの形式を取るが，
 ファイルを表現する場合の例を\figref{zfsDnode}に示す．
 
 \begin{myfig}{btp}{ファイルを表現するdnodeの例}{zfsDnode}
-  \centering\includegraphics[scale=0.75]{Fig/zfsDnode-crop.pdf}
+  \centering
+  \begin{minipage}{0.4\columnwidth}
+    \centering\includegraphics[scale=0.75]{Fig/zfsDnodeDirect-crop.pdf}
+    \subcaption{直接の場合}
+    \label{fig:zfsDnodeDirect}
+  \end{minipage}
+  \begin{minipage}{0.58\columnwidth}
+    \centering\includegraphics[scale=0.75]{Fig/zfsDnodeIndirect-crop.pdf}
+    \subcaption{間接の場合}
+    \label{fig:zfsDnodeIndirect}
+  \end{minipage}
 \end{myfig}
 
 以下では，\figref{zfsDnode}について説明する．
@@ -282,10 +283,11 @@ dnodeは表現するオブジェクトや，
   ブロックポインタの数が多い場合は小さくなる．
   図の例はdnodeがファイルを表現する場合なので，
   ファイルの属性情報（時刻や保護属性など）を格納している．
-\item データの大きさが128KiB以内の場合は，図の(a)に示すように
+\item データの大きさが128KiB以内の場合は\figref{zfsDnodeDirect}に示すように
   dnodeのブロックポインタがデータブロックを直接参照する．
 \item 大きさが128KiBを超える場合は，
-  図の(b)に示すようにdnodeのブロックポインタが間接ブロックを指すようになる．
+  \figref{zfsDnodeIndirect}に示すように
+  dnodeのブロックポインタが間接ブロックを指すようになる．
   最大128KiBの間接ブロックは128Bのブロックポインタを最大1Ki個格納できる．
 \item $128KiB \times 1Ki = 128MiB$より大きなデーを表現する時は，
   UFSのように多重の間接ブロックを用いる．
@@ -293,6 +295,7 @@ dnodeは表現するオブジェクトや，
   $2^{64}$バイト以上のファイルが表現できる．
   UFSではファイルの後方のデータブロックだけが間接ブロックになったが，
   すべてのブロックが同じ間接レベルで扱われる．
+  間接レベルはdnodeに記録される．
 \end{itemize}
 
 \subsection{全体像}
@@ -313,6 +316,7 @@ Objsetには最大三つのdnodeを埋め込むことができる．
 \emph{MOS layer}はストレージプール全体に関わるオブジェクトや，
 ファイルシステムやスナップショット，クローンなどの根になるdnodeを格納する．
 オブジェクトの種類はdnodeの型から分かる．
+
 \begin{itemize}
 \item dnode配列の先頭は\emph{master node}である．
   master node はストレージプールのコンフィグ，プロパティ，
@@ -327,7 +331,7 @@ Objsetには最大三つのdnodeを埋め込むことができる．
 \subsubsection{Object-set layer}
 \emph{Object-set layer}はファイルシステムやスナップショット，
 クローンなどの実体を格納する．
-\figref{zfsStructure}では二つのファイルシステムがObject-set layerに
+\figref{zfsStructure}は二つのファイルシステムがObject-set layerに
 格納されている様子を表している．
 
 \begin{itemize}
@@ -380,7 +384,8 @@ COWにより新しいコピーに役割を譲ったストレージプールの�
 解放しても良いか判断が難しくなる．
 そこで，ブロックポインタにリンクカウントを設ける方法が考えられる．
 しかし，この方法ではスナップショットを作るたびに
-ファイルシステムの全てのブロックポインタを書き換える必要が生じる．
+ファイルシステムの全てのブロックポインタを書き換える必要が生じるので，
+ZFSは別の方式を採用している．
 
 \subsubsection{スナップショットとdeadlistの構造}
 ZFSではブロックポインタのタイムスタンプとスナップショットのタイムスタンプを
@@ -390,7 +395,7 @@ ZFSではブロックポインタのタイムスタンプとスナップショ�
 タイムスタンプには，現実の時刻ではなく，
 トランザクショングループ番号が用いられる．
 また，ファイルシステムのObjsetは，
-現在は使用していないがスナップショットで使用されていないため解放できない
+現在は使用していないがスナップショットで使用されているので解放できない
 ブロックのリスト（deadlist）も管理している．
 その様子を\figref{zfsDeadlist1}に示す．
 
@@ -422,17 +427,17 @@ ZFSではブロックポインタのタイムスタンプとスナップショ�
 \begin{itemize}
 \item \|B#1|は\|Snapshot#1|と\|Snapshot#2|の間で使用されなくなったが，
   \|Snapshot#1|よりも前から使用されていた．
-  \|Snapshot#1|で使用されているので解放できない．
+  \|Snapshot#1|が使用しているので解放できない．
   その時点でアクティブな\|FileSystem|の\|deadlist|に入れる．
   \|Snapshot#2|作成時に\|deadlist|はスナップショット側に残される．
   \|FileSystem|の\|deadlist|は空になる．
 \item \|B#2|と\|B#3|は\|Snapshot#2|より前に割り当てられていた．
-  これらのブロックは過去のスナップショットで使用されているので，
+  これらのブロックも過去のスナップショットが使用しているので，
   現在のファイルシステムで使用されなくなっても解放できない．
   \|FileSystem|の\|deadlist|に入れる．
 \item \|B#4|は\|Snapshot#2|（最新のスナップショット）より後に割り当てられ，
   短時間の内に使用されなくなったブロックである．
-  このブロックは，どのスナップショットでも使用されていないので解放できる．
+  このブロックは，どのスナップショットにも使用されていないので解放できる．
 \end{itemize}
 
 \subsubsection{スナップショットの削除}
@@ -440,7 +445,7 @@ ZFSではブロックポインタのタイムスタンプとスナップショ�
 \figref{zfsDeadlist2}に示す．
 以下では\|Snapshot#2|を削除する手順を説明する．
 \|Snapshot#2|が削除されると最新のスナップショットが\|Snapshot#1|になるので，
-それに応じた処理が必要になる．
+それに応じた処理を行う．
 
 \begin{myfig}{btp}{スナップショットの削除}{zfsDeadlist2}
   \centering\includegraphics[scale=0.7]{Fig/zfsDeadlist2-crop.pdf}
@@ -484,7 +489,7 @@ ZFSは大きな主記憶と高速なCPUを前提に設計された新しいフ�
   \setlength{\leftskip}{1em}
 \item 次の言葉の意味を説明しなさい．
   また，分からない言葉について調べなさい．
-  \begin{itemize}
+  \begin{enumerate}
   \item COW（Copy On Write）
   \item メタデータ
   \item チェックサム
@@ -503,7 +508,7 @@ ZFSは大きな主記憶と高速なCPUを前提に設計された新しいフ�
   \item Object-set layer
   \item space map
   \item master node
-  \end{itemize}
+  \end{enumerate}
   \item トランザクショングループ番号は64ビットです．
     毎秒100トランザクショングループを処理したとして，
     トランザクショングループ番号がオーバーフローするまでに約何年かかるか

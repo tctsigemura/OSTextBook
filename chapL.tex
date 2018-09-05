@@ -1,4 +1,4 @@
-\chapter{メッセージ通信}
+\chapter{TacOSのメッセージ通信}
 \label{tacosIPC}
 TacOSではマイクロカーネルがメッセージ通信機構を提供し，
 ユーザ・プロセスとサーバプロセス，
@@ -13,7 +13,7 @@ TacOSのメッセージ通信機構は，
 メッセージ通信の手順は次のようになる．
 
 \begin{myfig}{btp}{TacOSのメッセージ通信}{tacosMessage}
-  \includegraphics[scale=0.66]{Fig/tacosMessage-crop.pdf}
+  \includegraphics[scale=0.75]{Fig/tacosMessage-crop.pdf}
 \end{myfig}
 
 \begin{enumerate}
@@ -35,7 +35,7 @@ TacOSのメッセージ通信機構は，
 
 %==============================================================================
 \section{リンク構造体}
-リスト\ref{tacosLink}にTacOSのリンク構造体の宣言を示す\footnote{
+リスト\ref{tacosLink}にリンク構造体の宣言を示す\footnote{
   \url{https://github.com/tctsigemura/TacOS/blob/master/os/kernel/process.hmm}
   の一部である．}．
 \|Link|構造体はランデブー用のリンクを定義している．
@@ -53,12 +53,12 @@ TacOSのリンクはセマフォを基盤にしている．
 %==============================================================================
 \section{リンクの作成}
 リスト\ref{tacosNewLink}に，
-TacOSのカーネル内のリンク作成ルーチンを示す\footnote{
+TacOSのマイクロカーネル内のリンク作成ルーチンを示す\footnote{
   \url{https://github.com/tctsigemura/TacOS/blob/master/os/kernel/kernel.cmm}の
   一部である．}．
 \|newLink()|関数はサーバプロセスがリンクを作り所有するために呼出す．
 TacOSのサーバプロセスはカーネルモードで実行され，
-カーネル内ルーチンを呼出すことができる．
+マイクロカーネル内ルーチンを呼出すことができる．
 複数のプロセスが\|newLink()|関数を呼出す可能性があるので，
 6行から19行の範囲は割込み禁止による相互排除を行っている．
 
@@ -75,9 +75,9 @@ TacOSのサーバプロセスはカーネルモードで実行され，
 
 %==============================================================================
 \section{サーバ用のメッセージ通信ルーチン}
-リスト\ref{tacosSendReceive}に，
-TacOSのカーネル内にある，
-サーバプロセス用のメッセージ通信プログラムを示す\footnote{
+マイクロカーネル内にある，
+サーバプロセス用のメッセージ通信プログラムを
+リスト\ref{tacosSendReceive}に示す\footnote{
   \url{https://github.com/tctsigemura/TacOS/blob/master/os/kernel/kernel.cmm}
   の一部である．}．
 2行の\|receive()|関数はメッセージの受信に使用する．
@@ -183,7 +183,7 @@ SVC割込みハンドラから\|exec()|関数を呼出す．
 %==============================================================================
 \section{まとめ}
 TacOSのメッセージ通信について，
-それを実現するカーネル内プログラムと利用例を示した．
+それを実現するマイクロカーネル内プログラムと利用例を示した．
 
 %==============================================================================
 \section*{練習問題}

@@ -1,4 +1,4 @@
-\chapter{ファイルシステム}
+\chapter{TacOSのファイルシステム}
 \label{tacosFAT}
 
 TacOSのファイルシステムサーバ（fs）\footnote{
@@ -43,20 +43,17 @@ fsクラスはファイルサーバプロセスのメインループと，
   リスト\ref{tacosFsMain}に示す\|fsMain()|が
   サーバプロセスのメインルーチンである．
   リンクを作成した後，無限ループでメッセージの受信と返信を繰り返す．
-  \|receive()|，\|send()|は\ref{tacosIPC}で紹介した
+  \|receive()|，\|send()|は第\ref{tacosIPC}章で紹介した
   TacOSのメッセージ通信機構である．
   \|fatFsSysCall()|は，
   システムコールの種類に応じてfatSysクラスの関数を呼び出す．
   \|fatFsSysCall()|の一部をリスト\ref{tacosFatFsSysCall}に示す．
-  
-  \lstinputlisting[caption=TacOS/fs.cmm/fsMain(),
+  \lstinputlisting[caption=ファイルシステムサーバのメインループ（fsMain()）,
     firstline=87,lastline=97,numbers=none,
     label=tacosFsMain,float=btp]{TacOS/fs/fs.cmm}
-
-  \lstinputlisting[caption=TacOS/fs.cmm/fatFsSysCall(),
+  \lstinputlisting[caption=システムコールによって分岐する（fatFsSysCall()）,
     firstline=63,lastline=68,numbers=none,
     label=tacosFatFsSysCall,float=btp]{TacOS/fs/fs.cmm}
-
 \item \emph{スタブルーチン}\\
   \|open()|〜\|rmDir()|は，
   システムコールを発行する側のプロセスが呼び出す．
@@ -65,11 +62,10 @@ fsクラスはファイルサーバプロセスのメインループと，
   スタブの例として\|open()|関数をリスト\ref{tacosOpen}に示す．
   \|sendrec()|はサーバプロセスの\|receive()|，\|send()|と通信する
   TacOSのメッセージ通信機構の関数である．
-    
-  \lstinputlisting[caption=TacOS/fs.cmm/open(),
+  \lstinputlisting[
+    caption=クライアントプロセスが呼び出すスタブルーチンの例（open()）,
     firstline=128,lastline=132,numbers=none,
     label=tacosOpen,float=btp]{TacOS/fs/fs.cmm}
-
 \end{itemize}
 
 %============================================================================
@@ -85,12 +81,17 @@ fatSysクラス自身が持つパスの解析機能とオープン中ファイ�
   リスト\ref{tacosSrchDir}の\|srchDir()|関数である．
   \|srchDir()|関数は，
   現在の着目位置から始めて指定された名前のエントリを探索する．
-  着目位置は，\|DirEnt|型のオブジェクト\|curEnt|に，
+  着目位置は，\|DirEnt|型（\figref{fsUML}およびリスト\ref{tacosDirEnt}参照）
+  のオブジェクト\|curEnt|に，
   ディレクトリファイルのクラスタ番号とディレクトリエントリの番号として
   記録している．
 
-  \lstinputlisting[caption=TacOS/fatSys.cmm/srchDir(),label=tacosSrchDir,
+  \lstinputlisting[caption=ディレクトリファイル内を探索する（srchDir()）,
     firstline=158,lastline=171,float=btp]{TacOS/fs/fatSys.cmm}
+
+  dirAccessクラスの\|readDirEnt()|関数は，
+  着目位置のディレクトリエントリを\|curEnt|に読み込む．
+  \|nextDir()|関数は\|curEnt|の着目位置を一つ進める．
 
 \item \emph{パスの解析} \\
   TacOSにはカレントディレクトリの概念が無いので，
@@ -100,7 +101,8 @@ fatSysクラス自身が持つパスの解析機能とオープン中ファイ�
   ファイルが登録されているディレクトリを操作する場合などは，
   パスの途中までを利用することがあるので文字数が必要である．
   
-  \lstinputlisting[caption=TacOS/fatSys.cmm/srchPath(),label=tacosSrchPath,
+  \lstinputlisting[caption=パスを解析する（srchPath()）,
+    label=tacosSrchPath,
     float=btp,numbers=left,xleftmargin=5mm, 
     firstline=176,lastline=201]{TacOS/fs/fatSys.cmm}
 
@@ -114,34 +116,38 @@ fatSysクラス自身が持つパスの解析機能とオープン中ファイ�
   開始クラスタ番号で置換える（18行）．
   これにより，着目しているディレクトリが次の階層のものになる．
   探索中のパス名から次の階層のファイル名を取出し（22行），
-  着目しているディレクトリファイルの中を探索する（23行）．
+  着目しているディレクトリファイルの中を，
+  前出の\|srchDir()|関数を用いて探索する（23行）．
   もしも，名前が見つからなければ終了するし，
   そうでなければ13行に戻る．
 
-\item \emph{オープンファイル中ファイルの管理} \\
+\item \emph{オープン中ファイルの管理} \\
   オープンファイル毎にFileクラス（\figref{fsUML}ではfileクラス）の
   オブジェクトを割付けfile配列に登録する．
   ファイルがクロースされるまで，
   ファイル操作はFileオブジェクトを用いて行われる．
   openシステムコールがFileオブジェクトの登録を行うので，
-  openシステムコールの処理プログラム\|sysOpen()|を前半と後半に分けて，
-  リスト\ref{tacosSysOpen1}，リスト\ref{tacosSysOpen2}に示す．
+  openシステムコールの処理プログラム\|sysOpen()|を
+  リスト\ref{tacosSysOpen}に示す．
+  この関数は，
+  リスト\ref{tacosFatFsSysCall}の\|fatFsSysCall()|関数から呼び出される．
 
   2行はクライアントプロセスのPCB中に
   ファイルを記録を残す場所を確保している\footnote{
     プロセス終了時にファイルを自動的にクローズるために，
     プロセス（PCB）に記録を残す必要がある．}．
   4行はfatSysクラスの\|files|配列に場所を確保している．
-  7行で\|path|を最後まで解析し目的ファイルのディレクトリエントリを探す．
+  7行で前出の\|srchPath()|関数を用いて\|path|を最後まで解析し，
+  目的ファイルのディレクトリエントリを探す．
   見つからない場合はエラーになる\footnote{
     TacOSのopenシステムコールにはファイルの作成機能は無い．
     ファイルの作成はcreatシステムコールで行う．}．
   12行でディレクトリファイルも読み出しオープンを可能にしている．
   14〜18行ではFileオブジェクトとセクタを格納するバッファを生成している．
 
-  \lstinputlisting[caption=TacOS/fatSys.cmm/sysOpen()（前半）,
-    label=tacosSysOpen1,float=btp,numbers=left,xleftmargin=5mm,
-    firstline=234,lastline=252]{TacOS/fs/fatSys.cmm}
+  \lstinputlisting[caption=openシステムコールの本体（sysOpen()）,
+    label=tacosSysOpen,float=btp,numbers=left,xleftmargin=5mm,
+    firstline=234,lastline=273]{TacOS/fs/fatSys.cmm}
 
   20〜29行ではFileオブジェクトを初期化している．
   21行ではオープンファイルが
@@ -157,16 +163,15 @@ fatSysクラス自身が持つパスの解析機能とオープン中ファイ�
   fileクラスのような複数のインスタンスを持つクラスを操作する場合，
   インスタンスを引数にクラスの関数を呼び出す．
 
-  \lstinputlisting[caption=TacOS/fatSys.cmm/sysOpen()（後半）,
-    label=tacosSysOpen2,float=btp,numbers=left,xleftmargin=5mm,
-    firstline=253,lastline=273,firstnumber=last]{TacOS/fs/fatSys.cmm}
-
 \item \emph{オープン中ファイルの操作} \\
   オープン中のファイルはFileオブジェクトを用いて操作する．
   例としてreadシステムコールの処理プログラム\|sysRead()|を
   リスト\ref{tacosSysRead}に示す．
+  この関数は，
+  リスト\ref{tacosFatFsSysCall}の\|fatFsSysCall()|関数から呼び出される．
 
-  \lstinputlisting[caption=TacOS/fatSys.cmm/sysRead(),label=tacosSysRead,
+  \lstinputlisting[caption=readシステムコールの本体（sysRead()）,
+    label=tacosSysRead,
     float=btp,numbers=left,xleftmargin=5mm,
     firstline=302,lastline=318]{TacOS/fs/fatSys.cmm}
 
@@ -180,13 +185,20 @@ fatSysクラス自身が持つパスの解析機能とオープン中ファイ�
   ディレクトリ書き換え操作の例として，
   ファイルを削除するremoveシステムコールの処理プログラムを
   リスト\ref{tacosSysRemove}に示す．
+  この関数は，
+  リスト\ref{tacosFatFsSysCall}の\|fatFsSysCall()|関数から呼び出される．
+
   12行で\|srchPath()|を用いて削除するファイルのディレクトリエントリを探索する．
-  消しても構わないなら，16行で\|delFile()|を用いてファイルを消す．
+  14行の\|isOpened()|は，システム中の全オープンファイルについて調べ，
+  削除するファイルがオープン中でないか調べる．
+  オープン中のファイルは削除できない．
+  削除しても構わないなら，16行で\|delFile()|を用いてファイルを消す．
   \|delFile()|はディレクトリの削除（rmdirシステムコール）からも使用される．
   3,7行で使用される\|delClstChain()|，\|flushFat()|はblkFileクラスの関数，
   5,6行の\|writeDirEnt()|，\|flushDirEnt()|はdirAccessクラスの関数である．
 
-  \lstinputlisting[caption=TacOS/fatSys.cmm/sysRemove(),label=tacosSysRemove,
+  \lstinputlisting[caption=removeシステムコールの本体（sysRemove()）,
+    label=tacosSysRemove,
     float=btp,numbers=left,xleftmargin=5mm,
     firstline=430,lastline=447]{TacOS/fs/fatSys.cmm}
 
@@ -213,7 +225,8 @@ fatSysクラス自身が持つパスの解析機能とオープン中ファイ�
   12〜18行はファイルがクローズされると必要なくなる一時的な属性である．
   21〜24行の関数はファイルオブジェクトを引数に実行される．
 
-  \lstinputlisting[caption=TacOS/file.hmm/File,label=tacosFile,
+  \lstinputlisting[caption=Fileクラスの外部インタフェース（file.hmm）,
+    label=tacosFile,
     float=btp,numbers=left,xleftmargin=5mm,
     firstline=34,lastline=57]{TacOS/fs/file.hmm}
 
@@ -221,10 +234,11 @@ fatSysクラス自身が持つパスの解析機能とオープン中ファイ�
   例として，ファイルからデータを読み出す\|getByteFile()|を
   リスト\ref{tacosGetByteFile}に示す．
   6行の\|fillBuf()|はファイルオブジェクトのバッファに
-  次に読むデータが格納済みか調べ  格納されていなかったら，
-  blkFileの機能を利用して目的のバイトを含む一セクタをバッファに読む．
+  次に読むデータが格納済みか調べ格納されていなかったら，
+  blkFileクラスの機能を利用して目的のバイトを含む一セクタを読む．
   
-  \lstinputlisting[caption=TacOS/file.cmm/getByteFile(),
+  \lstinputlisting[
+    caption=ファイルからバイト単位でデータを読む（getByteFile()）,
     label=tacosGetByteFile,float=btp,numbers=left,xleftmargin=5mm,
     firstline=105,lastline=115]{TacOS/fs/file.cmm}
 
@@ -252,7 +266,7 @@ dirAccessクラスの機能を利用する．
   ディレクトリエントリのアドレスを表現している．
   4行以下はディレクトリエントリの内容である．
 
-  \lstinputlisting[caption=TacOS/dirAccess.hmm/DirEnt,
+  \lstinputlisting[caption=ディレクトリエントリ構造体（DirEnt）,
     label=tacosDirEnt,float=btp,numbers=left,xleftmargin=5mm,
     firstline=34,lastline=42]{TacOS/fs/dirAccess.hmm}
 
@@ -260,18 +274,19 @@ dirAccessクラスの機能を利用する．
   例として，ディレクトリファイル（またはルートディレクトリ）から
   エントリを読み出す\|readDirEnt()|をリスト\ref{tacosReadDirEnt}に示す．
 
-  \lstinputlisting[caption=TacOS/dirAccess.cmm/readDirEnt(),
+  \lstinputlisting[
+    caption=ディレクトリファイルからエントリを読む（readDirEnt()）,
     label=tacosReadDirEnt,float=btp,numbers=left,xleftmargin=5mm,
     firstline=96,lastline=111]{TacOS/fs/dirAccess.cmm}
 
   \|readDirEnt()|関数は，
   \|DirEnt|型の引数\|dirEnt|にディレクトリファイルの位置と
   ディレクトリファイル内のエントリ番号を格納して呼出される．
-  5行目で，目的のディレクトリエントリがキャッシュに存在しない時，
+  5行で，目的のディレクトリエントリがキャッシュに存在しない時，
   ディレクトリエントリを含むセクタを\|dirCache|配列に読込む．
-  6行目は，目的のエントリの\|dirCache|配列中の位置を\|curEnt|に計算する．
+  6行は，目的のエントリの\|dirCache|配列中の位置を\|curEnt|に計算する．
 
-  7行目は，ファイル名の第1バイトを\|c|に読込む．
+  7行は，ファイル名の第1バイトを\|c|に読込む．
   \|c|の値によりエントリの状態を確認し（8，9行），
   有効なエントリの場合は内容を引数の\|dirEnt|構造体に読み込む（10行以降）．
   ファイル名の読み出しにはリスト\ref{tacosReadFname}の
@@ -290,6 +305,7 @@ dirAccessクラスの機能を利用する．
 
 %============================================================================
 \section{blkFileクラス}
+\label{readBlkFile}
 mmcspiクラスの機能を利用して，
 クラスタチェインを辿りながら\emph{セクタ単位}でファイルを読み書きする機能と，
 FATにクラスタを割り当てたりクラスタチェインを削除する機能を，
@@ -300,12 +316,12 @@ dirAccessクラス，fileクラス，fatSysクラスに提供する．
 \begin{itemize}
 \item \emph{初期化}\\
   FATの位置，ルートディレクトリの位置，データ領域の位置等の
-  基本情報（リスト\ref{tacosBPB}参照）を，
-  \|readMBR()|（リスト\ref{tacosReadMBR}参照）と
-  \|readBPB()|（リスト\ref{tacosReadBPB}参照）を使用して求める．
+  基本情報（リスト\ref{tacosBPB}）を，
+  \|readMBR()|（リスト\ref{tacosReadMBR}）と
+  \|readBPB()|（リスト\ref{tacosReadBPB}）を使用して求める．
   これらの位置は32ビットのLBAなので，int型の配列で表現する．
 
-  \lstinputlisting[caption=TacOS/blkFile.cmm/BPB基本情報,
+  \lstinputlisting[caption=BPB基本情報（blkFile.cmm）,
     firstline=75,lastline=80,numbers=left,xleftmargin=5mm,
     label=tacosBPB,float=btp]{TacOS/fs/blkFile.cmm}
 
@@ -313,10 +329,10 @@ dirAccessクラス，fileクラス，fatSysクラスに提供する．
   \item \|readMBR()|はマイクロSDカードのLBA0（MBR）を読み，
     パーティションテーブルを解析してTacOSが扱えるFAT16パーティションを探す．
     パーティションテーブルエントリの構造は，
-    \figref{partitionTable}や\tabref{partitionTableEntry}を参照すること．
+    \figref{partitionTable}や\tabref{partitionTableEntry}に示した．
     見つけたパーティションの位置をリスト\ref{tacosBPB}の\|bpbLba|に格納する．
   
-    \lstinputlisting[caption=TacOS/blkFile.cmm/readMBR(),
+    \lstinputlisting[caption=MBRを読む（readMBR()）,
       firstline=84,lastline=99,numbers=left,xleftmargin=5mm,
       label=tacosReadMBR,float=btp]{TacOS/fs/blkFile.cmm}
 
@@ -339,17 +355,17 @@ dirAccessクラス，fileクラス，fatSysクラスに提供する．
 
   \item \|readBPB()|は\|bpbLba|を参照しFATのBPB領域の位置を知り，
     BPBの内容を解析する．
-    BPBの構造は，\tabref{fatBpbParam}を参照すること．
+    BPBの構造は，\tabref{fatBpbParam}に示した．
     解析結果は，リスト\ref{tacosBPB}の\|fatLba|，
     \|rootLba|，\|dataLba|に格納する．
   
-  \lstinputlisting[caption=TacOS/blkFile.cmm/readBPB(),
+  \lstinputlisting[caption=BPBを読む（readBPB()）,
     firstline=102,lastline=128,numbers=left,xleftmargin=5mm,
     label=tacosReadBPB,float=btp]{TacOS/fs/blkFile.cmm}
 
     \begin{description}
     \item[2行] \|buf|にセクタを読み出すための512バイトのバッファを確保する．
-    \item[3行] mmcspiクラスの\|readSct()|関数を用いて\|buf|にBPBを読み込む．
+    \item[4行] mmcspiクラスの\|readSct()|関数を用いて\|buf|にBPBを読み込む．
     \item[5行] BPBの11バイト目からの2バイトを読みセクタ長を調べる．
     \item[8行] 13バイト目からクラスタあたりのセクタ数が分かる．
     \item[11，12行] 14バイト目からの2バイト（予約セクタ）は，
@@ -381,13 +397,14 @@ dirAccessクラス，fileクラス，fatSysクラスに提供する．
   普通のクラスタを読む場合は
   クラスタ番号からセクタ番号へ変換する計算を行う（12〜16行）．
   クラスタ番号から2を引いている（12行）のは，
-  普通のクラスタ番号は2から始まるからである．
+  普通のクラスタ番号は2から始まる（\tabref{fatClsNum}参照）からである．
 
   セクタ番号が決まったら，
   mmcspiクラス（デバイスドライバクラス）の\|readSct()|を用いて
   セクタを\|buf|に読み込む．
 
-  \lstinputlisting[caption=TacOS/blkFile.cmm/readBlk(),
+  \lstinputlisting[
+    caption=ファイルのデータセクタを読む（readBlk()）,
     firstline=195,lastline=213,numbers=left,xleftmargin=5mm,
     label=tacosReadBlk,float=btp]{TacOS/fs/blkFile.cmm}
 
@@ -405,7 +422,8 @@ dirAccessクラス，fileクラス，fatSysクラスに提供する．
   FATを参照して次のクラスタ番号を求める．
   10行の\|readFat()|がFATを読む関数である．
 
-  \lstinputlisting[caption=TacOS/blkFile.cmm/nextBlk(),
+  \lstinputlisting[
+    caption=データセクタのアドレスを進める（nextBlk()）,
     firstline=235,lastline=251,numbers=left,xleftmargin=5mm,
     label=tacosNextBlk,float=btp]{TacOS/fs/blkFile.cmm}
 
@@ -418,11 +436,12 @@ dirAccessクラス，fileクラス，fatSysクラスに提供する．
   FATのキャッシュに関連するプログラムの例として，
   \|readFat()|関数のソースプログラムをリスト\ref{tacosReadFat}に示す  
 
-  \lstinputlisting[caption=TacOS/blkFile.cmm/readFat(),label=tacosReadFat,
+  \lstinputlisting[caption=クラスタ番号で指定してFATを読む（readFat()）,
+    label=tacosReadFat,
     firstline=157,lastline=175,
     float=btp,numbers=left,xleftmargin=5mm]{TacOS/fs/blkFile.cmm}
 
-  セクタサイズ512Bの時，
+  セクタサイズが512バイトの時，
   16ビット（2バイト）のクラスタ番号は256個セクタに記録できる．
   6行ではクラスタ番号から，
   そのクラスタ番号に対応するセクタ番号に変換している．
@@ -442,30 +461,30 @@ dirAccessクラス，fileクラス，fatSysクラスに提供する．
 \section{mmcspiクラス}
 \label{tacosLbaDriver}
 マイクロSDカードのデバイスドライバ・クラスである．
-カードの読み書き機能を提供する
-リスト\ref{tacosMmcspi}にプログラムの一部を示す．
-セクタの書込を行う\|writeSct()|は，
-セクタの読込を行う\|readSct()|とよく似ているので掲載を省略した．
+カードの読み書き機能を提供する．
+リスト\ref{tacosMmcspi}にプログラムを示す．
 
-  \lstinputlisting[caption=TacOS/mmcspi.cmm/readSct(),label=tacosMmcspi,
-    firstline=73,lastline=98,
+  \lstinputlisting[caption=マイクロSDカードのデバイスドライバ,
+    label=tacosMmcspi,
+    firstline=73,lastline=110,
     float=btp,numbers=left,xleftmargin=5mm]{TacOS/fs/mmcspi.cmm}
 
 \|readSct()|はハードウェアに必要な情報を書き込み（21〜24行），
 割り込みの発生を25行で待つ．
+\|writeSct()|も同様である．
 
 \begin{description}
 \item[\texttt{restart()}関数]
   3行はディスクコントローラの割り込みハンドラである．
-  5行の\|semV()|はセマフォのV操作を行う（リスト\ref{tacosSemV}参照）．
+  5行の\|semV()|はセマフォのV操作を行う．
   割り込み発生時にセマフォを待ち合わせている
   プロセス（ファイルシステムサーバ）を起床させる．
 \item[\texttt{initMmcSpi()}関数]
   8行はバイスドライバの初期化関数である．
-  この関数はファイルシステムサーバによって実行される
+  この関数はファイルシステムサーバによって実行される．
   10行で割り込みハンドラ\|restart()|を割り込みベクタに登録している．
   11行は割り込みハンドラとプロセスの間で
-  同期を取るために使用する初期値\|0|のセマフォを割り当てている．
+  同期を取るために使用する初期値0のセマフォを割り当てている．
   12行ではハードウェアに初期化コマンドを発行している．
   13行ではセマフォを用いてハードウェアの初期化が終わるのを待つ．
   初期化の終了は割り込みで通知され3行の割り込みハンドラが実行される．
@@ -485,4 +504,12 @@ dirAccessクラス，fileクラス，fatSysクラスに提供する．
   CPUの力を借りることなく目的のデータをメモリに転送する．
   その間，デバイスドライバを呼び出したプロセス（ファイルシステムサーバ）は
   25行でCPUを解放して割り込みを待つ．
+\item[\texttt{writeSct()}関数]
+  セクタ書き込みルーチンである．
+  \|readSct()|関数とよく似ているので説明は省略する．
 \end{description}
+
+%============================================================================
+\section{まとめ}
+本章では，TacOSのファイルシステムサーバを例に，
+FATファイルシステムの実装例を示した．

@@ -1,7 +1,7 @@
-_x      DW        1       // int x = 1;
-_y      WS        1       // int y;
-_main   PUSH      FP      // void main() {
-        LD        FP,SP
+_x      DW        1       // int x = 1;             DW命令はdataセグメントに出力
+_y      WS        1       // int y;                 DW命令にbssセグメントに出力
+_main   PUSH      FP      // void main() {          機械語命令は
+        LD        FP,SP                               textセグメントに出力
         PUSH      G3      //   int z;
         PUSH      G4      //   char *p;
         LD        G0,#10  //
