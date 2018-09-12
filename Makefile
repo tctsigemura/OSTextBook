@@ -9,7 +9,7 @@ PDFS = os.pdf
 
 all : ${PDFS}
 
-os.pdf : os.tex chap?.tex bibliography.tex app?.tex
+os.pdf : mySty.sty os.tex chap?.tex bibliography.tex app?.tex
 
 clean :
 	rm -f *.log *.aux *.dvi *.out *.toc *.vrb *.snm *.nav *~

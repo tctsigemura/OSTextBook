@@ -1,4 +1,4 @@
-// 共有メモリクライアント（ipcUnixShearedMemoryClient.c）：共有メモリにデータを書き込む
+// 共有メモリクライアント（ipcUnixSharedMemoryClient.c）：共有メモリにデータを書き込む
 #include <stdio.h>
 #include <stdlib.h>
 #include <errno.h>

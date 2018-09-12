@@ -7,7 +7,6 @@
 プロセス間で情報を共有することが必要である．
 プロセス間で情報を共有する代表的な機構として，
 \emph{共有メモリ}と\emph{メッセージ通信}がある．
-
 複数のプロセスが情報を共有し協調して処理を進めることで，
 次のようなメリットが期待できる．
 
@@ -29,7 +28,7 @@
 \end{myfig}
 
 メモリ管理のハードウェア（Memory Management Unit : MMU）\footnote{
-  MMUに付いては第\ref{memoryManagement}部「メモリ管理」で解説する．
+  MMUに付いては「第\ref{memoryManagement}部 メモリ管理」で解説する．
 }を適切に設定することで，
 複数のプロセスの仮想メモリ空間に同じ物理メモリを貼り付ける．
 メモリを貼り付ける操作はシステムコールを用いて行う．
@@ -39,11 +38,11 @@
 
 \subsection{UNIXの共有メモリ関連システムコール等}
 UNIXの共有メモリ関連のシステムコールとライブラリ関数を
-\figref{ipcUnixShearedMemory}に紹介する．
+\figref{ipcUnixSharedMemory}に紹介する．
 
 \begin{myfig}{btp}{UNIXの共有メモリ関連システムコールとライブラリ関数}
-  {ipcUnixShearedMemory}
-  \lstinputlisting[numbers=none]{Lst/ipcUnixShearedMemory.txt}
+  {ipcUnixSharedMemory}
+  \lstinputlisting[numbers=none]{Lst/ipcUnixSharedMemory.txt}
 \end{myfig}
 
 \begin{quote}
@@ -64,7 +63,7 @@ UNIXの共有メモリ関連のシステムコールとライブラリ関数を
     プロセスの仮想アドレス空間に貼り付ける．
 
   \item [\texttt{shmdt}システムコール]
-    共有メモリセグメントをID（\|shmId|）で指定し，
+    共有メモリセグメントをアドレス（\|addr|）で指定し，
     プロセスの仮想アドレス空間から取り除く．
 
   \item [\texttt{shmctl}システムコール]
@@ -76,18 +75,20 @@ UNIXの共有メモリ関連のシステムコールとライブラリ関数を
 \subsection{UNIXの共有メモリ使用例}
 共有メモリセグメントを作成し，
 そこから定期的にデータを読み出し表示するサーバプログラムの例を
-リスト\ref{ipcUnixShearedMemoryServer}に示す\footnote{
+リスト\ref{ipcUnixSharedMemoryServer}に示す\footnote{
   ここで示すプログラムは macOS 10.13.2 で動作確認してあるが，
   他のUNIXでも動作するはずである．}．
 また，サーバプログラムが作成した共有メモリセグメントにデータを書き込む
 クライアントプログラムの例を
-リスト\ref{ipcUnixShearedMemoryClient}に示す．
+リスト\ref{ipcUnixSharedMemoryClient}に示す．
 
-\lstinputlisting[numbers=left,float=btp,label=ipcUnixShearedMemoryServer,
-  caption=UNIXの共有メモリサーバ例]{Lst/ipcUnixShearedMemoryServer.c}
+\lstinputlisting[numbers=left,float=btp,label=ipcUnixSharedMemoryServer,
+  caption=UNIXの共有メモリサーバ例]
+  {SampleCode/UnixSharedMemory/ipcUnixSharedMemoryServer.c}
 
-\lstinputlisting[numbers=left,float=btp,label=ipcUnixShearedMemoryClient,
-  caption=UNIXの共有メモリクライアント例]{Lst/ipcUnixShearedMemoryClient.c}
+\lstinputlisting[numbers=left,float=btp,label=ipcUnixSharedMemoryClient,
+  caption=UNIXの共有メモリクライアント例]
+  {SampleCode/UnixSharedMemory/ipcUnixSharedMemoryClient.c}
 
 サーバプログラムでは，
 28行の\|printf()|が共有メモリ（\|data|）から文字列を読み出し表示する．
@@ -99,22 +100,22 @@ UNIXの共有メモリ関連のシステムコールとライブラリ関数を
 共有メモリなので，
 \|fgets()|が書き込んだ内容を\|printf()|が読み出すことになる．
 
-実行例は\figref{ipcUnixShearedMemoryTest}のようになる．
+実行例は\figref{ipcUnixSharedMemoryTest}のようになる．
 図は二つのターミナルを開いて操作した状態を示している．
 左半分が第一のターミナル，
 右半分が第二のターミナルである．
 まず，左のターミナルで
-サーバプログラム（ipcUnixShearedMemoryServer）を起動する．
+サーバプログラム（ipcUnixSharedMemoryServer）を起動する．
 これで共有メモリセグメントが準備された．
 次に，右のターミナルで
-クライアントプログラム（ipcUnixShearedMemoryClient）を起動する．
+クライアントプログラム（ipcUnixSharedMemoryClient）を起動する．
 この状態で右のターミナルに入力した文字列が，
 クライアントプログラムにより共有メモリに書き込まれる．
 左のターミナルで実行中のサーバプログラムは，
 共有メモリの内容を定期的に表示する．
 
-\begin{myfig}{btp}{UNIXのメモリ共有プログラム実行例}{ipcUnixShearedMemoryTest}
-  \lstinputlisting[numbers=none]{Lst/ipcUnixShearedMemoryTest.txt}
+\begin{myfig}{btp}{UNIXのメモリ共有プログラム実行例}{ipcUnixSharedMemoryTest}
+  \lstinputlisting[numbers=none]{Lst/ipcUnixSharedMemoryTest.txt}
 \end{myfig}
 
 ここに紹介した簡単なプログラムでは，
@@ -134,14 +135,13 @@ UNIXの共有メモリ関連のシステムコールとライブラリ関数を
 プロセス２へメッセージを送る．
 プロセス２は\|receive()|システムコールを用いて
 プロセス１からメッセージを受取る．
+メッセージ通信は，
+データを送る度にシステムコールを使用するのでオーバーヘッドが大きいが，
+プロセス間の同期機構としても働く．
 
 \begin{myfig}{btp}{メッセージ通信}{ipcMessagePassing}
   \includegraphics[scale=0.6]{Fig/ipcMessagePassing-crop.pdf}
 \end{myfig}
-
-メッセージ通信は，
-データを送る度にシステムコールを使用するのでオーバーヘッドが大きいが，
-プロセス間の同期機構としても働く．
 
 \subsection{通信相手の指定方式（Naming）}
 メッセージの通信相手を指定する方式が二つある．
@@ -151,33 +151,28 @@ UNIXの共有メモリ関連のシステムコールとライブラリ関数を
   \item[直接指定方式]
     相手プロセスを直接指定する方式である．
     \figref{ipcDirect}は直接指定方式を表している．
-
-    \begin{myfig}{btp}{直接指定方式}{ipcDirect}
-      \includegraphics[scale=0.6]{Fig/ipcDirect-crop.pdf}
-    \end{myfig}
-
     \|send()|，\|receive()|システムコールの引数は，
     \emph{相手プロセス}と\emph{メッセージ}になる．
     \emph{相手プロセス}として\|ANY|のような記述を許すことで，
     多対多の通信も可能である．
     また，受信したメッセージをいくつか貯めることが可能な，
     バッファ付きの通信方式もあり得る．
-
+    \begin{myfig}{btp}{直接指定方式}{ipcDirect}
+      \includegraphics[scale=0.6]{Fig/ipcDirect-crop.pdf}
+    \end{myfig}
   \item[間接指定方式]
     \emph{リンク（ポート，ソケット，チャネルとも呼ばれる）}を作成し，
     通信先としてリンクの名前を用いる方式である．
     \figref{ipcIndirect}は間接指定方式を表している．
-
-    \begin{myfig}{btp}{間接指定方式}{ipcIndirect}
-      \includegraphics[scale=0.6]{Fig/ipcIndirect-crop.pdf}
-    \end{myfig}
-
     \|send()|，\|receive()|システムコールの引数は，
     \emph{リンク}と\emph{メッセージ}になる．
     同じリンクを共有する複数のプロセスが存在すると，
     自然に多対多の通信方式が実現できる．
     リンクにメッセージをいくつか貯めるバッファ機能を持たせる場合が多い．
     %UNIXのソケットやパイプはこの方式によく似ている．
+    \begin{myfig}{btp}{間接指定方式}{ipcIndirect}
+      \includegraphics[scale=0.6]{Fig/ipcIndirect-crop.pdf}
+    \end{myfig}
   \end{description}
 \end{quote}
 
@@ -219,8 +214,8 @@ UNIXの共有メモリ関連のシステムコールとライブラリ関数を
     \|send()|はバッファに空きがない場合エラーで終了する．
     \|receive()|はバッファにメッセージがない場合エラーで終了する．
   \item [同期方式]
-    \|send()|はバッファに空きがない場合ブロックし空きができるのを待つ．
-    \|receive()|はバッファにメッセージがない場合ブロックし
+    \|send()|はバッファに空きがない場合はブロックし，空きができるのを待つ．
+    \|receive()|はバッファにメッセージがない場合はブロックし，
     メッセージが届くのを待つ．
   \item [ランデブー方式]
     \|send()|は受信プロセスが\|receive()|を実行するまでブロックする．
@@ -258,8 +253,7 @@ UNIXのメッセージ通信関連のシステムコール等を\figref{ipcUnixM
     リンク（メッセージキューと呼ぶ）のIDを返す．
     \|key|は，共有メモリの場合と同様に\|ftok()|関数を用いて生成した値である．
     メッセージキューを識別するために用いる．
-    \|msgflg|に\|IPC_CREAT|を指定することで，
-    メッセージキューを新規に作成することもできる．
+    \|msgflg|に\|IPC_CREAT|を指定すると，メッセージキューを新規に作成する．
   \item [\texttt{msgsnd()}システムコール]
     \|msqid|で指定したメッセージキューにメッセージを送信する．
     \|msgp|に送信するメッセージを格納した\|msgBuf|構造体のポインタを渡す．
@@ -274,10 +268,10 @@ UNIXのメッセージ通信関連のシステムコール等を\figref{ipcUnixM
     \|msgtyp|に受信したいメッセージの\|mtype|を指定し，
     \emph{タグ}が合致するメッセージを選択的に受信できる．
     \|msgflg|に\|IPC_NOWAIT|フラグを指定すると\emph{非同期方式}になる．
-  \item [\texttt{msgclt()}システムコール]
+  \item [\texttt{msgctl()}システムコール]
     \|msqid|で指定したメッセージキューに対して操作を行う．
     \|cmd|に操作の種類（コマンド），
-    \|buf|にパラメータを渡す．
+    \|buf|にコマンドのパラメータを渡す．
     \|IPC_RMID|コマンドを指定するとメッセージキューの削除ができる．
   \end{description}
 \end{quote}
@@ -292,7 +286,8 @@ UNIXのメッセージ通信関連のシステムコール等を\figref{ipcUnixM
 以下のプログラムは，メッセージ長をこの値に固定した例になっている．
 
 \lstinputlisting[caption=UNIXのメッセージ通信プログラム例（メッセージ構造体）,
-  numbers=left,float=btp,label=ipcUnixMessageH]{Lst/ipcUnixMessage.h}
+  numbers=left,float=btp,label=ipcUnixMessageH]
+  {SampleCode/UnixMessage/ipcUnixMessage.h}
 
 リスト\ref{ipcUnixMessageWriter}に
 メッセージキューを作成しメッセージを書き込むプログラムの例を示す．
@@ -302,7 +297,7 @@ UNIXのメッセージ通信関連のシステムコール等を\figref{ipcUnixM
 
 \lstinputlisting[numbers=left,float=btp,label=ipcUnixMessageWriter,
   caption=UNIXのメッセージ通信プログラム例（メッセージ送信側）]
-                {Lst/ipcUnixMessageWriter.c}
+  {SampleCode/UnixMessage/ipcUnixMessageWriter.c}
 
 リスト\ref{ipcUnixMessageReader}に，
 メッセージキューからメッセージを読み込み内容を表示するプログラムの例を示す．
@@ -316,7 +311,7 @@ UNIXのメッセージ通信関連のシステムコール等を\figref{ipcUnixM
 
 \lstinputlisting[numbers=left,float=btp,label=ipcUnixMessageReader,
   caption=UNIXのメッセージ通信プログラム例（メッセージ受信側）]
-                {Lst/ipcUnixMessageReader.c}
+  {SampleCode/UnixMessage/ipcUnixMessageReader.c}
 
 \subsection{UNIXのメッセージ通信プログラムの実行例}
 メッセージ通信プログラムの実行例を
@@ -367,12 +362,11 @@ UNIXの共有メモリとメッセージ通信についてプログラム例を�
   \end{enumerate}
 \item プロセス間の共有メモリとスレッド間の共有変数の違いは何か？
 \item UNIXの共有メモリ使用例
-  （リスト\ref{ipcUnixShearedMemoryServer}，
-    リスト\ref{ipcUnixShearedMemoryClient}）
+  （リスト\ref{ipcUnixSharedMemoryServer}，
+    リスト\ref{ipcUnixSharedMemoryClient}）
   を実際に実行し動作確認しなさい．
   なお，ソースプログラムは以下から入手可能である． \\
-  \url{https://github.com/tctsigemura/OSTextBook/blob/master/Lst/ipcUnixShearedMemoryServer.c} （サーバ側）\\
-  \url{https://github.com/tctsigemura/OSTextBook/blob/master/Lst/ipcUnixShearedMemoryClient.c} （クライアント側）
+  \url{https://github.com/tctsigemura/OSTextBook/blob/master/SampleCode/UnixSharedMemory}
 \item 動作確認したプログラムでは，
   サーバプログラムは共有メモリが変更されたことを確認しないで，
   一定の時間間隔で共有メモリの内容を表示している．

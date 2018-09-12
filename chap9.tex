@@ -1,41 +1,43 @@
 \chapter{メモリ割付け方式}
-プロセスが実行を開始する前に，
-物理メモリの一部をプロセスに割付けプログラムをロードする．
+%プロセスが実行を開始する前に
+物理メモリの一部をプロセスに割付け，
+そこにプログラムをロードし実行する．
 物理メモリを複数のプロセスで分割し利用するために，
 幾つかの方式が考案されてきた．
 ここでは，固定区画方式と可変区画方式について解説する．
 
 %==============================================================================
 \section{固定区画方式}
-予めメモリを大小数種類の区画に分割しておく．
-\figref{fixedPartition}の例では利用可能なメモリを五つの区画に分割している．
-\figref{fixedPartitionA}はプロセス１から４を実行する場合を示している．
-プロセスのサイズにより適切な区画を選択しプロセスをロードする．
-プロセス４はロード可能な区画が無いので実行できない．
 
 \begin{myfig}{btp}{固定区画方式}{fixedPartition}
   \begin{minipage}{0.49\columnwidth}
     \begin{center}
-      \includegraphics[scale=0.6]{Fig/fixedPartitionLoad-crop.pdf}
+      \includegraphics[scale=0.66]{Fig/fixedPartitionLoad-crop.pdf}
       \subcaption{区画を選択しプロセスをロード}
       \label{fig:fixedPartitionA}
     \end{center}
   \end{minipage}
   \begin{minipage}{0.49\columnwidth}
     \begin{center}
-      \includegraphics[scale=0.6]{Fig/fixedPartitionExec-crop.pdf}
+      \includegraphics[scale=0.66]{Fig/fixedPartitionExec-crop.pdf}
       \subcaption{プロセスを実行}
       \label{fig:fixedPartitionB}
     \end{center}
   \end{minipage}
 \end{myfig}
 
+予めメモリを大小数種類の区画に分割しておく．
+\figref{fixedPartition}の例では利用可能なメモリを五つの区画に分割している．
+\figref{fixedPartitionA}はプロセス１から４を実行する場合を示している．
+プロセスのサイズにより適切な区画を選択しプロセスをロードする．
+プロセス４はロード可能な区画が無いので実行できない．
+
 \figref{fixedPartitionB}の区画１から３ように，
 区画の大きさとプロセスの大きさは一致するとは限らない．
 内部に使用されない領域（\emph{内部フラグメント}）が生じる．
 また，区画４と区画５を合わせるとプロセス４をロード可能であるが，
 固定区画方式では区画を組合せて利用することはできない．
-仕組みが簡単だがメモリの利用率が低い．
+仕組みは簡単だがメモリの利用率が低い．
 特徴を以下にまとめる．
 
 \begin{enumerate}
@@ -54,7 +56,7 @@
 \figref{variablePartition}に模式図を示す．
 
 \begin{myfig}{btp}{可変区画方式}{variablePartition}
-  \includegraphics[scale=0.6]{Fig/variablePartition-crop.pdf}
+  \includegraphics[scale=0.66]{Fig/variablePartition-crop.pdf}
 \end{myfig}
 
 \begin{enumerate}
@@ -89,7 +91,7 @@
 \figref{firstBestWorstFit}に三つの方式で選択される空き領域の例を示す．
 
 \begin{myfig}{btp}{空き領域の選択方式}{firstBestWorstFit}
-  \includegraphics[scale=0.6]{Fig/firstBestWorstFit-crop.pdf}
+  \includegraphics[scale=0.66]{Fig/firstBestWorstFit-crop.pdf}
 \end{myfig}
 
 \begin{itemize}
@@ -102,8 +104,8 @@
   最も大きな領域を選択する．
 \end{itemize}
 
-シミュレーションの結果メモリ利用率の点で，
-ワーストフィット方式は最も性能が劣るが，
+シミュレーションの結果，
+メモリ利用率の点でワーストフィット方式は最も性能が劣るが，
 ファーストフィットとベストフィットの性能は互角だと言われている．
 しかし実行時間の点で，
 ファーストフィットがベストフィットより優れている\cite{MemoryAllocation}．
@@ -123,7 +125,7 @@
   ビットが 1 なら使用中の意味になる．
 
   \begin{myfig}{btp}{ビットマップ方式}{bitMap}
-    \includegraphics[scale=0.6]{Fig/bitMap-crop.pdf}
+    \includegraphics[scale=0.66]{Fig/bitMap-crop.pdf}
   \end{myfig}
 
   ビットマップはメモリ上に記録する．
@@ -138,7 +140,7 @@
   となる．
 
   ビットマップに使用するメモリは無視できるほど小さいものではない．
-  ビットマップをより小さくするにはブロックサイズを大きくすれば良い．
+  ビットマップを小さくするにはブロックサイズを大きくすれば良い．
   しかし，ブロックサイズを大きくすると内部フラグメントが大きくなる．
 
 \item \emph{リスト（linked-list）方式}\\
@@ -149,7 +151,7 @@
   その様子を\figref{memFree}に示す．
 
   \begin{myfig}{btp}{領域開放時に空き領域を連結する様子}{memFree}
-    \includegraphics[scale=0.74]{Fig/memFree-crop.pdf}
+    \includegraphics[scale=0.80]{Fig/memFree-crop.pdf}
   \end{myfig}
 
   リスト方式で用いるデータ構造の例を\figref{linkedList}に示す．
@@ -157,7 +159,7 @@
   空き領域はアドレス順にソートしてリストに挿入される．
 
   \begin{myfig}{btp}{空き領域リスト}{linkedList}
-    \includegraphics[scale=0.6]{Fig/linkedList-crop.pdf}
+    \includegraphics[scale=0.66]{Fig/linkedList-crop.pdf}
   \end{myfig}
 
   アドレス順に領域がソートしてあると，

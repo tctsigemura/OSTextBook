@@ -1,4 +1,4 @@
-// 共有メモリサーバ（ipcUnixShearedMemoryServer.c）：共有メモリからデータを読みだし表示する
+// 共有メモリサーバ（ipcUnixSharedMemoryServer.c）：共有メモリからデータを読みだし表示する
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>

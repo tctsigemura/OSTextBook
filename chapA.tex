@@ -42,7 +42,7 @@
 プロセスの仮想アドレス空間が二次元になった．
 
 \begin{myfig}{btp}{セグメントからなる仮想アドレス空間}{segment}
-  \includegraphics[scale=0.8]{Fig/segment-crop.pdf}
+  \includegraphics[scale=0.88]{Fig/segment-crop.pdf}
 \end{myfig}
 
 \figref{segment}は以下のことを表している．
@@ -55,9 +55,8 @@
 前向きに伸びるセグメントが使いやすい．
 IA-32\footnote{
   32bitパーソナルコンピュータで広く使われてきた
-  インテル社CPUのアーキテクチャのことである．
-}等では前に向かって伸びるセグメントも
-サポートされている\cite{ia32Segmentation}．
+  インテル社CPUのアーキテクチャのことである．}は，
+前に向かって伸びるセグメントもサポートしている\cite{ia32Segmentation}．
 
 各領域を独立したセグメントにすることで，
 \emph{仮想アドレス空間内の領域配置の問題から解放された}．
@@ -74,7 +73,7 @@ IA-32\footnote{
 各命令がセグメント番号のために大きくなるので，
 プログラムサイズが大きくなる．
 \begin{center}
-  \includegraphics[scale=0.7]{Fig/segmentationInstruction-crop.pdf}
+  \includegraphics[scale=0.77]{Fig/segmentationInstruction-crop.pdf}
 \end{center}
 
 \subsection{カレントセグメントレジスタ}
@@ -103,7 +102,7 @@ CPU内部に現在のセグメント番号を格納するレジスタを置く�
 セグメント1のプログラムの実行が再開される．
 
 \begin{myfig}{btp}{セグメント間のサブルーチンコール}{segmentCall}
-  \includegraphics[scale=0.6]{Fig/segmentCall-crop.pdf}
+  \includegraphics[scale=0.66]{Fig/segmentCall-crop.pdf}
 \end{myfig}
 
 IA-32では，
@@ -120,7 +119,7 @@ CPUが出力したセグメント番号（S）とセグメント内アドレス�
 セグメントテーブルを使用して物理アドレスに変換する．
 
 \begin{myfig}{btp}{セグメンテーション機構}{segmentation}
-  \includegraphics[scale=0.6]{Fig/segmentation-crop.pdf}
+  \includegraphics[scale=0.66]{Fig/segmentation-crop.pdf}
 \end{myfig}
 
 \subsection{セグメントテーブル}
@@ -266,9 +265,9 @@ CPUが出力したセグメント番号（S）とセグメント内アドレス�
 \end{myfig}
 
 \begin{itemize}
-\item C言語ライブラリ（\texttt{printf()}等を含む）は，
-  C言語で使用する関数を提供する．
-  ライブラリはプログラムだけを格納し変更されないとすると，
+\item C言語ライブラリは，
+  C言語で使用する関数（\texttt{printf()}等）を提供する．
+  ライブラリはプログラムだけを格納し変更されないので，
   全てのプロセスで共用することができる\footnote{
     本当は，ライブラリが使用するグローバル変数（例えば\texttt{errno}）を
     どうするか問題である．

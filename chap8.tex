@@ -39,7 +39,7 @@ TeCの主記憶は256バイトのRAM領域であったし，
   \end{minipage}
 \end{myfig}
 
-プログラム実行時にCPUは以下のようにメモリをアクセスする．
+CPUは命令を実行する際に，次の手順でメモリをアクセスする．
 \begin{enumerate}
 \item 命令フェッチ（fetch）\\
   PCの値をアドレスとして出力し主記憶からデータ（命令コード）を\emph{読む}．
@@ -57,8 +57,8 @@ TeCやH8/3664のようなマイクロコンピュータの様子を表すため�
 本格的なオペレーティングシステムを作動させるには，次の点で不十分である．
 \begin{enumerate}
 \item メモリ保護機構がない．\\
-  ユーザプロセスがOSのカーネルや，
-  他のプロセスを破壊することを防ぐことができない．
+  ユーザプログラムのバグで，
+  OSのカーネルや他のプロセスを破壊する可能性がある．
 \item メモリの再配置機構がない．\\
   同時に複数のプロセスが主記憶にロードされる環境では，
   プロセスの起動と終了が繰り返されるうちに使用できない
@@ -86,12 +86,12 @@ CPUを仮想化したことによって，
 コンピュータの使い勝手が非常に良くなった．
 しかし，ユーザプログラムのバグや悪意によって，
 OSカーネルや他のユーザプログラムが破壊される可能性がでてきた．
-OSカーネルはそれの性質上全てのメモリ領域にアクセスする必要がある．
+OSカーネルは，全てのメモリ領域にアクセスする必要がある．
 一方でユーザプロセスは自身に割当てられたメモリ以外に
 アクセスできない仕組みが必要である．
 
 \subsection{上限・下限レジスタ}
-プロセスがアクセスしても良いメモリのアドレスの範囲をレジスタに設定し，
+プロセスがアクセスしても良いメモリアドレスの範囲をレジスタに設定し，
 メモリアクセスする度にCPUが出力するアドレスとレジスタの値を比較する．
 \figref{baseLimitAddrSpace}はプロセス２が実行中の
 上限・下限レジスタの状態を表している．
@@ -101,14 +101,14 @@ OSカーネルはそれの性質上全てのメモリ領域にアクセスする
 \begin{myfig}{btp}{上限・下限レジスタの仕組み}{baseLimitRegister}
   \begin{minipage}{0.49\columnwidth}
     \begin{center}
-      \includegraphics[scale=0.6]{Fig/baseLimitAddrSpace-crop.pdf}
+      \includegraphics[scale=0.66]{Fig/baseLimitAddrSpace-crop.pdf}
       \subcaption{物理アドレス空間}
       \label{fig:baseLimitAddrSpace}
     \end{center}
   \end{minipage}
   \begin{minipage}{0.49\columnwidth}
     \begin{center}
-      \includegraphics[scale=0.6]{Fig/baseLimitHardware-crop.pdf}
+      \includegraphics[scale=0.66]{Fig/baseLimitHardware-crop.pdf}
       \subcaption{ハードウェア構成}
       \label{fig:baseLimitHardware}
     \end{center}
@@ -121,7 +121,7 @@ OSカーネルはそれの性質上全てのメモリ領域にアクセスする
   上限・下限レジスタを操作できるのはカーネルモード\footnote{
     実行モードは\ref{gen2nd}で紹介したので忘れた人は再確認すること．}で
   実行されるカーネルだけである．
-  ユーザプロセスが自身のアクセスできる領域を変更することはできない．
+  ユーザプロセスが，自身のアクセスできる領域を変更することはできない．
 \item カーネルはプロセスの実行を開始させる．
 \item プロセスはユーザモードで実行される．
   ユーザモードで実行中は
@@ -152,6 +152,9 @@ MMUはCPUが出力したアドレスからページ番号を求め表を引く�
 メモリ保護違反の割込みを発生する．
 MMUを操作できるのはCPUの実行モードがカーネルモードの時だけ，
 MMUがメモリ保護違反の割込みを発生するのはユーザモード時だけである．
+特別なプロテクションキー（例えば0）のページは
+全てのプロセスがアクセス可能とすれば，
+プロセス間の共有メモリを実現できる．
 
 \begin{myfig}{btp}{ロック／キー機構の仕組み}{lockKey}
   \begin{minipage}{0.49\columnwidth}
@@ -170,24 +173,20 @@ MMUがメモリ保護違反の割込みを発生するのはユーザモード�
   \end{minipage}
 \end{myfig}
 
-特別なプロテクションキー（例えば0）のページは
-全てのプロセスがアクセス可能とすれば，
-プロセス間の共有メモリを実現できる．
-
 %==============================================================================
 \section{プログラムの再配置}
 コンパイルされたプログラムはメモリにロードされる時にアドレスが確定する．
 ファイルに格納された実行可能形式プログラムは，
 ロード時にアドレスを変更できる必要がある．
 
-また，実行途中のプログラムのアドレスを変更することがある．
+また，実行中のプログラムをメモリ内で移動することがある．
 \figref{memoryCompaction}のようにメモリが多くの領域に分断され，
 領域の間に小さなメモリの断片（\emph{メモリフラグメント}）が沢山できた場合は，
 プログラムの詰め合わせ（\emph{メモリコンパクション}）を行う．
-実行途中のプログラムを移動することを\emph{動的再配置}と呼ぶ．
+実行中のプログラムを移動することを\emph{動的再配置}と呼ぶ．
 
 \begin{myfig}{btp}{プログラムの動的再配置}{memoryCompaction}
-  \includegraphics[scale=0.60]{Fig/memoryCompaction-crop.pdf}
+  \includegraphics[scale=0.66]{Fig/memoryCompaction-crop.pdf}
 \end{myfig}
 
 \subsection{再配置可能オブジェクトファイル}
@@ -227,23 +226,24 @@ MMUがメモリ保護違反の割込みを発生するのはユーザモード�
 プロセスのロードアドレス（B:Base）と大きさ（L:Limit）を記録するレジスタである．
 ディスパッチャがプロセスを実行する時に値を設定する．
 
-\figref{relocationHardware}に示すように
+\figref{relocationHardware}に示すように，
 CPUが出力したアドレスはプロセスの大きさ（L）と比較される．
-アドレスがL以上の場合はプロセス領域外のアドレスになるので
-メモリ保護違反の割込みを発生する．
-CPUのアドレスにプロセスのロードアドレス（B）を足した値がメモリアドレスになる．
+アドレスがL以上の場合は，
+プロセス領域の外なのでメモリ保護違反の割込みを発生する．
+CPUのアドレスにプロセスのロードアドレス（B）を足した値が，
+メモリのアドレスになる．
 
 \begin{myfig}{btp}{リロケーションレジスタ}{relocationRegister}
   \begin{minipage}{0.49\columnwidth}
     \begin{center}
-      \includegraphics[scale=0.6]{Fig/relocationAddrSpace-crop.pdf}
+      \includegraphics[scale=0.66]{Fig/relocationAddrSpace-crop.pdf}
       \subcaption{物理アドレス空間}
       \label{fig:relocationAddrSpace}
     \end{center}
   \end{minipage}
   \begin{minipage}{0.49\columnwidth}
     \begin{center}
-      \includegraphics[scale=0.6]{Fig/relocationHardware-crop.pdf}
+      \includegraphics[scale=0.66]{Fig/relocationHardware-crop.pdf}
       \subcaption{ハードウェア構成}
       \label{fig:relocationHardware}
     \end{center}
@@ -253,7 +253,7 @@ CPUのアドレスにプロセスのロードアドレス（B）を足した値�
 動的再配置を行うにはプロセスがRunning以外の状態の時に，
 主記憶上でプロセスのメモリ領域を新しい領域にコピーする．
 次回プロセスが実行される時，
-ディスパッチャは新しい領域のアドレスをBにロードする．
+ディスパッチャは新しい領域のアドレスをBに設定する．
 ユーザプログラムは再配置されたことを知る必要はない．
 しかし，プロセスの領域の移動は大量のメモリコピーを伴うので，
 \emph{オーバーヘッドが大きい}処理である．
@@ -282,10 +282,8 @@ CPUのアドレスにプロセスのロードアドレス（B）を足した値�
 
 \subsection{多重仮想記憶}
 アドレス空間が仮想化されることにより，
-全てのプロセスが0番地から始まるアドレス空間を持つことが可能になる．
+全てのプロセスが独立したアドレス空間を持つことが可能になる．
 プロセス毎に独立したアドレス空間を持つ方式を\emph{多重仮想記憶}と呼ぶ．
-実行可能形式のプログラムは，いつも0番地にロードされ実行される．
-%再配置可能なオブジェクトでなくても良い．
 
 \subsection{仮想アドレス空間の配置}
 仮想アドレス空間にプログラムや変数を配置する方法は
@@ -314,7 +312,7 @@ UNIX上でC言語プログラムが配置される様子を示す．
   関数の実行開始時に\emph{スタックセグメント}または
   \emph{CPUレジスタ}に割り付けられ，
   関数を終了する時に破棄される．
-  同じスタックを関数呼出しのために CALL 機械語命令も使用する．
+  同じスタックを関数呼び出しのために CALL 機械語命令も使用する．
   スタックは，必要に応じて仮想アドレス空間を0番地側に伸びる．
 \item \|malloc()|関数等を用いて動的に領域を割り当てると
   \emph{ヒープセグメント}が使用される．
@@ -371,10 +369,10 @@ text，data，bss，ヒープ，スタックセグメントからなる．
   \item ヒープセグメント
   \item スタックセグメント
   \end{enumerate}
-\item 自分がいつも使用しているPCの主記憶（メモリ）は何GBか調べなさい．
+\item 自分がいつも使用しているPCの主記憶（メモリ）は何GiBか調べなさい．
 \item 上限・下限レジスタは，プログラムの動的再配置のために使用できるか？
-\item 付録\ref{appTacosFileFormat}に示すTacOSのファイルフォーマットの中で，
-  再配置可能オブジェクトファイルの構造を理解しなさい．
+\item 付録\ref{appTacosFileFormat}に掲載した
+  TacOSの再配置可能オブジェクトファイルの構造を理解しなさい．
 \item リスト\ref{cmmSample}のプログラムの場合，
   リロケーションレコードはいくつ必要か？
 \end{enumerate}

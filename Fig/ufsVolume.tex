@@ -6,17 +6,27 @@
 \ttfamily\begin{tabular}{r |c | c | c | c| l}
 \multicolumn{1}{r}{セクタNo.} &
 \multicolumn{4}{c}{セクタの内容（1行1ブロック）} & \\\cline{2-5}
-0            & \multicolumn{4}{|c|}{ブートブロック} &             \\\cline{2-5}
-16           & \multicolumn{4}{|c|}{スーパブロック} &             \\\cline{2-5}
-32           & i-node & i-node & ...    & i-node    & ↑           \\\cline{2-5}
-...          &...     & ...    & ...    & ...       & i-nodeリスト\\\cline{2-5}
-             & i-node & i-node & ...    & i-node    & ↓           \\\cline{2-5}
-32+N*16      & \multicolumn{4}{|c|}{データブロック0}& ↑           \\\cline{2-5}
-32+N*16+16   & \multicolumn{4}{|c|}{データブロック1}& ↑           \\\cline{2-5}
-             & \multicolumn{4}{|c|}{}               & ↑           \\
-   ...       & \multicolumn{4}{|c|}{...}            & データブロック \\
-             & \multicolumn{4}{|c|}{}               & ↓           \\
-             & \multicolumn{4}{|c|}{}               & ↓           \\\cline{2-5}
-32+N*16+M*16 & \multicolumn{4}{|c|}{データブロックM}& ↓           \\\cline{2-5}
+0            & \multicolumn{4}{|c|}{ブートブロック}   &                \\
+\cline{2-5}
+16           & \multicolumn{4}{|c|}{スーパブロック}   &                \\
+\cline{2-5}
+32           & i-node & i-node & ...    & i-node      & ↑              \\
+\cline{2-5}
+...          & ...    & ...    & ...    & ...         & i-nodeリスト   \\
+             &        &        &        &             & （Nブロック）  \\
+\cline{2-5}
+             & i-node & i-node & ...    & i-node      & ↓              \\
+\cline{2-5}
+32+N*16      & \multicolumn{4}{|c|}{データブロック0}  & ↑              \\
+\cline{2-5}
+32+N*16+16   & \multicolumn{4}{|c|}{データブロック1}  & ↑              \\
+\cline{2-5}
+             & \multicolumn{4}{|c|}{}                 & ↑              \\
+   ...       & \multicolumn{4}{|c|}{...}              & データブロック \\
+             & \multicolumn{4}{|c|}{}                 & （Mブロック）  \\
+             & \multicolumn{4}{|c|}{}                 & ↓              \\
+\cline{2-5}
+32+N*16+M*16 & \multicolumn{4}{|c|}{データブロックM-1}& ↓              \\
+\cline{2-5}
 \end{tabular}
 \end{document}
