@@ -242,7 +242,8 @@ TaCはベクタ方式の割込み機構を持っており，
 次に，リスト\ref{tacosYield}の内容を解説する．
 
 \lstinputlisting[firstline=49,lastline=77,numbers=left,label=tacosYield,
-  float=btp,caption=TacOSコンテキスト保存プログラム]{TacOS/kernel/dispatcher.s}
+  caption=TacOSのコンテキスト保存プログラム,
+  float=btp]{TacOS/kernel/dispatcher.s}
 
 \begin{description}
 \item[1行] プロセスを切換える時にマイクロカーネル内で呼び出される
@@ -282,7 +283,8 @@ TaCはベクタ方式の割込み機構を持っており，
 次にリスト\ref{tacosDispatch}の内容を解説する．
 
 \lstinputlisting[firstline=78,lastline=102,numbers=left,label=tacosDispatch,
-  float=btp,caption=TacOSコンテキスト復旧プログラム]{TacOS/kernel/dispatcher.s}
+  caption=TacOSのコンテキスト復旧プログラム,
+  float=btp]{TacOS/kernel/dispatcher.s}
 
 \begin{description}
     \item[1行] プロセスにCPUを割付ける

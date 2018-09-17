@@ -242,12 +242,12 @@ Javaクラスに書換えたものを
 \lstinputlisting[firstline=3,lastline=36,numbers=left,float=btp,
   label=semProducerBuffer1,
   caption=モニタと同等なキューをセマフォで実現（Java版，前半）]
-                {Lst/SemBoundedBuffer.java}
+                {SampleCode/SemBoundedBuffer/SemBoundedBuffer.java}
 
 \lstinputlisting[firstline=37,firstnumber=last,numbers=left,float=btp,
   label=semProducerBuffer2,
   caption=モニタと同等なキューをセマフォで実現（Java版，後半）]
-                {Lst/SemBoundedBuffer.java}
+                {SampleCode/SemBoundedButter/SemBoundedBuffer.java}
 
 \subsection{モニタ機能のJavaによる実装}
 リスト\ref{semProducerBuffer1}は，
@@ -333,7 +333,7 @@ Javaには\emph{条件変数}に相当するものが無い．
 
 \lstinputlisting[numbers=left,float=btp,label=javaMonProducerConsumer,
   caption=Javaのモニタ風機構による生産者と消費者問題の解]
-                {Lst/MonBoundedBuffer.java}
+                {SampleCode/MonBoundedBuffer/MonBoundedBuffer.java}
 
 \begin{description}
 \item [1行]
