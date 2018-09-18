@@ -29,13 +29,13 @@ FATを管理し
   （\texttt{mmcspi.hmm}）}）
 からなる．
 
-\begin{myfig}{btp}{TacOSのファイルサーバの構造}{fsUML}
+\begin{myfig}{btp}{TacOSのファイルシステムサーバの構造}{fsUML}
   \centering{\includegraphics[scale=0.84,angle=90]{TacOS/uml/fs-crop.pdf}}
 \end{myfig}
 
 %============================================================================
 \section{fsクラス}
-fsクラスはファイルサーバプロセスのメインループと，
+fsクラスはファイルシステムサーバのメインループと，
 他のプロセスが呼び出すシステムコールのスタブルーチンを持っている．
 ファイルシステムサーバは，カーネルモードで実行されるプロセスである．
 
