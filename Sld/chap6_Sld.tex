@@ -1,5 +1,5 @@
 %\documentclass[dvipdfmx]{beamer}
-\documentclass{beamer}                   % lualatex の場合
+\documentclass[unicode]{beamer}                   % lualatex の場合
 \usepackage{mySld}
 
 \begin{document}
@@ -53,31 +53,35 @@
 %=========================================================================
 \begin{frame}
   \frametitle{UNIXの共有メモリサーバ例（前半）}
-  \lst{lastline=20,frame=tlr}{ipcUnixShearedMemoryServer.c}
+  \smp{lastline=20,frame=tlr,numbers=left,xleftmargin=5mm}
+      {UnixSharedMemory/ipcUnixSharedMemoryServer.c}
 \end{frame}
 
 %=========================================================================
 \begin{frame}
   \frametitle{UNIXの共有メモリサーバ例（後半）}
-  \lst{firstline=21,frame=lrb}{ipcUnixShearedMemoryServer.c}
+  \smp{firstline=21,frame=lrb,firstnumber=21,numbers=left,xleftmargin=5mm}
+      {UnixSharedMemory/ipcUnixSharedMemoryServer.c}
 \end{frame}
 
 %=========================================================================
 \begin{frame}
   \frametitle{UNIXの共有メモリクライアント例（前半）}
-  \lst{lastline=16,frame=trl}{ipcUnixShearedMemoryClient.c}
+  \smp{lastline=16,frame=trl,numbers=left,xleftmargin=5mm}
+      {UnixSharedMemory/ipcUnixSharedMemoryClient.c}
 \end{frame}
 
 %=========================================================================
 \begin{frame}
   \frametitle{UNIXの共有メモリクライアント例（後半）}
-  \lst{firstline=17,frame=lrb}{ipcUnixShearedMemoryClient.c}
+  \smp{firstline=17,frame=lrb,firstnumber=17,numbers=left,xleftmargin=5mm}
+      {UnixSharedMemory/ipcUnixSharedMemoryClient.c}
 \end{frame}
 
 %=========================================================================
 \begin{frame}
   \frametitle{UNIXの共有メモリプログラム実行例}
-  \lst{language=}{ipcUnixShearedMemoryTest.txt}
+  \lst{language=}{ipcUnixSharedMemoryTest.txt}
   \begin{itemize}
   \item このプログラムは相互排除をやっていない．
   \item このプログラムは{\bf 使用してはならない}．
@@ -140,26 +144,30 @@
 %=========================================================================
 \begin{frame}
   \frametitle{UNIXのメッセージ通信プログラム例１}
-  \lst{language={C}}{ipcUnixMessage.h}
-  \lst{lastline=15,frame=tlr}{ipcUnixMessageWriter.c}
+  \smp{numbers=left,xleftmargin=5mm}{UnixMessage/ipcUnixMessage.h}
+  \smp{lastline=15,frame=tlr,numbers=left,xleftmargin=5mm}
+      {UnixMessage/ipcUnixMessageWriter.c}
 \end{frame}
 
 %=========================================================================
 \begin{frame}
   \frametitle{UNIXのメッセージ通信プログラム例２}
-  \lst{firstline=16,frame=lrb}{ipcUnixMessageWriter.c}
+  \smp{firstline=16,frame=lrb,numbers=left,xleftmargin=5mm,firstnumber=16}
+      {UnixMessage/ipcUnixMessageWriter.c}
 \end{frame}
 
 %=========================================================================
 \begin{frame}
   \frametitle{UNIXのメッセージ通信プログラム例３}
-  \lst{lastline=19,frame=tlr}{ipcUnixMessageReader.c}
+  \smp{lastline=19,frame=tlr,numbers=left,xleftmargin=5mm}
+      {UnixMessage/ipcUnixMessageReader.c}
 \end{frame}
 
 %=========================================================================
 \begin{frame}
   \frametitle{UNIXのメッセージ通信プログラム例４}
-  \lst{firstline=20,frame=lrb}{ipcUnixMessageReader.c}
+  \smp{firstline=20,frame=lrb,numbers=left,xleftmargin=5mm,firstnumber=20}
+      {UnixMessage/ipcUnixMessageReader.c}
   \lst{}{ipcUnixMessageTest.txt}
 \end{frame}
 
@@ -182,7 +190,8 @@
 %=========================================================================
 \begin{frame}
   \frametitle{TacOSのリンク構造体}
-  \lst{language={C++}}{tacosLink.hmm}
+  \src{firstline=107,lastline=119,
+    numbers=left,xleftmargin=5mm}{kernel/process.hmm}
   \begin{itemize}
   \item リンクはサーバが所有する．
   \item セマフォを用いて相互排除と同期を行う．
@@ -193,18 +202,20 @@
 %=========================================================================
 \begin{frame}
   \frametitle{TacOSのリンク作成ルーチン}
-  \lst{language={C++}}{tacosNewLink.cmm}
+  \src{firstline=496,lastline=516,
+      numbers=left,xleftmargin=5mm}{kernel/kernel.cmm}
   \begin{itemize}
   \item 割込み禁止による相互排除を行っている．
-  \item リンクの廃棄（削除）はできない．
-  \item セマフォを三つ割当てる．
+%  \item リンクの廃棄（削除）はできない．
+%  \item セマフォを三つ割当てる．
   \end{itemize}
 \end{frame}
 
 %=========================================================================
 \begin{frame}
   \frametitle{TacOSのメッセージ通信ルーチン（サーバ用）}
-  \lst{language={C++}}{tacosSendReceive.cmm}
+  \src{firstline=518,lastline=532,
+    numbers=left,xleftmargin=5mm}{kernel/kernel.cmm}
   \begin{itemize}
   \item {\tt receive()}はリンクにメッセージが届くのを待つ．
   \item {\tt receive()}はメッセージが書き込まれたリンクを返す．
@@ -215,7 +226,8 @@
 %=========================================================================
 \begin{frame}
   \frametitle{TacOSのメッセージ通信使用例（サーバ側）}
-  \lst{language={C++}}{tacosPmMain.cmm}
+  \src{firstline=286,lastline=294,
+    numbers=left,xleftmargin=5mm}{pm/pm.cmm}
   \begin{itemize}
   \item プロセスマネージャ（サーバプロセス）の例．
   \item サーバはリンクを作成した後，受信，処理，返信を繰り返す．
@@ -228,7 +240,8 @@
 %=========================================================================
 \begin{frame}
   \frametitle{TacOSのメッセージ通信ルーチン（クライアント用）}
-  \lst{language={C++}}{tacosSndRec.cmm}
+  \src{firstline=534,lastline=550,
+    numbers=left,xleftmargin=5mm}{kernel/kernel.cmm}
   \begin{itemize}
   \item {\tt iSemv()}を使用するので割込み禁止による相互排除が必要．
   \item クライアント間での相互排除にセマフォ{\tt s2}を使用．
@@ -238,7 +251,8 @@
 %=========================================================================
 \begin{frame}
   \frametitle{TacOSのメッセージ通信使用例（クライアント側）}
-  \lst{language={C++}}{tacosPmExec.cmm}
+  \src{firstline=302,lastline=305,
+    numbers=left,xleftmargin=5mm}{pm/pm.cmm}
   \begin{itemize}
   \item execシステムコールを例にする．
   \item execは{\tt path}のプログラムを新しいプロセスで実行する．

@@ -1,10 +1,10 @@
 %\documentclass[dvipdfmx]{beamer}
-\documentclass{beamer}                   % lualatex の場合
+\documentclass[unicode]{beamer}                   % lualatex の場合
 \usepackage{mySld}
 \newcommand{\inode}{\texttt{i-node}}
 \begin{document}
-\title[UNIX ファイルシステム]
-      {オペレーティングシステム\\第１７章 UNIX ファイルシステム}
+\title[ZFS]
+      {オペレーティングシステム\\第１７章 ZFS}
 \date{}
 \begin{frame}
   \titlepage
@@ -17,226 +17,444 @@
 %  \frametitle{}
 %\end{frame}
 
-\section{UNIX ファイルシステム}
+\section{ZFS}
 %=========================================================================
 \begin{frame}
-  \frametitle{UNIX ファイルシステム}
+  \frametitle{ZFSの特徴（１）}
+  2005年にサン・マイクロがOpenSolarisに実装して公開し，
+  オープンソースで開発が続いているファイルシステム．
+  FreeBSD，Linux等に移植されSolaris以外のOSでも使用できるようになっている．
+  大きな主記憶と，高速なマルチプロセッサシステムを前提に設計されている．
+
   \begin{itemize}
-  \item UFS（UNIX File System）
-  \item 1979年にリリースされたVersion 7 UNIX のファイルシステムと \\
-    それを改良した多くのファイルシステムを UFS と呼ぶ．
-  \item 第１５章で「UNIXの場合」＝「UFSの場合」だった．
-  \item 多くのファイルシステムがUFSに準拠している．
-    \begin{itemize}
-    \item Windows の NTFS
-    \item macOS の HFS+，APFS
-    \item Linux の ext3，ext4
-    \end{itemize}
+  \item \emph{COW（Copy On Write）}でデータやメタデータを
+    ハードディスク（以下ではデバイス）に書き込む．
+    デバイスのブロックを上書きすることが無い．
+  \item 一連の書き込み終了時点にUberblockを書き込むと変更が反映される．
+  \item Uberblockの書き込み前なら変更前の完全な状態，
+    Uberblockの書き込み後なら変更後の完全な状態になり，
+    変更途中の不完全な状態になることはない．
+  \item チェックサムにより高い信頼性が確保されている．
+    ファイルシステムのメタデータだけでなく，
+    全てのデータ（ブロック）のチェックサムが，
+    そのブロックを管理する1階層上のデータ構造に記録されている．（次ページの図）
   \end{itemize}
   \vfill
 \end{frame}
 
 %=========================================================================
 \begin{frame}
-  \frametitle{ボリューム内部の配置}
-  \fig{scale=1.0}{ufsVolume.pdf}
+  \frametitle{\inode 全ブロックにわたるチェックサム}
+  \fig{scale=0.5}{zfsCheckSum-crop.pdf}
   \begin{itemize}
-  \item セクタ512B，ブロック16セクタ，\inode 128B
-  \item \inode がファイルを表現する（\inode ＝ ファイル？）
+    \item ブロックポインタがチェックサムを持つ．
+    \item チェックサムの不整合が見つかった場合，
+      データの2重化（ミラー）がされていれば，
+      自動的にミラーからデータを修復する．
   \end{itemize}
   \vfill
 \end{frame}
 
 %=========================================================================
 \begin{frame}
-  \frametitle{\inode （index node）（１）}
-  \fig{scale=0.8}{ufsInodeAndDataBlock-crop.pdf}
-\end{frame}
-
-%=========================================================================
-\begin{frame}
-  \frametitle{\inode （index node）（２）}
+  \frametitle{ZFSの特徴（２）}
   \begin{itemize}
-  \item \emph{タイプ・モード}\\
-    \begin{itemize}
-    \item \texttt{type/sst/rwxrwxrwx}の16ビット
-    \item \texttt{type}：ファイル型（通常，ディレクトリ，シンボリックリンク等）
-    \item \texttt{ss}(Set-uid,Set-gid)：プログラムファイルを所有者の権限で実行
-    \item \texttt{t}：UNIXのバージョンによりさまざま
-    \item \texttt{rwxrwxrwx}：ファイルの保護モード
-    \end{itemize}
-  \item \emph{リンク数}：ハードリンク数
-  \item \emph{ファイルサイズ}：バイト単位
-  \item \emph{3つの時刻}\\
-    \begin{itemize}
-    \item 最終アクセス時刻
-    \item 変更時刻
-    \item \inode 変更時刻
-    \end{itemize}
-    時刻は，次の2つの32ビット整数で表現する．
-    \begin{itemize}
-    \item 1970年1月1日午前0時（UTC）からの経過秒数
-    \item 秒の小数点以下をナノ秒単位で表現
-    \end{itemize}
-  \end{itemize}
-\end{frame}
-
-%=========================================================================
-\begin{frame}
-  \frametitle{\inode （index node）（３）}
-  \begin{itemize}
-  \item \emph{直接ブロック} \\
-    \begin{itemize}
-    \item ファイル本体のデータ
-    \item $8KiB \times 12 = 96KiB$まで表現（ブロックサイズ8KiB時）
-    \item ファイルの第$0$バイト〜第$96Ki - 1$バイトまでを管理
-    \end{itemize}
-  \item \emph{1重間接ブロック}\\
-    \begin{itemize}
-    \item 直接ブロックだけでは表現できない大きなファイルに使用
-    \item 1重間接ブロックを用いてデータブロックの番号を格納
-    \item 1重間接ブロックに$8KiB \div 4B = 2Ki$個のブロック番号を格納
-    \item 2Ki個のデータブロックは$8KiB \times 2Ki = 16MiB$のデータを格納
-    \item 第$96Ki$バイト〜第$96KiB + 16MiB - 1$バイトの範囲を受け持つ
-    \end{itemize}
-  \item \emph{2重間接ブロック}\\
-    \begin{itemize}
-    \item 1重間接ブロックでも表現できない大きなファイルに使用
-    \item 2重間接ブロックは1重間接ブロックの番号を格納
-    \item 2重間接ブロックに$8KiB \div 4B = 2Ki$個のブロック番号を格納
-    \item 2Ki個の1重間接ブロックは$16MiB \times 2Ki = 32GiB$のデータを格納
-    \end{itemize}
+  \item \emph{スナップショット}や\emph{クローン}の作成が一瞬で完了する．
+    その後は COW の手法を使用し，
+    コピーとオリジナルに違いが出た時点で，
+    違いが出たブロックとそれの親だけのコピーが作られる．
+    デバイスの容量も無駄にならない．（前の図で最上位だけコピーするイメージ）
+  \item ボリュームの代わりにストレージプールと呼ばれる
+    ソフトウェアの層をデバイスとファイルシステムの間にはさんでいる．
+    （次々ページ）
+  \item ファイルサイズ等の制約が事実上無くなった．
+    ファイルサイズは最大$2^{64}$バイト，
+    ストレージプールサイズは最大$2^{70}$バイト（$Zetta = 2^{70}$ ）
+  \item ストレージプールは，
+    ミラーやRAID-Z等によりデバイスの故障に対する信頼性・可用性を向上する．
   \end{itemize}
   \vfill
-\end{frame}
-
-%=========================================================================
-\begin{frame}
-  \frametitle{\inode （index node）（４）}
-  \begin{itemize}
-  \item \emph{3重間接ブロック}\\
-    \begin{itemize}
-    \item 2重間接ブロックを2Ki個管理できる
-    \item 2Ki個の2重間接ブロックは$32GiB \times 2Ki = 64TiB$のデータを格納
-    \end{itemize}
-  \item \emph{所有者ID}：ファイル所有者のユーザ番号（マルチユーザ）
-  \item \emph{グループID}：ファイルのグループ番号
-  \end{itemize}
-  \vfill
-  \begin{description}
-  \item[インデクス方式]
-    \inode のような構造を使う方式のこと．\\
-    高速なランダムアクセスができる．
-  \item[スパースファイル]
-    途中に穴の空いたファイルのこと．\\
-    インデクス方式はスパースファイルを表現できる．
-  \end{description}
-\end{frame}
-
-%=========================================================================
-\begin{frame}
-  \frametitle{ディレクトリファイル}
-  \begin{itemize}
-  \item ファイルの一種である．→ \inode により表現
-  \item ファイルの型（\texttt{type}）がディレクトリを表す値のもの
-  \item ディレクトリファイルは\emph{ファイル名}と\inode の対応表
-  \item 対応表の１行がディレクトリエントリ
-  \end{itemize}
-  \fig{scale=1.0}{ufsDirEntry.pdf}
-  \begin{itemize}
-  \item \emph{\inode 番号}：ファイルの \inode 番号
-  \item \emph{$l_1$}：ディレクトリエントリの大きさ（4の倍数バイト）
-  \item \emph{型}：ファイルの型（抹消されたディレクトリエントリの表現）
-  \item \emph{$l_2$}：ファイル名のバイト数
-  \item \emph{ファイ名}：255文字以内
-  \item \emph{詰め物}：エントリが4の倍数バイトになるように
-  \end{itemize}
-\end{frame}
-
-%=========================================================================
-\begin{frame}
-  \frametitle{パス名と \inode の対応付け（\texttt{/etc/passwd}を解析）}
-  \fig{scale=0.8}{ufsSample-crop.pdf}
 \end{frame}
 
 %=========================================================================
 \begin{frame}[fragile]
-  \frametitle{パス名と \inode の対応付け（\texttt{/etc/passwd}を解析）}
+  \frametitle{従来の方式}
+  \fig{scale=0.6}{zfsVolume-crop.pdf}
+  \begin{itemize}
+  \item ファイルシステムの初期化以前にボリュームを決定し，
+  \item 後でサイズの変更などはできない．
+  \end{itemize}
+  \vfill
+\end{frame}
+  
+%=========================================================================
+\begin{frame}[fragile]
+  \frametitle{ストレージプール}
+  \fig{scale=0.6}{zfsPool-crop.pdf}
+  \begin{itemize}
+  \item ストレージプールは沢山のデバイスを収容する．
+  \item ZFSからの要求に応じてデータブロックを割り付ける．
+  \item C言語プログラムの\|malloc()|や\|free()|に似ている．
+  \item ストレージプールに後でデバイスを追加することも可能できる．
+  \end{itemize}
+  \vfill
+\end{frame}
+  
+%=========================================================================
+\begin{frame}
+  \frametitle{ZFSの特徴（３）}
+  \begin{itemize}
+  \item 仮想記憶のページキャッシュと統合されていない．
+  \item CPUやメモリの利用率が高い．
+    64ビットCPUでないとZFSに十分なメモリを提供できない．
+    （FreeNASでは最低8GiBのメモリ）
+  \end{itemize}
+  \vfill
+\end{frame}
+
+%=========================================================================
+\begin{frame}[fragile]
+  \frametitle{ZFSのソフトウェア構成（１）}
+  \fig{scale=0.45}{zfsSoftModule-crop.pdf}
   \begin{enumerate}
-  \item[(1)] 絶対パスなのでルートディレクトリから探索を開始する．\\
-    ルートディレクトリの\inode 番号は必ず2と決められている．
-  \item[(2)] ルートディレクトリの\inode から，
-    データブロック3にルートディレクトリの内容が格納されていることが分かる．
-  \item[(3)] データブロック3の3番目のエントリから，
-    \|etc|が12番の\inode に対応すると分かる．
-  \item[(4)] 12番目の\inode から\|etc|はディレクトリファイルであること，
-    内容がデータブロック123に格納されていることが分かる．
-  \item[(5)] データブロック123の3番目のエントリから，
-    \|passwd|が45番の\inode に対応することが分かる．
-  \item[(6)] 45番目の\inode から\|passwd|は普通のファイルであること，
-    ファイルの内容がデータブロック456に格納されていることが分かる．
+  \item[1.] システムコールは，OSカーネル本体がVNODE操作に変換する．
+  \item[2.] ZPLは VNODE 操作をZFSのトランザクションに変換する．
+    1つのシステムコールが1つのトランザクションに変換される．
+  \end{enumerate}  
+  \vfill
+\end{frame}
+
+%=========================================================================
+\begin{frame}[fragile]
+  \frametitle{ZFSのソフトウェア構成（２）}
+  \fig{scale=0.45}{zfsSoftModule-crop.pdf}
+  \begin{enumerate}
+  \item[3.] DMUは複数トランザクションを
+    \emph{トランザショングループ}にする．
+  \item[4.] SPAは，DMUがトランザクショングループをキャッシュに書込み終わると，
+    キャッシュの内容をデバイスに反映させる．
+  \end{enumerate}  
+  \vfill
+\end{frame}
+
+%=========================================================================
+\begin{frame}[fragile]
+  \frametitle{ZFSのソフトウェア構成（３）}
+  \fig{scale=0.45}{zfsTranscation-crop.pdf}
+  \begin{enumerate}
+  \item[3.] DMUは複数トランザクションを
+    \emph{トランザショングループ}にする．
+  \item[4.] SPAは，DMUがトランザクショングループをキャッシュに書込み終わると，
+    キャッシュの内容をデバイスに反映させる．（バースト）
+  \end{enumerate}  
+  \vfill
+\end{frame}
+
+%=========================================================================
+\begin{frame}[fragile]
+  \frametitle{ストレージプールの構造（概要）}
+  \centerline{
+  \begin{minipage}{0.45\columnwidth}
+    デバイス内部の構造
+    \fig{scale=0.6}{zfsDevice.pdf}
+  \end{minipage}
+  \begin{minipage}{0.45\columnwidth}
+    ボリュームラベル
+    \fig{scale=0.6}{zfsVolumeLabel.pdf}
+  \end{minipage}
+  }
+  \begin{itemize}
+  \item デバイス（ディスク）の4箇所に同じボリュームラベルを書く．
+  \item ボリュームラベルには128個のUberblockを格納できる．
+  \item Uberblockはトランザクショングループ番号を含んでいる．
+  \item Uberblockはトランザクショングループ番号を128で割った余りの位置に書く．
+  \end{itemize}
+  \vfill
+\end{frame}
+
+%=========================================================================
+\begin{frame}[fragile]
+  \frametitle{ストレージプールの更新（１）}
+  \fig{scale=0.45,clip,trim=0 290 0 0}{zfsCommit-crop.pdf}
+  \begin{enumerate}
+    \item[1.] Uberblock起点の木構造でブロックは記録されている．
+    \item[2.] 変更するには，新しいブロックを確保し内容を書き込む（COW）．
   \end{enumerate}
+  \vfill
+\end{frame}
+
+%=========================================================================
+\begin{frame}[fragile]
+  \frametitle{ストレージプールの更新（２）}
+  \fig{scale=0.45,clip,trim=0 0 0 288}{zfsCommit-crop.pdf}
+  \begin{enumerate}
+    \item[3.] メタデータブロックもCOWで更新する．
+    \item[4.] Uberblockを新しい領域に書き込む．\\
+      （トランザクショングループ番号が最新のUberblockが有効）\\
+      （古い世代のブロックは解放され，再利用される．）
+  \end{enumerate}
+  \vfill
+\end{frame}
+
+%=========================================================================
+\begin{frame}[fragile]
+  \frametitle{ブロックポインタ}
+  図中でブロックを指していた\emph{矢印}を表現するデータ構造を
+  \emph{ブロックポインタ}と呼ぶ．
+  ブロックポインタはデータ多重化のために最大３組のアドレスを記録できる．
+  ブロックポインタの内容は以下の通り．
+  \vfill
+  \begin{itemize}
+  \item \emph{サイズ}：ブロックの大きさに関する情報
+  \item \emph{チェックサム}（64ビット）：ブロックのチェックサム（最大３個）
+  \item \emph{ブロックのアドレス}：
+    ブロックのストレージプール内での格納位置に関する情報（最大３個）
+    （デバイス，デバイス内アドレス）
+  \item \emph{タイムスタンプ}：
+    ブロックを作成したトランザクショングループの番号
+    （ブロックが削除される時にスナップショットと比較）
+  \item \emph{その他}：チェックサム計算に使用するアルゴリズムの種類，
+    データ圧縮に使用するアルゴリズムの種類，圧縮後のサイズなど．．．
+  \end{itemize}
+  \vfill
+\end{frame}
+
+%=========================================================================
+\begin{frame}[fragile]
+  \frametitle{Dnode（１）}
+  ストレージプール内のあらゆるオブジェクトを表現する
+  512バイトのデータ構造である．
+  USFの\texttt{i-node}に似ているが，
+  ファイルやディレクトリだけでなく，ファイルシステムなども表現する．
+  \begin{minipage}{0.49\columnwidth}
+    \fig{scale=0.55}{zfsDnodeDirect-crop.pdf}
+    \centerline{(a) 直接の場合}
+  \end{minipage}
+  \begin{minipage}{0.49\columnwidth}
+    \fig{scale=0.55}{zfsDnodeIndirect-crop.pdf}
+    \centerline{(b) 間接の場合}
+  \end{minipage}
+  \vfill
+\end{frame}
+
+%=========================================================================
+\begin{frame}[fragile]
+  \frametitle{Dnode（２）}
+  \begin{minipage}{0.49\columnwidth}
+    \fig{scale=0.55}{zfsDnodeDirect-crop.pdf}
+    \centerline{(a) 直接の場合}
+  \end{minipage}
+  \begin{minipage}{0.49\columnwidth}
+    \fig{scale=0.55}{zfsDnodeIndirect-crop.pdf}
+    \centerline{(b) 間接の場合}
+  \end{minipage}
+  \begin{itemize}
+  \item dnodeは三つ以内のブロックポインタを格納することができる．
+  \item dnodeは表現するオブジェクトに応じたデータを格納する領域を持っている．
+    （この領域はブロックポインタと共用になっている）
+  \end{itemize}
+  \vfill
+\end{frame}
+
+%=========================================================================
+\begin{frame}[fragile]
+  \frametitle{Dnode（３）}
+  \begin{minipage}{0.49\columnwidth}
+    \fig{scale=0.55}{zfsDnodeDirect-crop.pdf}
+    \centerline{(a) 直接の場合}
+  \end{minipage}
+  \begin{minipage}{0.49\columnwidth}
+    \fig{scale=0.55}{zfsDnodeIndirect-crop.pdf}
+    \centerline{(b) 間接の場合}
+  \end{minipage}
+  \begin{itemize}
+  \item データの大きさが128KiB以内の場合は直接参照（図の(a)）
+  \item 大きさが128KiBを超える場合は間接ブロック（図の(b)）
+  \end{itemize}
+  \vfill
+\end{frame}
+
+%=========================================================================
+\begin{frame}[fragile]
+  \frametitle{Dnode（４）}
+  \begin{minipage}{0.49\columnwidth}
+    \fig{scale=0.55}{zfsDnodeDirect-crop.pdf}
+    \centerline{(a) 直接の場合}
+  \end{minipage}
+  \begin{minipage}{0.49\columnwidth}
+    \fig{scale=0.55}{zfsDnodeIndirect-crop.pdf}
+    \centerline{(b) 間接の場合}
+  \end{minipage}
+  \begin{itemize}
+  \item 128KiBの間接ブロックはブロックポインタを最大1Ki個格納できる．
+  \item $128KiB \times 1Ki = 128MiB$より大きなデーを表現する時は，
+    多重の間接ブロック（最大6レベル）を用いる．（$2^{64}$バイト以上）
+  \end{itemize}
+  \vfill
+\end{frame}
+
+%=========================================================================
+\begin{frame}[fragile]
+  \frametitle{ストレージプールの全体像}
+  \fig{scale=0.4}{zfsStructure-crop.pdf}
+  \vfill
+\end{frame}
+
+%=========================================================================
+\begin{frame}[fragile]
+  \frametitle{ストレージプールの全体像（MOS layer）}
+  \fig{scale=0.4,clip,trim=0 250 0 0}{zfsStructure-crop.pdf}
+  \begin{itemize}
+  \item Objsetはdnodeの配列を管理する．
+  \item 配列には，ストレージプールプール全体の管理に関する情報や，
+    ファイルシステムやスナップショット等の一覧が格納される．
+  \item master node はストレージプールのコンフィグ，プロパティなど．
+  \item space map はストレージプール内のブロックの割付を管理する．
+  \end{itemize}
+  \vfill
+\end{frame}
+
+%=========================================================================
+\begin{frame}[fragile]
+  \frametitle{ストレージプールの全体像（Object-set layer）}
+  \fig{scale=0.4,clip,trim=0 0 0 250}{zfsStructure-crop.pdf}
+  \begin{itemize}
+  \item ファイルシステムはObjsetのdnode配列で表現する．
+  \item dnodeリストがUFSの\texttt{i-node}リストに相当する．
+  \item master node は root ディレクトリの dnode 番号などの情報．
+  \item 図は，通常ファイルの例とディレクトリファイルの例
+  \end{itemize}
+  \vfill
+\end{frame}
+
+%=========================================================================
+\begin{frame}[fragile]
+  \frametitle{スナップショットの作成}
+  \fig{scale=0.4,clip,trim=0 0 0 200}{zfsSnapshot-crop.pdf}
+  \begin{itemize}
+  \item ファイルシステムを表すObjsetのコピーを作る．
+  \item MOS layer の dnode 配列に登録する．
+  \item スナップショットは一瞬で作成できる．
+  \item 変更がないデータブロックは共用する．
+  \item 内容が書き換わるとCOWで必要最小限のブロックのコピーを作る．
+  \end{itemize}
+  \vfill
+\end{frame}
+
+%=========================================================================
+\begin{frame}[fragile]
+  \frametitle{スナップショットとdeadlist}
+  \fig{scale=0.55}{zfsDeadlist1-crop.pdf}
+  \begin{itemize}
+    \item ファイルシステム（\|FileSystem|）は時間とともに変化する．
+    \item ある瞬間の状態を保存したものがスナップショット．
+    \item \|B#N|と続く線はブロックとブロックの寿命を表す．
+    \item \|Snapshot#N|はスナップショットを表す．
+    \item \|deadlist|は使用されなくなったが解放できないブロックのリスト
+  \end{itemize}
+  \vfill
+\end{frame}
+
+%=========================================================================
+\begin{frame}[fragile]
+  \frametitle{ブロックの解放（１）}
+  \fig{scale=0.55}{zfsDeadlist1-crop.pdf}
+  \begin{itemize}
+    \item \|B#1|は\|Snapshot#1|で使用されているので解放できない．
+    \item \|B#2|と\|B#3|もスナップショットで使用されているので解放できない．
+    \item \|B#4|はスナップショットで使用されていないので解放できる．
+    \item 解放できないブロックは\|deadlist|に格納される．
+  \end{itemize}
+  \vfill
+\end{frame}
+
+%=========================================================================
+\begin{frame}[fragile]
+  \frametitle{ブロックの解放（２）}
+  \fig{scale=0.55}{zfsDeadlist2-crop.pdf}
+  \begin{itemize}
+    \item \|Snapshot#2|を削除した状態．
+    \item \|B#1|と\|B#2|は\|Snapshot#1|で使用されているので解放できない．
+    \item \|B#3|は\|Snapshot#2|が削除されたので解放できる．
+    \item \|B#1|と\|B#2|は\|FileSystem|の\|deadlist|に格納される．
+  \end{itemize}
+  \vfill
+\end{frame}
+
+%=========================================================================
+\begin{frame}[fragile]
+  \frametitle{まとめ}
+  ZFSは大きな主記憶と高速なCPUを前提に設計されている．\\
+  以下の特徴を持つ．
+  \begin{itemize}
+  \item COW（Copy On Write）を用い既存のブロックを上書きしない．
+  \item COWのお蔭でシステムのクラッシュでも壊れない構造を実現．
+  \item デバイス上の全てのデータについてチェックサムを持つ．
+  \item スナップショットやクローンを一瞬で作ることができる．
+  \item ボリュームの代わりにストレージプールを使用する．
+  \item ストレージプールに後で新しいデバイスを追加可能．
+  \end{itemize}
   \vfill
 \end{frame}
 
 %=========================================================================
 \begin{frame}[fragile]
   \frametitle{練習問題（１）}
-  \begin{enumerate}
-  \item[1.] 次の言葉の意味を説明しなさい．
-    \begin{itemize}
-    \item ブートブロック
-    \item スーパーブロック
-    \item \inode
-    \item \inode リスト
-    \item インデクス方式
-    \item スパースファイル
-    \item ディレクトリファイル
-    \item ディレクトリエントリ
-    \item 直接ブロック
-    \item 間接ブロック
-    \end{itemize}
-  \end{enumerate}
+  次の言葉の意味を説明しなさい．
+  分からない言葉は調べなさい．
+  \begin{itemize}
+  \item COW（Copy On Write）
+  \item メタデータ
+  \item チェックサム
+  \item スナップショット
+  \item クローン
+  \item ボリューム
+  \item ストレージプール
+  \item ZPL（ZFS POSIX Layer）
+  \item DMU（Data Management Unit）
+  \item SPA（Storage Pool Allocator）
+  \item VNODE
+  \end{itemize}
+  \vfill
 \end{frame}
 
 %=========================================================================
 \begin{frame}[fragile]
   \frametitle{練習問題（２）}
-  \begin{enumerate}
-  \item[2.] ブロックサイズが8セクタ（4KiB）の場合，
-    直接ブロックだけ用いて表現できるファイルの最大サイズを答えなさい．
-  \item[3.] ブロックサイズが8セクタ（4KiB）の場合，
-    1重間接ブロックを用いることによって，
-    直接ブロックだけの場合と比較して，
-    ファイルサイズを最大でどれだけ大きくできるか答えなさい．
-  \item[4.] ブロックサイズが8セクタ（4KiB）の場合，
-    ２重間接ブロックを用いることによって，
-    直接ブロックと１重間接ブロックだけ使用する場合と比較して，
-    ファイルサイズを最大でどれだけ大きくできるか答えなさい．
-  \end{enumerate}
+  \begin{itemize}
+  \item Uberblock
+  \item ブロックポインタ
+  \item Dnode
+  \item MOS（Meta Object Set） layer
+  \item Object-set layer
+  \item space map
+  \item master node
+  \end{itemize}
+  \vfill
 \end{frame}
 
 %=========================================================================
 \begin{frame}[fragile]
   \frametitle{練習問題（３）}
-  \begin{enumerate}
-  \item[5.] 4ページの例がスパースファイルを表現しているとする．
-    また，ブロックサイズ等は「ボリューム内部の配置」で示したものと同じとする．
-    次のアドレスはデータブロックが割り当てられいるか答えなさい．
-    \begin{enumerate}
-    \item[(a)] 第\|0x00000000|バイト
-    \item[(b)] 第\|0x00001000|バイト
-    \item[(c)] 第\|0x00010000|バイト
-    \item[(d)] 第\|0x00100000|バイト
-    \item[(e)] 第\|0x01000000|バイト
-    \item[(f)] 第\|0x10000000|バイト
-    \end{enumerate}
-  \end{enumerate}
+  \begin{itemize}
+  \item トランザクショングループ番号は64ビットです．
+    毎秒100トランザクショングループを処理したとして，
+    トランザクショングループ番号がオーバーフローするまでに約何年かかるか
+    計算しなさい．
+  \item ZFSで使用できるチェックサム計算アルゴリズムについて調べなさい．
+  \item ファイルを表現するdnodeが間接レベル2の時，
+    最大のファイルサイズは何バイトになるか計算しなさい．
+  \item ブロックにリンクカウントを設け，
+    スナップショットからの参照数を管理することで，
+    ブロックの解放を判断するアイデアの利点と問題点を挙げなさい．
+  \end{itemize}
+  \vfill
 \end{frame}
 
 %=========================================================================
 %\begin{frame}[fragile]
 %  \frametitle{}
+%  \vfill
 %\end{frame}
 
 \end{document}

@@ -1,5 +1,5 @@
 %\documentclass[dvipdfmx]{beamer}
-\documentclass{beamer}                   % lualatex の場合
+\documentclass[unicode]{beamer}                   % lualatex の場合
 \usepackage{mySld}
 
 \begin{document}
@@ -50,12 +50,21 @@ CPU と同様に重要な装置
 %=========================================================================
 \begin{frame}
   \frametitle{本章で用いるモデル}
-  \fig{scale=0.40}{cpuAndMemory-crop.pdf}
-      {\bf MMU（Memory Management Unit：メモリ管理装置）}
-      \begin{itemize}
-      \item メモリ保護機構，メモリ再配置機構，仮想記憶
-      \item 仮想アドレス，物理アドレス
-      \end{itemize}
+  \begin{minipage}{0.49\columnwidth}
+    \fig{scale=0.40}{cpuMemory-crop.pdf}
+    \centerline{(a) 単純なモデル}
+  \end{minipage}
+  \begin{minipage}{0.49\columnwidth}
+    \fig{scale=0.40}{cpuMmuMemory-crop.pdf}
+    \centerline{(b) 仮想化が可能なモデル}
+  \end{minipage}
+  \vfill
+  {\bf MMU（Memory Management Unit：メモリ管理装置）}
+  \begin{itemize}
+  \item メモリ保護機構，メモリ再配置機構，仮想記憶
+  \item 仮想アドレス，物理アドレス
+  \end{itemize}
+  \vfill
 \end{frame}
 
 \section{メモリ保護機構}
@@ -80,7 +89,15 @@ CPU と同様に重要な装置
     \item プロセスのメモリアクセスはアドレスをチェックする（ハード）
     \item レジスタを操作できるのはカーネルだけ．
   \end{itemize}
-  \fig{scale=0.60}{baseLimitRegister-crop.pdf}
+  \begin{minipage}{0.49\columnwidth}
+    \fig{scale=0.60}{baseLimitAddrSpace-crop.pdf}
+    \centerline{(a) 物理アドレス空間}
+  \end{minipage}
+  \begin{minipage}{0.49\columnwidth}
+    \fig{scale=0.60}{baseLimitHardware-crop.pdf}
+    \centerline{(b) ハードウェア構成}
+  \end{minipage}
+  \vfill
 \end{frame}
 
 %=========================================================================
@@ -90,7 +107,15 @@ CPU と同様に重要な装置
     \item メモリをページに分割する（例：64KiBを256ページに）
     \item ページ毎に，アクセスしてよいプロセスとアクセス方法を記録
   \end{itemize}
-  \fig{scale=0.60}{lockKey-crop.pdf}
+  \begin{minipage}{0.49\columnwidth}
+    \fig{scale=0.60}{lockKeyAddrSpace-crop.pdf}
+    \centerline{(a) アドレス空間}
+  \end{minipage}
+  \begin{minipage}{0.49\columnwidth}
+    \fig{scale=0.60}{lockKeyHardware-crop.pdf}
+    \centerline{(b) ハードウェア構成}
+  \end{minipage}
+  \vfill
 \end{frame}
 
 \section{プログラムの再配置}
@@ -143,7 +168,15 @@ CPU と同様に重要な装置
     \item メモリ保護の機能も持つ．
     \item ロードアドレス（B:Base）と大きさ（L:Limit）を記録
   \end{itemize}
-  \fig{scale=0.60}{relocationRegister-crop.pdf}
+  \begin{minipage}{0.49\columnwidth}
+    \fig{scale=0.60}{relocationAddrSpace-crop.pdf}
+    \centerline{(a) 物理アドレス空間}
+  \end{minipage}
+  \begin{minipage}{0.49\columnwidth}
+    \fig{scale=0.60}{relocationHardware-crop.pdf}
+    \centerline{(b) ハードウェア構成}
+  \end{minipage}
+  \vfill
 \end{frame}
 
 \section{主記憶の仮想化}

@@ -1,9 +1,10 @@
 %\documentclass[dvipdfmx]{beamer}
-\documentclass{beamer}                   % lualatex の場合
+\documentclass[unicode]{beamer}                   % lualatex の場合
 \usepackage{mySld}
 
 \begin{document}
-\title[仮想記憶]{オペレーティングシステム\\第１３章 仮想記憶}
+\title[二次記憶装置]
+      {オペレーティングシステム\\第１３章 二次記憶装置（ストレージ）}
 \date{}
 \begin{frame}
   \titlepage
@@ -16,522 +17,311 @@
 %  \frametitle{}
 %\end{frame}
 
-\section{仮想記憶}
+\section{二次記憶装置}
 %=========================================================================
 \begin{frame}
-  \frametitle{基本概念}
-  ページングをベースに仮想記憶を実現する．
+  \frametitle{記憶装置の階層（１）}
+  \fig{scale=1.3}{memoryHierarchy.pdf}
   \begin{itemize}
-  \item システムの使用メモリ合計が物理メモリより大きい． → 実行可
-  \item 単一のプログラムがメモリより大きい。 → 実行可
-  \item ページテーブルのV=0を上手く使用する．
-  \item V=0のページにアクセスするとページ不在割込み → OSへ
-  \item プロセステーブルのV=0に二つの場合がある．
+  \item \emph{レジスタ}はCPUレジスタのこと．\\
+    容量は数十バイト程度，高速アクセスが可能，揮発性
+  \item \emph{主記憶（メモリ）} \\
+    アクセス時間は数ナノ秒〜十数ナノ秒程度\\
+    容量は数Giバイト〜数十Giバイト程度，揮発性
+  \item \emph{二次記憶装置} \\
+    ハードディスクやSSD（Solid State Drive）のこと．\\
+    アクセス時間は数ミリ秒〜数十ミリ秒（ハードディスク），不揮発性
+\end{itemize}
+\end{frame}
+
+%=========================================================================
+\begin{frame}
+  \frametitle{記憶装置の階層（２）}
+  夫々の特性に合った使い方をする．\\
+  \emph{二次記憶装置の特性}は次の通り．
+  \begin{itemize}
+  \item 大容量（ビット単価が安い）\\
+    オペレーティングシステム，アプリケーション，データなどの\\
+    全てを格納できる．
+  \item 不揮発性（電源を切っても消えない） \\
+    プログラムやデータの永続的な置き場所として適している．
+  \end{itemize}
+  \vfill
+\end{frame}
+
+%=========================================================================
+\begin{frame}
+  \frametitle{二次記憶装置の種類（１）}
+  \fig{scale=0.4}{hardBlock-crop.pdf}
+  \emph{接続方式}
+  \begin{itemize}
+  \item CPUからはホストコントローラを介してアクセスする．
+  \item 二次記憶装置はホストコントローラの先に接続される．
+  \item USBメモリスティックやポータブルハードディスクは取り外し可能.
+  \item 取り外し可能 => データ交換，バックアップ用途にも適する．
+  \end{itemize}
+\end{frame}
+
+%=========================================================================
+\begin{frame}
+  \frametitle{二次記憶装置の種類（２）}
+  \fig{scale=0.2}{magneticTape.jpg}
+  \emph{テープ型装置}
+  \begin{itemize}
+  \item データのバックアップや輸送用（ビット単価が安い）
+  \item \emph{シーケンシャルアクセス}専用
+  \item 読み出し位置まで進むために数分！！
+  \end{itemize}
+\end{frame}
+
+%=========================================================================
+\begin{frame}
+  \frametitle{二次記憶装置の種類（３）}
+  \fig{scale=0.2}{hardDisk.jpg}
+  \emph{ディスク型装置}
+  \begin{itemize}
+  \item \emph{ランダムアクセス}が可能
+  \item ハードディスクのこと（CD-ROMなどの光ディスクも仲間）
+  \item SSD，USBメモリ，その他メモリカードも仲間
+  \end{itemize}
+\end{frame}
+
+%=========================================================================
+\begin{frame}
+  \frametitle{ハードディスク（１）}
+  \fig{scale=0.2}{hardDisk.jpg}
+  \begin{itemize}
+  \item システムの起動ドライブ（OS，アプリ，データ全てが置かれる）
+  \item 仮想記憶のバックストレージとしても使用される．
+  \item ハードディスク管理が，OSの性能や使い勝手を左右する．
+  \item ファイル管理機構はハードディスクを前提にしていることが多い
+  \end{itemize}
+\end{frame}
+
+%=========================================================================
+\begin{frame}
+  \frametitle{ハードディスク（２）}
+  \fig{scale=0.2}{hardDisk.jpg}
+  \emph{セクタ・トラック・シリンダ}
+  \begin{itemize}
+  \item 同心円の\emph{トラック（Track）}
+  \item トラックを区切った\emph{セクタ（Sector）}
+  \item トラックをまとめた\emph{シリンダ（Cylinder）}
+  \end{itemize}
+\end{frame}
+
+%=========================================================================
+\begin{frame}
+  \frametitle{ハードディスク（３）}
+  \emph{セクタのアドレッシング}\\
+  512バイト（4KiB）のセクタのアドレス付け方法
+  \begin{itemize}
+  \item \emph{CHS（Cylinder Head Sector）}方式
     \begin{itemize}
-      \item[1.] 無効な領域 → プロセス終了
-      \item[2.] \emph{バッキングストア}に退避中 → 復旧して再開
-    \end{itemize}
-  \item プロセス生成時にバッキングストアにプロセスのイメージを作る．
-  \item Windows，macOS，Linux等，現代のOSのほとんどが採用している．
+    \item Cylinder Head Sector の三次元アドレス．
+    \item Head は Track と同じ意味．
+    \item CHSはPCの世界で使用されてきた用語．
+    \item ハードディスクの物理的な構造通りのアドレッシング．
+    \item 過去，長く使われてきた方式．
   \end{itemize}
-\end{frame}
-
-%=========================================================================
-\begin{frame}
-  \frametitle{仮想記憶の基本}
-  \fig{scale=0.45}{virtualMemoryBasic-crop.pdf}
-\end{frame}
-
-%=========================================================================
-\begin{frame}
-  \frametitle{デマンドページング（Demand Paging）}
-  \fig{scale=0.45}{virtualMemoryWithZMagic-crop.pdf}
-  \begin{itemize}
-  \item ページをswap-inするための方式の一つ．
-  \item 全てのページが不在の状態からスタートする．
-  \item ページ不在を起こしたページをswap-inする．\\
-    （使用しないページを読み込むような無駄が無い）
-  \end{itemize}
-\end{frame}
-
-%=========================================================================
-\begin{frame}
-  \frametitle{プログラムファイルの直接swap-inによる実行}
-  \fig{scale=0.45}{virtualMemoryWithZMagic-crop.pdf}
-  \begin{itemize}
-  \item デマンドページング用の実行可能形式ファイルを用いる．\\
-    （このファイルはページサイズを意識した構造になっている）
-  \item プログラムはファイルからswap-inする（R-Xに設定）．
-  \item 初期化データはファイルからswap-inする（RW-に設定）．
-  \item 非初期化データ，ヒープ，スタックはゼロにする（RW-に設定）．
-  \end{itemize}
-\end{frame}
-
-%=========================================================================
-\begin{frame}
-  \frametitle{プログラムのswap-out}
-  \fig{scale=0.45}{virtualMemoryWithZMagic-crop.pdf}
-  \begin{itemize}
-  \item フレームが枯渇したら使用頻度の低いフレームを解放し再利用する．
-  \item プログラム（R-X）は変化しないのでswap-outしない．
-  \item 初期化データ（RW-）はバッキングストアにswap-outする．
-  \item 非初期化データ，ヒープ，スタックもswap-outする．
-  \end{itemize}
-\end{frame}
-
-%=========================================================================
-\begin{frame}
-  \frametitle{Copy on Write（１）}
-  \fig{scale=0.40}{virtualMemoryFork-crop.pdf}
-  \begin{itemize}
-  \item fork-exec ではアドレス空間のコピーに無駄が多い． → vfork
-  \item vforkは使いにくい．使いやすいforkを改良する．
-  \item forkの後，書き込み可能ページを一時的に\texttt{R--}に設定しておく．
-  \end{itemize}
-\end{frame}
-
-%=========================================================================
-\begin{frame}
-  \frametitle{Copy on Write（２）}
-  \fig{scale=0.40}{virtualMemoryCOW-crop.pdf}
-  \begin{itemize}
-  \item 例えばスタックに\emph{書き込み}があるとメモリ保護割込みが発生する．
-  \item この時点でOSが新しいフレームを割当て，内容を\emph{コピー}する．
-  \item ページを\texttt{RW-}に変更しプロセスを再開する．
-  \end{itemize}
-\end{frame}
-
-%=========================================================================
-\begin{frame}
-  \frametitle{メモリマップドファイル（１）}
-  \fig{scale=0.45}{virtualMemoryWithMmap-crop.pdf}
-  \begin{itemize}
-  \item 仮想記憶機構を用いたファイルへのアクセス手段である．
-  \item プロセスはメモリ上の配列のようにファイルにアクセスできる．
-  \item ファイルアクセスで，一々システムコールを使用しない．\\
-    （軽いファイルアクセス手段）
-  \item 同じファイルを複数プロセスがマッピング → 共有メモリになる．
-  \end{itemize}
-\end{frame}
-
-%=========================================================================
-\begin{frame}[fragile]
-  \frametitle{メモリマップドファイル（２）}
-  UNIX のメモリマップドファイルの例（mmapシステムコール）
-
-\begin{lstlisting}[numbers=none]
-void * mmap(void *addr, size_t len, int prot, int flags, int fd, off_t offset);
-\end{lstlisting}
-
-  \begin{description}
-  \item[\emph{戻り値}：] マップされた領域の先頭アドレスが返される．
-  \item[\texttt{addr}：] マップしたい仮想アドレス空間の先頭アドレスを渡す．
-  \item[\texttt{len}：] マップする領域の大きさを渡す．
-  \item[\texttt{prot}：] 保護モード（protection：RWX）を表す値を渡す．
-  \item[\texttt{flags}：]共用する（\|MAP_SHARED|）／
-    しない（\|MAP_PRIVATE|）等
-  \item[\texttt{fd}：] オープン済みファイルのファイルディスクリプタを渡す．
-  \item[\texttt{offset}：] ファイル中のマッピング位置．
-  \end{description}
-
-  アドレスや長さはページサイズの整数倍にする．
-\end{frame}
-
-%=========================================================================
-\begin{frame}
-  \frametitle{メモリマップドファイル（３）}
-  \lst{numbers=none}{mmapTest.c}
-\end{frame}
-
-%=========================================================================
-\begin{frame}
-  \frametitle{メモリマップドファイル（４）}
-  メモリマップドファイルの仕組み
-  \fig{scale=0.45}{virtualMemoryWithMmap-crop.pdf}
-  \begin{itemize}
-  \item ファイルの読み込みはデマンドページングの要領で行う．
-  \item ファイルの書き込みは
+  \item \emph{LBA（Logical Block Addressing）}
     \begin{itemize}
-      \item Dirty ページを定期的にファイルに書き戻す．
-      \item プロセスの終了やマッピングの解消時に書き戻す．
+    \item セクタの通し番号（一次元）を用いる．
+    \item ハードディスクブラックボックス化（物理構造通が不明）
+    \item CHSは煩雑なだけでメリットがなくなった．
     \end{itemize}
   \end{itemize}
 \end{frame}
 
 %=========================================================================
 \begin{frame}
-  \frametitle{メモリマップドファイル（５）}
-  read/writeシステムコールとの比較
-  \fig{scale=0.45}{mmapVsReadWrite-crop.pdf}
+  \frametitle{フォーマッティング（１）}
+  \emph{ハードディスクの初期化の例}
   \begin{itemize}
-  \item ファイルを操作する度にシステムコールを発行する．\\
-    （システムコールは重い処理）
-  \item ディスクキャッシュとプログラムのバッファ間でメモリコピー\\
-    （メモリコピーは重い処理）
+    \item[1.] 低レベル（物理）フォーマット \\
+      ディスクの表面に磁気的にトラックを書き込む．
+    \item[2.] \emph{パーティション}（区画）に分割 \\
+      \begin{itemize}
+      \item 装置全体を一つの\emph{ボリューム} => 大きすぎる
+      \item 区画に分割し区画をボリュームとして扱う => \\
+        オペレーティングシステムのパーティション \\
+        ユーザデータのパーティション => ここだけバックアップ
+      \item 複数のオペレーティングシステムをインストール
+        第１パーティション（ボリューム）にWindows \\
+        第２パーティション（ボリューム）にLinux \\
+        第３パーティション（ボリューム）にFreeBSD
+      \end{itemize}
+    \item[3.] 高レベル（論理）フォーマット \\
+      各ボリュームの内部に該当オペレーティングシステムの \\
+      空のファイルシステムを作る．
   \end{itemize}
 \end{frame}
 
 %=========================================================================
-\begin{frame}[fragile]
-  \frametitle{メモリマップドファイル（６）}
-  プロセスにローカルなマッピング
-  \fig{scale=0.45}{virtualMemoryWithPrivateMap-crop.pdf}
+\begin{frame}
+  \frametitle{フォーマッティング（２）}
+  \emph{PC用ハードディスクのパーティションの例}
+  \fig{scale=0.8}{hddPartition.pdf}
   \begin{itemize}
-  \item これまでは\|MAP_SHARED|の例だった．
-  \item \|MAP_PRIVATE|の例を紹介する．
-  \item 最初は「ファイルデータ１」のように共有される（\texttt{R--}）．
-  \item 書き換えが発生した時点でコピーを作る（Copy on Write）．
-  \item 「ファイルデータ２」のようにプロセスは別々のコピーを参照する．
+  \item \emph{MBR（Master Boot Record）} \\
+    \begin{itemize}
+    \item ハードディスクの先頭セクタ（LBA0）に格納
+    \item MBRのサイズは512バイト
+    \item 内容は\emph{ブートプログラム}と\emph{パーティションテーブル}
+    \end{itemize}
   \end{itemize}
 \end{frame}
 
 %=========================================================================
-\begin{frame}[fragile]
-  \frametitle{メモリマップドファイル（７）}
-  無名メモリ
-  \fig{scale=0.45}{virtualMemoryWithAnonymousMap-crop.pdf}
+\begin{frame}
+  \frametitle{フォーマッティング（３）}
+  \emph{PC用ハードディスクのMBRの内容}
+  \fig{scale=0.8}{masterBootRecord.pdf}
   \begin{itemize}
-  \item ファイルに関連付けられないがメモリ領域．
-  \item \|MAP_ANON|フラグを用いる．
-  \item アクセスがあった時点で作成される（デマンドページング）．
-  \item ページの初期値は\emph{ゼロ}．
+  \item \emph{MBR（Master Boot Record）（512バイト）} \\
+    \begin{itemize}
+    \item ブートプログラム（446バイト） \\
+      PCの機械語プログラム（OSを起動するためのプログラム）
+    \item パーティションテーブル（64バイト） \\
+      各パーティションの位置と大きさ等を記録する４業の表 \\
+    \item シグネチャ（2バイト） \\
+      フォーマッティングされている目印（\texttt{55H，AAH}）
+    \end{itemize}
   \end{itemize}
 \end{frame}
 
 %=========================================================================
-\begin{frame}[fragile]
-  \frametitle{メモリマップドファイル（８）}
-  プログラムの実行とメモリマップドファイル
-  \fig{scale=0.40}{virtualMemoryWithZMagic-crop.pdf}
+\begin{frame}
+  \frametitle{フォーマッティング（４）}
+  \emph{PC用ハードディスクのパーティションテーブルの例}
+  \fig{scale=1.0}{partitionTable.pdf}
+  \begin{center}
+    \begin{minipage}{0.64\columnwidth}
+      \tbl{scale=0.8}{partitionTableEntry.pdf}
+    \end{minipage}
+    \begin{minipage}{0.34\columnwidth}
+      \tbl{scale=0.8}{partitionTableType.pdf}
+    \end{minipage}
+  \end{center}
+\end{frame}
+
+%=========================================================================
+\begin{frame}
+  \frametitle{ブートストラップ（１）}
+  \emph{PCの場合を例にブートストラップを説明する．}
   \begin{itemize}
-  \item 実行形式ファイルをメモリにマッピングする．
-  \item プログラムは，\|R-X|，\|MAP_SHARED/PRIVATE|でマッピングする．\\
-    （プログラムはプロセス間で共用される）
-  \item 初期化データは，\|RW-|，\|MAP_PRIVATE|でマッピングする．
-  \item 非初期化データ，ヒープ，スタックは無名メモリ（\|RW-|，\|MAP_ANON|）
+  \item ハードディスクからOSを起動する作業のこと．
+  \item OSのカーネルを格納したファイルを見つけてロード・実行する．
+  \item PCの製造時にはどんなOSがインストールされるか分からない． \\
+    => ブートストラップは後で変更できる必要がある．
+  \item 以下に説明する段階を経てOSをブートする．
+  \item 以下の方法がPCでは標準的であるが様々な変種がある．\\
+    （段階が多い場合，強力なブートマネージャを備えている場合）
   \end{itemize}
 \end{frame}
 
 %=========================================================================
-\begin{frame}[fragile]
-  \frametitle{ページ置換えアルゴリズム}
-  ページングによる仮想記憶で重要な三つのアルゴリズム
+\begin{frame}
+  \frametitle{ブートストラップ（２）}
+  \emph{ハードディスク ＝ ボリュームの場合}
+  \fig{scale=0.55}{bootstrapSequence-crop.pdf}
+  \begin{itemize}
+  \item \emph{IPL（Initial Program Loader）} \\
+    \small{PCのROMに格納されており電源ONと同時に動作開始}
+  \item ブートローダ（第１段階：Loader1）\emph{512バイト以内} \\
+    \small{LBA0に格納されIPLによってロード・実行される．}
+  \item ブートローダ（第２段階：Loader2） \\
+    \small{ディスク上のどこか連続セクタに格納されLoader1がロード・実行．\\
+      サイズに制限がない => 高機能にできる．}
+  \item OSのカーネル \\
+    \small{ファイルシステムにファイルとして格納されLoader2がロード・実行．}
+  \end{itemize}
+\end{frame}
+
+%=========================================================================
+\begin{frame}
+  \frametitle{ブートストラップ（３）}
+  \emph{パーティション ＝ ボリュームの場合}
+  \fig{scale=0.55}{bootstrapSequenceMulti-crop.pdf}
+  \begin{itemize}
+  \item \emph{IPL（Initial Program Loader）}
+  \item ブートセレクタ・ブートマネージャ（Boot）\emph{446バイト以内} \\
+    \small{LBA0（MBR）に格納されIPLによってロード・実行される．\\
+    メニューを表示してユーザにOSのパーティションを選択させる．\\
+    （勝手に次に進むものもある．）}
+  \item ブートローダ（第１段階：Loader1）\emph{512バイト以内} 
+  \item ブートローダ（第２段階：Loader2）
+  \item OSのカーネル
+  \end{itemize}
+\end{frame}
+
+%=========================================================================
+\begin{frame}
+  \frametitle{練習問題（１）}
   \begin{enumerate}
-  \item[1.]\emph{ページ読み込みアルゴリズム} ：
-    いつページをswap-inするか決める．
-    普通は，既に学んだデマンドページングを用いる．
-  \item[2.] \emph{ページ置き換えアルゴリズム} ：
-    フレーム不足時に，どのページを再利用するか決める．
-  \item[3.] \emph{フレーム割付けアルゴリズム} ：
-    どのフレームを使用するか決める．
-  \end{enumerate}
-  \vfill
-  ページ置き換えアルゴリズムが，
-  将来，使用されないフレームをうまく選択しないと，
-  swap-outしたページが直後にswap-inされることになり，
-  システムの性能が著しく低下する．
-\end{frame}
-
-%=========================================================================
-\begin{frame}
-  \frametitle{局所性・ワーキングセット・フェーズ化（１）}
-  \fig{scale=0.48}{locality-crop.pdf}
-  \begin{description}
-  \item[局所性]
-    短い時間に着目すると，
-    一部の連続したページが集中的にアクセスされる．
-    →　\emph{空間的局所性}\\
-    あるページに着目すると一部の連続した時刻にアクセスが集中している．
-    → \emph{時間的局所性}
-  \end{description}
-\end{frame}
-
-%=========================================================================
-\begin{frame}
-  \frametitle{局所性・ワーキングセット・フェーズ化（２）}
-  \fig{scale=0.48}{locality-crop.pdf}
-  \begin{description}
-  \item[ワーキングセット]
-    ある時間にアクセスされるページの集合のこと．\\
-    メモリに入り切らなくなると急激に性能が低下する．\\
-    → \emph{スラッシング}
-  \end{description}
-\end{frame}
-
-%=========================================================================
-\begin{frame}
-  \frametitle{局所性・ワーキングセット・フェーズ化（３）}
-  \fig{scale=0.48}{locality-crop.pdf}
-  \begin{description}
-  \item[フェーズ化現象]
-    ワーキングセットが急激に変化する現象のこと．\\
-    「入力フェーズ」，「計算フェーズ」，「出力フェーズ」 \\
-    フェーズ遷移時は局所性が失われる → ページ不在集中
-\end{description}
-\end{frame}
-
-%=========================================================================
-\begin{frame}
-  \frametitle{LRU（Least Recentry Used）アルゴリズム（１）}
-  仮定：最近アクセスされていないページは，この先，アクセスされない．\\
-  （時間的局所性があるなら最良な方法．）
-  \fig{scale=0.43}{pagingLRU-crop.pdf}
-  \begin{enumerate}
-  \item[1.] メモリアクセス毎にページテーブルにカウンタの値を書く．
-  \item[2.] ページテーブルをスキャンし最も古いページを見つける．
-  \item[3.] 見つけたページをswap-outし目的のページをswap-inする．（置換え）
-  \end{enumerate}
-\end{frame}
-
-%=========================================================================
-\begin{frame}
-  \frametitle{LRU（Least Recentry Used）アルゴリズム（２）}
-  \fig{scale=0.43}{pagingLRU-crop.pdf}
-  問題点（LRUの完全な実装は困難と言われている）\\
-  \begin{enumerate}
-  \item[1.] ハードウェアのコスト
-  \item[2.] ページ不在時の処理の重さ．（ページ不在は頻繁に発生）
-  \end{enumerate}
-  macOSのvm\_statで調べると毎秒数千回のページ不在！！
-\end{frame}
-
-%=========================================================================
-\begin{frame}
-  \frametitle{LFU（Least Frequently Used）アルゴリズム}
-  NFU（Not Frequently Used）とも呼ばれる．
-  \begin{itemize}
-  \item LRUの近似方式の一種である．
-  \item ページテーブルのRビットを使用．
-  \item フレーム毎にカウンタを準備．
-  \item 特別なハードウェアは不要．
-  \end{itemize}
-  \vfill
-  \emph{アルゴリズム}
-  \begin{enumerate}
-  \item[1.] Rビットとフレームのカウンタをゼロにクリアする．
-  \item[2.] 定期的（例えばTICK=20ms毎）にページテーブルをスキャンする．
-    R=1のエントリを見つけたら対応するフレームのカウンタをインクリメントし，
-    Rをゼロにクリアする．
-  \item[3.] ページ不在時にフレームが不足したなら，
-    カウンタの値が最小のフレームを置き換える．
+  \item[1.] 次の言葉の意味を説明しなさい．
+    \begin{itemize}
+    \item 二次記憶装置
+    \item 揮発性・不揮発性
+    \item 記憶の階層
+    \item テープ型装置・ディスク型装置
+    \item シーケンシャルアクセス・ランダムアクセス
+    \item セクタ・トラック・シリンダ
+    \item CHS・LBA
+    \item ボリューム
+    \item パーティション
+    \item MBR
+    \item IPL
+    \item ブートストラップ
+    \end{itemize}
   \end{enumerate}
 \end{frame}
 
 %=========================================================================
 \begin{frame}
-  \frametitle{エージングアルゴリズム}
-  LFU（Least Frequently Used）アルゴリズムの改良\\
-  \vfill
-  \emph{LFUの問題点}\\
-  一度カウンタの値が大きくなると，
-  使用されなくなっても置き換えが起こらない．
-  \vfill
-  \emph{LFUの改良}\\
-  定期的にページテーブルをスキャンする際の
-  カウンタの更新方法を次のように改良する．
-  \begin{description}
-  \item[R=1のフレーム]
-    $cnt \leftarrow cnt \div 2 + 0x8000$（カウンタは16bitと仮定）
-  \item[R=0のフレーム]
-    $cnt \leftarrow cnt \div 2$
-  \end{description}
-  この改良により，過去のRビットの影響が徐々に小さくなる．
-\end{frame}
-
-%=========================================================================
-\begin{frame}
-  \frametitle{FIFO（First-In First-Out）アルゴリズム}
-  仮定：「長くメモリに滞在しているページは役割を終えている」\\
-  特別なハードウェアを用いることなく，ソフトウェアだけで実現できる．
-  \fig{scale=0.6}{pagingFIFO-crop.pdf}
-  \vfill
-  \emph{アルゴリズム}
+  \frametitle{練習問題（２）}
   \begin{enumerate}
-  \item[1.] swap-in したフレームをリストの最後に追加する．
-  \item[2.] フレームが不足時は，リストの先頭のフレームを置き換える．
-  \end{enumerate}
-  \vfill
-  ページテーブルのスキャンが不要なので非常に軽い．\\
-  常時使用されるページも時間が経過するとswap-outされる問題がある．\\
-  \emph{Beladyの異常な振る舞い}をすることがある．
-\end{frame}
-
-%=========================================================================
-\begin{frame}
-  \frametitle{Beladyの異常な振る舞いの例}
-  \vfill
-  FIFOアルゴリズムを用い，\\
-  ページ参照ストリング（W : 1 2 3 4 1 2 5 1 2 3 4 5）の場合
-  \begin{itemize}
-  \item フレーム数（m=3）の場合（ページ不在9回）\\
-    \tbl{scale=1.0}{beladyAnomalyM3.pdf}
-  \item フレーム数（m=4）の場合（ページ不在10回）\\
-    \tbl{scale=1.0}{beladyAnomalyM4.pdf}
-  \end{itemize}
-  メモリが多い方（m=4）のページ不在回数が多い．
-  \vfill
-\end{frame}
-
-%=========================================================================
-\begin{frame}
-  \frametitle{Clock アルゴリズム}
-  環状リストを用いる．Rビットも使用する．
-
-  \fig{scale=0.55}{pagingClock-crop.pdf}
-
-  \begin{enumerate}
-  \item[1.] swap-inする度にフレームを環状リストに挿入していく．
-  \item[2.] 定期的（例えばTICK=20ms毎）にRビットをクリアする．
-  \item[3.] 時計の針が指しているフレームのRビットを調べる．
-    \begin{description}
-    \item[R=0の場合]
-      ページは古い＋最近アクセスされていない．→ 置換え
-    \item[R=1の場合]
-      ページは最近アクセスされている．→ 針を進める
-    \end{description}
-    最悪でも時計の針が一周回るとR=0のページが見つかる．
+  \item[2.] 次のディスクに付いて答えなさい．
+    \begin{quote}
+      \begin{tabular}{l l}
+        1台全体   & 1,024シリンダ  \\
+        1シリンダ & 8トラック      \\
+        1トラック & 128セクタ      \\
+        1セクタ   & 512バイト
+      \end{tabular}
+    \end{quote}
+    \begin{itemize}
+    \item ディスクの容量をセクタ単位で答えなさい．
+    \item ディスクの容量をバイト単位で答えなさい．
+    \item 最後のセクタのアドレスをLBAで答えなさい．
+    \item 最後のセクタのアドレスをCHSで答えなさい．\\
+      （但し，C：0以上，H：0以上，S：1以上である．）
+    \end{itemize}
   \end{enumerate}
 \end{frame}
 
 %=========================================================================
 \begin{frame}
-  \frametitle{WSClock アルゴリズム（１）}
-
-  \fig{scale=0.55}{pagingWSClock-crop.pdf}
-
-  \begin{itemize}
-  \item ワーキングセットを考慮したClockアルゴリズムである．
-  \item 単純でパフォーマンスが良いので広く使用されている．
-  \item アクセス時刻を記録した環状リストに用いる．
-  \end{itemize}
-
-\end{frame}
-
-%=========================================================================
-\begin{frame}
-  \frametitle{WSClock アルゴリズム（２）}
-
-  \fig{scale=0.55}{pagingWSClock-crop.pdf}
-
-  \begin{itemize}
-  \item 時刻が古くなっているフレームはワーキングセット外と判断．
-  \item ページテーブルのRビットとDビットも使用する．
-  \end{itemize}
-\end{frame}
-
-%=========================================================================
-\begin{frame}
-  \frametitle{WSClock アルゴリズム（３）}
-
-  \fig{scale=0.55}{pagingWSClock-crop.pdf}
-
+  \frametitle{練習問題（３）}
   \begin{enumerate}
-  \item[1.] swap-inする度にフレームを環状リストに挿入していく．
-  \item[2.] 定期的に全テーブルエントリのRビットをクリアする．\\
-    その際，R=1だったフレームだけに現在時刻を記録する．
+  \item[3.] 例示したパーティションテーブルに付いて答えなさい．
+    \begin{itemize}
+    \item 第1パーティションの位置をLBAで答えなさい．
+    \item 第1パーティションのサイズをセクタ数で答えなさい．
+    \item 第1パーティションの種類を答えなさい．
+    \item 第2パーティションの位置をLBAで答えなさい．
+    \item 第2パーティションのサイズをセクタ数で答えなさい．
+    \item 第2パーティションの種類を答えなさい．
+    \end{itemize}
+    \vfill
+  \item[4.] PC用の高機能なブートローダGRUBについて調査しなさい．
+    \vfill
   \end{enumerate}
-\end{frame}
-
-%=========================================================================
-\begin{frame}
-  \frametitle{WSClock アルゴリズム（４）}
-
-  \fig{scale=0.55}{pagingWSClock-crop.pdf}
-
-  \begin{enumerate}
-  \item[3.] フレーム不足なら時計の針のフレームを調べる．
-    \begin{description}
-    \item[R=1の場合]
-      Rビットをクリアして次のフレームに進む．
-    \item[時刻が新しい場合]
-      次のフレームに進む．
-    \item[時刻が古い場合]
-      ページはワーキングセットに含まれていない．\\
-      \emph{ページの置換え処理}を行う．
-    \end{description}
-  \end{enumerate}
-\end{frame}
-
-%=========================================================================
-\begin{frame}
-  \frametitle{WSClock アルゴリズム（５）}
-
-  \fig{scale=0.55}{pagingWSClock-crop.pdf}
-
-  \begin{enumerate}
-  \item[3.] フレーム不足なら時計の針のフレームを調べる．
-    \begin{description}
-    \item[時刻が古い場合] \emph{ページの置換え処理}を行う．
-      \begin{description}
-      \item[D=1の場合]
-        swap-outを予約し次のフレームに進む．
-      \item[D=0の場合]
-        このフレームを置き換える．
-      \end{description}
-    \end{description}
-  \end{enumerate}
-\end{frame}
-
-%=========================================================================
-\begin{frame}
-  \frametitle{フレーム割付方式（１）}
-  \fig{scale=0.41}{hardBlock-crop.pdf}
-  \begin{itemize}
-  \item フレームはどれも均質
-  \item SMPシステムであってもそうである．
-  \end{itemize}
-\end{frame}
-
-%=========================================================================
-\begin{frame}
-  \frametitle{フレーム割付方式（２）}
-  \fig{scale=0.3}{intelServer-crop.pdf}
-  \begin{itemize}
-  \item 近年のサーバ用SMPでは均質ではない．
-  \item メモリとCPUからなるノードを相互接続している．
-  \item 自ノードと他ノードでメモリアクセス時間が異なる．
-  \item このことを考慮したフレーム割付とCPUスケジューリングが必要．
-  \end{itemize}
 \end{frame}
 
 %=========================================================================
 %\begin{frame}
 %  \frametitle{}
 %\end{frame}
-
-%=========================================================================
-\begin{frame}
-  \frametitle{練習問題}
-  \begin{enumerate}
-  \item[1.] 次の言葉の意味を説明しなさい．
-    \begin{itemize}
-    \item 仮想記憶
-    \item デマンドページング
-    \item swap-in，swap-out
-    \item Copy on Write
-    \item メモリマップドファイル
-    \item 局所性
-    \item ワーキングセット
-    \item フェーズ化
-    \item スラッシング
-    \item ページ読み込みアルゴリズム
-    \item ページ置き換えアルゴリズム
-    \item ページ割付けアルゴリズム
-    \item Beladyの異常な振る舞い
-    \end{itemize}
-  \end{enumerate}
-\end{frame}
-
-%=========================================================================
-\begin{frame}
-  \frametitle{練習問題}
-  \begin{enumerate}
-  \item[2.] 「Beladyの異常な振る舞いの例」で示した
-    ページ参照ストリングとフレーム数を用い，
-    他のページ置き換えアルゴリズムを適用した場合をトレースしなさい．
-  \end{enumerate}
-  \vfill
-  \vfill
-\end{frame}
 
 \end{document}

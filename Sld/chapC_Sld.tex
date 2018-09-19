@@ -1,10 +1,9 @@
 %\documentclass[dvipdfmx]{beamer}
-\documentclass{beamer}                   % lualatex の場合
+\documentclass[unicode]{beamer}                   % lualatex の場合
 \usepackage{mySld}
 
 \begin{document}
-\title[ページング]
-      {オペレーティングシステム\\第１２章 ページング}
+\title[仮想記憶]{オペレーティングシステム\\第１２章 仮想記憶}
 \date{}
 \begin{frame}
   \titlepage
@@ -17,386 +16,522 @@
 %  \frametitle{}
 %\end{frame}
 
-\section{ページング}
-%=========================================================================
-\begin{frame}
-  \frametitle{ページング}
-  ページングは以下のようなメモリ管理方式である．
-  \begin{itemize}
-  \item メモリより広い仮想アドレス空間を使用できる．
-  \item 外部フラグメンテーションを生じない．
-  \item メモリコンパクションが不要である．
-  \item Windows，macOS，Linux等，現代のOSのほとんどが採用している．
-  \item 用語
-    \begin{itemize}
-      \item \emph{ページ}：仮想アドレス空間をページに分割する．
-      \item \emph{フレーム}：物理アドレス空間をページに分割する．
-    \end{itemize}
-  \end{itemize}
-\end{frame}
-
+\section{仮想記憶}
 %=========================================================================
 \begin{frame}
   \frametitle{基本概念}
-  \fig{scale=0.4}{pageToFrame-crop.pdf}
+  ページングをベースに仮想記憶を実現する．
   \begin{itemize}
-  \item ページをフレームにマッピングする．
-  \item ページサイズとフレームサイズは同じ．
-  \item どのフレームも任意プロセスの任意ページにマッピングできる．
-  \end{itemize}
-\end{frame}
-
-%=========================================================================
-\begin{frame}
-  \frametitle{ページとフレーム}
-  \fig{scale=0.4}{pagingAddress-crop.pdf}
-  \begin{itemize}
-  \item 仮想アドレスの上位ビットがページ番号（p）
-  \item 仮想アドレスの下位ビットがページ内アドレス（w）
-  \item ページサイズは2の累乗にする．
-  \item ページ内アドレスがwビットならページサイズは$2^w$バイト
-  \item 物理アドレスの上位ビットがフレーム番号（f）
-  \item 物理アドレスの下位ビットがフレーム内アドレス（w）
-  \item ページ内アドレスとフレーム内アドレスは同じ（w）
-  \item p を f に変換することでページをフレームにマッピングする．
-  \item p と f のビット数は異なっていても良い．
-  \end{itemize}
-\end{frame}
-
-%=========================================================================
-\begin{frame}
-  \frametitle{マッピング関数}
-  \fig{scale=0.35}{pageToFrame-crop.pdf}
-  \begin{itemize}
-  \item p → f 変換関数をマッピング関数と呼ぶ．
-  \item \emph{ページテーブル}（表）を用いて実装する．
-  \item MMUがページテーブルを参照してマッピングする．
-  \item プロセス毎にマッピング関数は異なる．
-  \item ディスパッチャがMMUを操作しマッピングを入れ換える．
-  \end{itemize}
-\end{frame}
-
-%=========================================================================
-\begin{frame}
-  \frametitle{フラグメンテーション}
-  \begin{minipage}{0.35\columnwidth}
-    \fig{scale=0.5}{pagingInnerFragment-crop.pdf}
-  \end{minipage}
-  \begin{minipage}{0.63\columnwidth}
+  \item システムの使用メモリ合計が物理メモリより大きい． → 実行可
+  \item 単一のプログラムがメモリより大きい。 → 実行可
+  \item ページテーブルのV=0を上手く使用する．
+  \item V=0のページにアクセスするとページ不在割込み → OSへ
+  \item プロセステーブルのV=0に二つの場合がある．
     \begin{itemize}
-    \item \emph{外部フラグメンテーション}は解決した．
-      \begin{itemize}
-      \item どのフレームでも任意のプロセスの任意のページにマッピングできる．
-      \item メモリコンパクションも不要になった．
-      \end{itemize}
-    \item \emph{内部フラグメンテーション}が発生する．\\
-      ページ毎にメモリ保護モードを設定する．
-      \begin{itemize}
-        \item プログラム領域は\texttt{r-x}にする．
-        \item データ領域は\texttt{rw-}にする．
-        \item \emph{あな}部分にはフレームを割当てない．\\
-          （sparse address spaces）
-        \item スタック領域も\texttt{rw-}にする．
-      \end{itemize}
-      領域サイズはページの倍数ではない．\\
-      フラグメント部分のアクセスは不正だが検知できない．
+      \item[1.] 無効な領域 → プロセス終了
+      \item[2.] \emph{バッキングストア}に退避中 → 復旧して再開
     \end{itemize}
-  \end{minipage}
-\end{frame}
-
-%=========================================================================
-\begin{frame}
-  \frametitle{ページング機構の概要}
-  \fig{scale=0.4}{paging-crop.pdf}
-  \begin{itemize}
-  \item ページテーブルの一つの\emph{エントリ}をページ番号(p)で選択する．
-  \item 選択したエントリに格納されているフレーム番号(f)を取り出す．
-  \item フレーム番号(f)とページ内アドレス(w)を結合し物理アドレスにする．
+  \item プロセス生成時にバッキングストアにプロセスのイメージを作る．
+  \item Windows，macOS，Linux等，現代のOSのほとんどが採用している．
   \end{itemize}
 \end{frame}
 
 %=========================================================================
 \begin{frame}
-  \frametitle{ページテーブルエントリ}
+  \frametitle{仮想記憶の基本}
+  \fig{scale=0.45}{virtualMemoryBasic-crop.pdf}
+\end{frame}
+
+%=========================================================================
+\begin{frame}
+  \frametitle{デマンドページング（Demand Paging）}
+  \fig{scale=0.45}{virtualMemoryWithZMagic-crop.pdf}
   \begin{itemize}
-  \item \emph{fフィールド}：フレーム番号
-  \item \emph{cフィールド}：制御 \\
-    \tbl{scale=0.9}{pageTableAttr.pdf}
+  \item ページをswap-inするための方式の一つ．
+  \item 全てのページが不在の状態からスタートする．
+  \item ページ不在を起こしたページをswap-inする．\\
+    （使用しないページを読み込むような無駄が無い）
+  \end{itemize}
+\end{frame}
+
+%=========================================================================
+\begin{frame}
+  \frametitle{プログラムファイルの直接swap-inによる実行}
+  \fig{scale=0.45}{virtualMemoryWithZMagic-crop.pdf}
+  \begin{itemize}
+  \item デマンドページング用の実行可能形式ファイルを用いる．\\
+    （このファイルはページサイズを意識した構造になっている）
+  \item プログラムはファイルからswap-inする（R-Xに設定）．
+  \item 初期化データはファイルからswap-inする（RW-に設定）．
+  \item 非初期化データ，ヒープ，スタックはゼロにする（RW-に設定）．
+  \end{itemize}
+\end{frame}
+
+%=========================================================================
+\begin{frame}
+  \frametitle{プログラムのswap-out}
+  \fig{scale=0.45}{virtualMemoryWithZMagic-crop.pdf}
+  \begin{itemize}
+  \item フレームが枯渇したら使用頻度の低いフレームを解放し再利用する．
+  \item プログラム（R-X）は変化しないのでswap-outしない．
+  \item 初期化データ（RW-）はバッキングストアにswap-outする．
+  \item 非初期化データ，ヒープ，スタックもswap-outする．
+  \end{itemize}
+\end{frame}
+
+%=========================================================================
+\begin{frame}
+  \frametitle{Copy on Write（１）}
+  \fig{scale=0.40}{virtualMemoryFork-crop.pdf}
+  \begin{itemize}
+  \item fork-exec ではアドレス空間のコピーに無駄が多い． → vfork
+  \item vforkは使いにくい．使いやすいforkを改良する．
+  \item forkの後，書き込み可能ページを一時的に\texttt{R--}に設定しておく．
+  \end{itemize}
+\end{frame}
+
+%=========================================================================
+\begin{frame}
+  \frametitle{Copy on Write（２）}
+  \fig{scale=0.40}{virtualMemoryCOW-crop.pdf}
+  \begin{itemize}
+  \item 例えばスタックに\emph{書き込む}とメモリ保護違反割込みが発生する．
+  \item この時点でOSが新しいフレームを割当て，内容を\emph{コピー}する．
+  \item ページを\texttt{RW-}に変更しプロセスを再開する．
+  \end{itemize}
+\end{frame}
+
+%=========================================================================
+\begin{frame}
+  \frametitle{メモリマップドファイル（１）}
+  \fig{scale=0.45}{virtualMemoryWithMmap-crop.pdf}
+  \begin{itemize}
+  \item 仮想記憶機構を用いたファイルへのアクセス手段である．
+  \item プロセスはメモリ上の配列のようにファイルにアクセスできる．
+  \item ファイルアクセスで，一々システムコールを使用しない．\\
+    （軽いファイルアクセス手段）
+  \item 同じファイルを複数プロセスがマッピング → 共有メモリになる．
+  \end{itemize}
+\end{frame}
+
+%=========================================================================
+\begin{frame}[fragile]
+  \frametitle{メモリマップドファイル（２）}
+  UNIX のメモリマップドファイルの例（mmapシステムコール）
+
+\begin{lstlisting}[numbers=none]
+void * mmap(void *addr, size_t len, int prot, int flags, int fd, off_t offset);
+\end{lstlisting}
+
+  \begin{description}
+  \item[\emph{戻り値}：] マップされた領域の先頭アドレスが返される．
+  \item[\texttt{addr}：] マップしたい仮想アドレス空間の先頭アドレスを渡す．
+  \item[\texttt{len}：] マップする領域の大きさを渡す．
+  \item[\texttt{prot}：] 保護モード（protection：RWX）を表す値を渡す．
+  \item[\texttt{flags}：]共用する（\|MAP_SHARED|）／
+    しない（\|MAP_PRIVATE|）等
+  \item[\texttt{fd}：] オープン済みファイルのファイルディスクリプタを渡す．
+  \item[\texttt{offset}：] ファイル中のマッピング位置．
+  \end{description}
+
+  アドレスや長さはページサイズの整数倍にする．
+\end{frame}
+
+%=========================================================================
+\begin{frame}
+  \frametitle{メモリマップドファイル（３）}
+  \lst{numbers=left,xleftmargin=5mm}{mmapTest.c}
+\end{frame}
+
+%=========================================================================
+\begin{frame}
+  \frametitle{メモリマップドファイル（４）}
+  メモリマップドファイルの仕組み
+  \vspace{3mm}\fig{scale=0.45}{virtualMemoryWithMmap-crop.pdf}
+  \begin{itemize}
+  \item ファイルの読み込みはデマンドページングの要領で行う．
+  \item ファイルの書き込みは
     \begin{itemize}
-    \item V=0 なら\emph{ページ不在割込み}
-    \item R はページの使用頻度の測定等に使用
-    \item D=0 ならスワップアウト不要
-    \item RWX によりメモリ保護（\emph{メモリ保護割込み}）
+      \item Dirty ページを定期的にファイルに書き戻す．
+      \item プロセスの終了やマッピングの解消時に書き戻す．
     \end{itemize}
   \end{itemize}
 \end{frame}
 
 %=========================================================================
 \begin{frame}
-  \frametitle{ページテーブル}
-  \fig{scale=0.35}{paging-crop.pdf}
+  \frametitle{メモリマップドファイル（５）}
+  read/writeシステムコールとの比較
+  \vspace{3mm}\fig{scale=0.45}{mmapVsReadWrite-crop.pdf}
   \begin{itemize}
-  \item ページテーブルはかなり大きな表である．
-  \item ページ番号が20ビットなら$2^{20}=1Mi$エントリ
-  \item エントリのサイズが4バイトと仮定すると全体で4MiB
-  \item プロセス毎に必要なのでディスパッチの度にロードするのも大変
-  \item \emph{ページテーブルレジスタ}にアドレスを記録しメモリ上に置く
+  \item ファイルを操作する度にシステムコールを発行する．\\
+    （システムコールは重い処理）
+  \item ディスクキャッシュとプログラムのバッファ間でメモリコピー\\
+    （メモリコピーは重い処理）
   \end{itemize}
 \end{frame}
 
 %=========================================================================
-\begin{frame}
-  \frametitle{TLB（Translation Look-aside Buffer）}
-  \fig{scale=0.35}{pagingWithTlb-crop.pdf}
-  \begin{itemize}
-  \item メモリ上にあるページテーブルにアクセスするには時間がかかる．
-  \item 変換結果（pとfの対応）を\emph{TLB}にキャッシュする．
-  \item TLB（数十から数千エントリ）は高速な連想メモリ．
+\begin{frame}[fragile]
+  \frametitle{メモリマップドファイル（６）}
+  プロセスにローカルなマッピング
+  \vspace{3mm}\fig{scale=0.45}{virtualMemoryWithPrivateMap-crop.pdf}
+  \vspace{-5mm}\begin{itemize}
+  \item これまでは\|MAP_SHARED|の例だった．
+  \item \|MAP_PRIVATE|の例を紹介する．
+  \item 最初は「ファイルデータ１」のように共有される（\texttt{R--}）．
+  \item 書き換えが発生した時点でコピーを作る（Copy on Write）．
+  \item 「ファイルデータ２」のようにプロセスは別々のコピーを参照する．
   \end{itemize}
 \end{frame}
 
 %=========================================================================
-\begin{frame}
-  \frametitle{TLB（Translation Look-aside Buffer）}
-  \fig{scale=0.35}{pagingWithTlb-crop.pdf}
+\begin{frame}[fragile]
+  \frametitle{メモリマップドファイル（７）}
+  無名メモリ
+  \vspace{3mm}\fig{scale=0.45}{virtualMemoryWithAnonymousMap-crop.pdf}
+  \begin{itemize}
+  \item ファイルに関連付けられないがメモリ領域．
+  \item \|MAP_ANON|フラグを用いる．
+  \item アクセスがあった時点で作成される（デマンドページング）．
+  \item ページの初期値は\emph{ゼロ}．
+  \end{itemize}
+\end{frame}
+
+%=========================================================================
+\begin{frame}[fragile]
+  \frametitle{メモリマップドファイル（８）}
+  プログラムの実行とメモリマップドファイル
+  \fig{scale=0.40}{virtualMemoryWithZMagic-crop.pdf}
+  \begin{itemize}
+  \item 実行形式ファイルをメモリにマッピングする．
+  \item プログラムは，\|R-X|，\|MAP_SHARED/PRIVATE|でマッピングする．\\
+    （プログラムはプロセス間で共用される）
+  \item 初期化データは，\|RW-|，\|MAP_PRIVATE|でマッピングする．
+  \item 非初期化データ，ヒープ，スタックは無名メモリ（\|RW-|，\|MAP_ANON|）
+  \end{itemize}
+\end{frame}
+
+%=========================================================================
+\begin{frame}[fragile]
+  \frametitle{ページ置換えアルゴリズム}
+  ページングによる仮想記憶で重要な三つのアルゴリズム
   \begin{enumerate}
-  \item[1)] ページ番号（p）でTLBを検索しエントリを選択する．
-    （\emph{TLB miss}）
-  \item[2)] RWXをチェックする．（メモリ保護例外）
-  \item[3)] フレーム番号（f）を出力する．
+  \item[1.]\emph{ページ読み込みアルゴリズム} ：
+    いつページをswap-inするか決める．
+    普通は，既に学んだデマンドページングを用いる．
+  \item[2.] \emph{ページ置き換えアルゴリズム} ：
+    フレーム不足時に，どのページを再利用するか決める．
+  \item[3.] \emph{フレーム割付けアルゴリズム} ：
+    どのフレームを使用するか決める．
+  \end{enumerate}
+  \vfill
+  ページ置き換えアルゴリズムが，
+  将来，使用されないフレームをうまく選択しないと，
+  swap-outしたページが直後にswap-inされることになり，
+  システムの性能が著しく低下する．
+\end{frame}
+
+%=========================================================================
+\begin{frame}
+  \frametitle{局所性・ワーキングセット・フェーズ化（１）}
+  \fig{scale=0.48}{locality-crop.pdf}
+  \begin{description}
+  \item[局所性]
+    短い時間に着目すると，
+    一部の連続したページが集中的にアクセスされる．
+    →　\emph{空間的局所性}\\
+    あるページに着目すると一部の連続した時刻にアクセスが集中している．
+    → \emph{時間的局所性}
+  \end{description}
+\end{frame}
+
+%=========================================================================
+\begin{frame}
+  \frametitle{局所性・ワーキングセット・フェーズ化（２）}
+  \fig{scale=0.48}{locality-crop.pdf}
+  \begin{description}
+  \item[ワーキングセット]
+    ある時間にアクセスされるページの集合のこと．\\
+    メモリに入り切らなくなると急激に性能が低下する．\\
+    → \emph{スラッシング}
+  \end{description}
+\end{frame}
+
+%=========================================================================
+\begin{frame}
+  \frametitle{局所性・ワーキングセット・フェーズ化（３）}
+  \fig{scale=0.48}{locality-crop.pdf}
+  \begin{description}
+  \item[フェーズ化現象]
+    ワーキングセットが急激に変化する現象のこと．\\
+    「入力フェーズ」，「計算フェーズ」，「出力フェーズ」 \\
+    フェーズ遷移時は局所性が失われる → ページ不在集中
+\end{description}
+\end{frame}
+
+%=========================================================================
+\begin{frame}
+  \frametitle{LRU（Least Recently Used）アルゴリズム（１）}
+  仮定：最近アクセスされていないページは，この先，アクセスされない．\\
+  （時間的局所性があるなら最良な方法．）
+  \vspace{3mm}\fig{scale=0.43}{pagingLRU-crop.pdf}
+  \begin{enumerate}
+  \item[1.] メモリアクセス毎にページテーブルにカウンタの値を書く．
+  \item[2.] ページテーブルをスキャンし最も古いページを見つける．
+  \item[3.] 見つけたページをswap-outし目的のページをswap-inする．（置換え）
   \end{enumerate}
 \end{frame}
 
 %=========================================================================
 \begin{frame}
-  \frametitle{Page Table Walk}
-  \begin{itemize}
-  \item \emph{TLB miss}のときページテーブルを検索すること．
-  \item ハードウェアで自動的に行う場合 \\
-    ページテーブルレジスタからページテーブルの位置を知る． \\
-    ハードウェアを用いることで高速化
-  \item ソフトウェアで行う場合 \\
-    TLB miss 割込みを発生しOSに切換える．　\\
-    ハードウェアが単純 => チップ面積に余裕 => \\
-    TLBのエントリ数を増やす => TLB miss の頻度を低くする．
-  \item ページテーブルのエントリ V=0 の場合 \\
-    ページ不在割込みを発生 \\
-  \item ページテーブルのエントリ V=1 の場合 \\
-    1. TLB のエントリの一つをページテーブルに書き戻す． \\
-    2. TLB の空いたエントリにページテーブルからロード
-  \end{itemize}
+  \frametitle{LRU（Least Recently Used）アルゴリズム（２）}
+  \fig{scale=0.43}{pagingLRU-crop.pdf}
+  \vspace{3mm}問題点（LRUの完全な実装は困難と言われている）\\
+  \begin{enumerate}
+  \item[1.] ハードウェアのコスト
+  \item[2.] ページ不在時の処理の重さ．（ページ不在は頻繁に発生）
+  \end{enumerate}
+  macOSのvm\_statで調べると毎秒数千回のページ不在！！
 \end{frame}
 
 %=========================================================================
 \begin{frame}
-  \frametitle{TLBエントリのクリア}
+  \frametitle{LFU（Least Frequently Used）アルゴリズム}
+  NFU（Not Frequently Used）とも呼ばれる．
   \begin{itemize}
-  \item プロセススイッチのとき
-  \item ページテーブルに変更があったとき
-  \item TLBの内容は変更前のページテーブルのエントリなので \\
-    クリアする必要がある．
-  \item TLBのクリアは\emph{大きなペナルティ}を伴うので避けたい．
-  \item TLBのエントリがプロセス番号を含む方式
-  \item TLBのエントリを個別にクリアできる方式
-  \end{itemize}
-\end{frame}
-
-%=========================================================================
-\begin{frame}
-  \frametitle{フレームの共用}
-  \fig{scale=0.4}{pageSharing-crop.pdf}
-  \begin{itemize}
-  \item プロセスが変更しないページ（\texttt{R-X}）は共用できる．
-  \item ページテーブルの操作により実現
-  \item ライブラリは\emph{位置独立コード}でなければならい．
-  \end{itemize}
-\end{frame}
-
-%=========================================================================
-\begin{frame}
-  \frametitle{位置独立コード}
-  \begin{itembox}[l]{位置独立コードのイメージ}
-    \begin{tabular}{l l l}
-      CALL  & 200,PC    &   // 200番地先にあるサブルーチン実行    \\
-      JMP   & 100,PC    &   // 100番地先にジャンプする            \\
-      LD    & G0,4,FP   &   // ローカル変数はスタック上           \\
-      ST    & G0,40,G11 &   // グローバル変数はレジスタ相対で参照 \\
-    \end{tabular}
-  \end{itembox}
-  \begin{itemize}
-  \item ライブラリはマッピングされる仮想アドレスが変化する．
-  \item どのアドレスにマッピングされても大丈夫なプログラム \\
-    => \emph{位置独立コード}
-  \item PC相対でJMPやCALLを行う．
-  \item データはレジスタをベースにアクセスする．
-  \end{itemize}
-\end{frame}
-
-%=========================================================================
-\begin{frame}
-  \frametitle{ページテーブルの編成方法}
-  \begin{itemize}
-  \item ページテーブルは大きくなりすぎる．（32ビットCPUの例）
-    \begin{itemize}
-      \item 仮想アドレス32ビット，ページサイズ4KiB，エントリ4Bの例 \\
-        $2^{32} \div 4KiB = 2^{32} \div 2^{12} = 2^{20} = 1Mi$エントリ\\
-        $1Mi エントリ \times 4B = 4MiB$
-      \item 32ビットCPUの普及が始まった当時のPCは， \\
-        メモリを 4MiB 〜 16MiB しか搭載していなかった．
-    \end{itemize}
-    \vfill
-  \item ページテーブルは大きくなりすぎる．（64ビットCPUの例）
-    \begin{itemize}
-      \item 仮想アドレス48ビット，ページサイズ4KiB，エントリ8Bの例 \\
-        $2^{48} \div 4KiB = 2^{48} \div 2^{12} = 2^{36} = 64Gi$エントリ\\
-        $64Gi エントリ \times 8B = 512GiB$
-      \item 現代の64ビットPCのメモリは，4GiB 〜 16GiB 程度？
-    \end{itemize}
-    \vfill
-  \item ページテーブルを小さくする工夫が必要！！
-  \end{itemize}
-\end{frame}
-
-%=========================================================================
-\begin{frame}
-  \frametitle{二段のページテーブル（IA-32の例）}
-  \fig{scale=0.33}{pagingMultiLevel-crop.pdf}
-  \begin{itemize}
-  \item 一段目のページテーブルサイズ4KiB = フレームサイズ
-  \item ニ段目のページテーブルの区画サイズ4KiB = フレームサイズ
-  \end{itemize}
-\end{frame}
-
-%=========================================================================
-\begin{frame}
-  \frametitle{ページテーブルフレームの節約}
-  \fig{scale=0.5}{pagingSparseSpace-crop.pdf}
-  \begin{itemize}
-  \item 仮想アドレス空間の\emph{あな}部分の二段目を省略
-  \item 一段目のページテーブルエントリのV=0にする．
-  \item 従来1,025フレーム => 3フレーム
-  \end{itemize}
-\end{frame}
-
-%=========================================================================
-\begin{frame}
-  \frametitle{64ビット仮想アドレス空間（x86-64の例）}
-  \begin{itemize}
-  \item 実質48ビット仮想アドレス => 256TiB（十分大きい）
-  \item 仮に二段のページテーブルならページテーブルの区画は \\
-    18ビット（p），18ビット（q），12ビット（w） と仮定 \\
-    エントリサイズ = 8B  と仮定 \\
-    $2^{18} \times 8B = 2MiB$
-  \item プロセスあたり最低でも3区画必要 \\
-    $2MiB \times 3 = 6MiB$
-  \item 400個のプロセスがあったとすると \\
-    $6MiB \times 400 = 2.4GiB$（8GiBの30\%）
-  \item 二段のページテーブルでは区画が大きくなりすぎる．
-  \item 区画を小さくするために段数を多くする．
-  \end{itemize}
-\end{frame}
-
-%=========================================================================
-\begin{frame}
-  \frametitle{四段のページテーブル（x86-64の例）}
-  \fig{scale=0.4}{paging4Level-crop.pdf}
-  \begin{itemize}
-  \item ページサイズ（フレームサイズ）は4KiB
-  \item ページテーブルの区画は$2^9 \times 8B = 4KiB$
-  \item ページテーブルは最低7フレーム（28KiB）
-  \item 400プロセスでも約11MiBで済む（8GiBの0.14\%）
-  \end{itemize}
-\end{frame}
-
-%=========================================================================
-\begin{frame}
-  \frametitle{逆引きページテーブル}
-  \fig{scale=0.4}{pagingInvertedTable-crop.pdf}
-  \begin{itemize}
-  \item テーブルでフレーム番号とページ番号の立場が逆転（逆引き）
-  \item システム全体でページテーブル一つ（プロセス毎ではない）
-  \item どの仮想アドレス空間のエントリか識別するための pid あり
-  \end{itemize}
-\end{frame}
-
-%=========================================================================
-\begin{frame}
-  \frametitle{逆引きページテーブル}
-  \emph{ページテーブルのサイズ}
-  \begin{itemize}
-  \item 8GiBのメモリを4KiBのページで分割する場合のエントリ数\\
-    \centerline{$8GiB \div 4KiB = 2^{33} \div 2^{12} = 2Mi$エントリ}
-  \item １エントリ8バイト仮定すると
-    \centerline{$2Mi \times 8B = 12MiB$}
-  \item システム全体で12MiBで済む（8GiBの0.2\%）
+  \item LRUの近似方式の一種である．
+  \item ページテーブルのRビットを使用．
+  \item フレーム毎にカウンタを準備．
+  \item 特別なハードウェアは不要．
   \end{itemize}
   \vfill
-  \emph{Page Table Walk}
+  \emph{アルゴリズム}
+  \begin{enumerate}
+  \item[1.] Rビットとフレームのカウンタをゼロにクリアする．
+  \item[2.] 定期的（例えばTICK=20ms毎）にページテーブルをスキャンする．
+    R=1のエントリを見つけたら対応するフレームのカウンタをインクリメントし，
+    Rをゼロにクリアする．
+  \item[3.] ページ不在時にフレームが不足したなら，
+    カウンタの値が最小のフレームを置き換える．
+  \end{enumerate}
+\end{frame}
+
+%=========================================================================
+\begin{frame}
+  \frametitle{エージングアルゴリズム}
+  LFU（Least Frequently Used）アルゴリズムの改良\\
+  \vfill
+  \emph{LFUの問題点}\\
+  一度カウンタの値が大きくなると，
+  使用されなくなっても置き換えが起こらない．
+  \vfill
+  \emph{LFUの改良}\\
+  定期的にページテーブルをスキャンする際の
+  カウンタの更新方法を次のように改良する．
+  \begin{description}
+  \item[R=1のフレーム]
+    $cnt \leftarrow cnt \div 2 + 0x8000$（カウンタは16bitと仮定）
+  \item[R=0のフレーム]
+    $cnt \leftarrow cnt \div 2$
+  \end{description}
+  この改良により，過去のRビットの影響が徐々に小さくなる．
+\end{frame}
+
+%=========================================================================
+\begin{frame}
+  \frametitle{FIFO（First-In First-Out）アルゴリズム}
+  仮定：「長くメモリに滞在しているページは役割を終えている」\\
+  特別なハードウェアを用いることなく，ソフトウェアだけで実現できる．
+  \fig{scale=0.6}{pagingFIFO-crop.pdf}
+  \vfill
+  \emph{アルゴリズム}
+  \begin{enumerate}
+  \item[1.] swap-in したフレームをリストの最後に追加する．
+  \item[2.] フレームが不足時は，リストの先頭のフレームを置き換える．
+  \end{enumerate}
+  \vfill
+  ページテーブルのスキャンが不要なので非常に軽い．\\
+  常時使用されるページも時間が経過するとswap-outされる問題がある．\\
+  \emph{Beladyの異常な振る舞い}をすることがある．
+\end{frame}
+
+%=========================================================================
+\begin{frame}
+  \frametitle{Beladyの異常な振る舞いの例}
+  \vfill
+  FIFOアルゴリズムを用い，\\
+  ページ参照ストリング（W : 1 2 3 4 1 2 5 1 2 3 4 5）の場合
   \begin{itemize}
-  \item CPUは仮想アドレスの他にpid（プロセス番号を出力）
-  \item ページテーブルを pid と p（ページ番号）で探索する
-  \item 線形探索などを用いると遅くて実用にならない
+  \item フレーム数（m=3）の場合（ページ不在9回）\\
+    \vspace{3mm}\tbl{scale=1.0}{beladyAnomalyM3.pdf}
+  \item フレーム数（m=4）の場合（ページ不在10回）\\
+    \vspace{3mm}\tbl{scale=1.0}{beladyAnomalyM4.pdf}
+  \end{itemize}
+  メモリが多い方（m=4）のページ不在回数が多い．
+  \vfill
+\end{frame}
+
+%=========================================================================
+\begin{frame}
+  \frametitle{Clock アルゴリズム}
+  環状リストを用いる．Rビットも使用する．
+
+  \fig{scale=0.55}{pagingClock-crop.pdf}
+
+  \begin{enumerate}
+  \item[1.] swap-inする度にフレームを環状リストに挿入していく．
+  \item[2.] 定期的（例えばTICK=20ms毎）にRビットをクリアする．
+  \item[3.] 時計の針が指しているフレームのRビットを調べる．
+    \begin{description}
+    \item[R=0の場合]
+      ページは古い＋最近アクセスされていない．→ 置換え
+    \item[R=1の場合]
+      ページは最近アクセスされている．→ 針を進める
+    \end{description}
+    最悪でも時計の針が一周回るとR=0のページが見つかる．
+  \end{enumerate}
+\end{frame}
+
+%=========================================================================
+\begin{frame}
+  \frametitle{WSClock アルゴリズム（１）}
+
+  \fig{scale=0.55}{pagingWSClock-crop.pdf}
+
+  \begin{itemize}
+  \item ワーキングセットを考慮したClockアルゴリズムである．
+  \item 単純でパフォーマンスが良いので広く使用されている．
+  \item アクセス時刻を記録した環状リストに用いる．
+  \end{itemize}
+
+\end{frame}
+
+%=========================================================================
+\begin{frame}
+  \frametitle{WSClock アルゴリズム（２）}
+
+  \fig{scale=0.55}{pagingWSClock-crop.pdf}
+
+  \begin{itemize}
+  \item 時刻が古くなっているフレームはワーキングセット外と判断．
+  \item ページテーブルのRビットとDビットも使用する．
   \end{itemize}
 \end{frame}
 
 %=========================================================================
 \begin{frame}
-  \frametitle{逆引きページテーブル（IBM 801 の例）}
-  \fig{scale=0.4}{paging801-crop.pdf}
+  \frametitle{WSClock アルゴリズム（３）}
+
+  \fig{scale=0.55}{pagingWSClock-crop.pdf}
+
+  \begin{enumerate}
+  \item[1.] swap-inする度にフレームを環状リストに挿入していく．
+  \item[2.] 定期的に全テーブルエントリのRビットをクリアする．\\
+    その際，R=1だったフレームだけに現在時刻を記録する．
+  \end{enumerate}
+\end{frame}
+
+%=========================================================================
+\begin{frame}
+  \frametitle{WSClock アルゴリズム（４）}
+
+  \fig{scale=0.55}{pagingWSClock-crop.pdf}
+
+  \begin{enumerate}
+  \item[3.] フレーム不足なら時計の針のフレームを調べる．
+    \begin{description}
+    \item[R=1の場合]
+      Rビットをクリアして次のフレームに進む．
+    \item[時刻が新しい場合]
+      次のフレームに進む．
+    \item[時刻が古い場合]
+      ページはワーキングセットに含まれていない．\\
+      \emph{ページの置換え処理}を行う．
+    \end{description}
+  \end{enumerate}
+\end{frame}
+
+%=========================================================================
+\begin{frame}
+  \frametitle{WSClock アルゴリズム（５）}
+
+  \fig{scale=0.55}{pagingWSClock-crop.pdf}
+
+  \begin{enumerate}
+  \item[3.] フレーム不足なら時計の針のフレームを調べる．
+    \begin{description}
+    \item[時刻が古い場合] \emph{ページの置換え処理}を行う．
+      \begin{description}
+      \item[D=1の場合]
+        swap-outを予約し次のフレームに進む．
+      \item[D=0の場合]
+        このフレームを置き換える．
+      \end{description}
+    \end{description}
+  \end{enumerate}
+\end{frame}
+
+%=========================================================================
+\begin{frame}
+  \frametitle{フレーム割り付けアルゴリズム（１）}
+  \fig{scale=0.41}{hardBlock-crop.pdf}
   \begin{itemize}
-  \item ハッシュ表を用いて探索を高速化
-  \item ハッシュ表の大きさは二の累乗（$0 〜 2^n-1$）
-  \item ページテーブルはnext を使用してチェインを作る
+  \item フレームはどれも均質
+  \item SMPシステムであってもそうである．
   \end{itemize}
 \end{frame}
 
 %=========================================================================
 \begin{frame}
-  \frametitle{逆引きページテーブル（IBM 801 の例）}
-  \emph{ハッシュ表を用いた Page Table Walk}
+  \frametitle{フレーム割り付けアルゴリズム（２）}
+  \fig{scale=0.3}{intelServer-crop.pdf}
   \begin{itemize}
-  \item pid と p を用いてハッシュ関数を計算する（$h \leftarrow f(pid, p)$）\\
-    （ハッシュ関数は pid と p の XOR。。。速度優先）
-    \vfill
-  \item ハッシュ表の第 h エントリを見る
-    \begin{itemize}
-      \item 空（図では×）ならページ不在（\emph{割込み！}）
-      \item 空でなければページテーブルのインデクス（f）
-    \end{itemize}
-    \vfill
-  \item ページテーブルの第 f エントリの内容を見る
-    \begin{itemize}
-      \item pid ，p が一致 →  この時の f をフレーム番号にする（\emph{完了！}）
-      \item pid ，p が一致しない →  next を見る
-        \begin{itemize}
-        \item 空（図では×）ならページ不在（\emph{割込み！}）
-        \item 空でなければ\\ 
-          ページテーブルのインデクス（f）を更新して再度トライ
-        \end{itemize}
-    \end{itemize}
+  \item 近年のサーバ用SMPでは均質ではない．
+  \item メモリとCPUからなるノードを相互接続している．
+  \item 自ノードと他ノードでメモリアクセス時間が異なる．
+  \item このことを考慮したフレーム割付とCPUスケジューリングが必要．
   \end{itemize}
+\end{frame}
 
-  \emph{TLB} : 不可欠！
+%=========================================================================
+%\begin{frame}
+%  \frametitle{}
+%\end{frame}
+
+%=========================================================================
+\begin{frame}
+  \frametitle{練習問題}
+  \begin{enumerate}
+  \item[1.] 次の言葉の意味を説明しなさい．
+    \begin{itemize}
+    \item 仮想記憶
+    \item デマンドページング
+    \item swap-in，swap-out
+    \item Copy on Write
+    \item メモリマップドファイル
+    \item 局所性
+    \item ワーキングセット
+    \item フェーズ化
+    \item スラッシング
+    \item ページ読み込みアルゴリズム
+    \item ページ置き換えアルゴリズム
+    \item ページ割付けアルゴリズム
+    \item Beladyの異常な振る舞い
+    \end{itemize}
+  \end{enumerate}
 \end{frame}
 
 %=========================================================================
 \begin{frame}
   \frametitle{練習問題}
   \begin{enumerate}
-  \item[(1)] 一回のメモリアクセス時間に1ns，page table walk に2nsかかるとする，
-    TLBのヒット率が90パーセントの時の平均メモリアクセス時間を計算しなさい．
-  \item[(2)] 図12.7 において，
-    $p=1$の仮想アドレスの範囲を8桁の16進数で答えなさい．
-  \item[(3)] 図12.7 において，
-    $p=1$，$q=1$の仮想アドレスの範囲を8桁の16進数で答えなさい．
-  \item[(4)] 逆引きページテーブルを用いる場合，
-    TLBに格納すべき最低限の情報の範囲を考察しなさい．
-  \item[(5)] 図12.11 に，
-    $pid=3$，$p=2$のページがフレーム１にマッピングされるような
-    ページテーブルの状態を書き込みなさい．
-  \item[(6)] 逆引きページテーブルを用いるシステムで，
-    プロセス間でページの共有が可能か考察しなさい．
+  \item[2.] 「Beladyの異常な振る舞いの例」で示した
+    ページ参照ストリングとフレーム数を用い，
+    他のページ置き換えアルゴリズムを適用した場合をトレースしなさい．
   \end{enumerate}
+  \vfill
+  \vfill
 \end{frame}
 
 \end{document}

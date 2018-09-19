@@ -1,18 +1,18 @@
 class BoundedBufferMain {
   static BoundedBuffer queue = new BoundedBuffer(10);  // 大きさ10のキュー
-  static void producer() {                             // 生産者スレッドが実行する
+  static void producer() {                             // 生産者スレッドが実行
     while(true) {
       int x = データを作る();
-      queue.append(x);                                 // キューにデータを追加する
+      queue.append(x);                                 // キューにデータを追加
     }
   }
-  static void consumer() {                             // 消費者スレッドが実行する
-    while(true) {
-      int x = queue.remove();                          // キューからデータを取り出す
+  static void consumer() {                             // 消費者スレッドが実行
+    while(true) {                                      // キューから
+      int x = queue.remove();                          //     データを取り出す
       データを使用する(x);
     }
   }
-  public static void main(String[] args) {             // main から実行を開始する
+  public static void main(String[] args) {             // main から実行を開始
     生産者スレッドを起動;
     消費者スレッドを起動;
   }

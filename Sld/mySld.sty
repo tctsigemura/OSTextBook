@@ -39,9 +39,15 @@
   commentstyle=\slshape
 }
 
-\newcommand{\fig}[2]{\begin{center}\includegraphics[#1]{../Fig/#2}\end{center}}
-\newcommand{\tbl}[2]{\begin{center}\includegraphics[#1]{../Tbl/#2}\end{center}}
-\newcommand{\gant}[2]{\begin{center}\includegraphics[#1]{../GanntChart/#2}\end{center}}
+\newcommand{\fig}[2]{\centerline{\includegraphics[#1]{../Fig/#2}}}
+\newcommand{\tbl}[2]{\centerline{\includegraphics[#1]{../Tbl/#2}}}
+\newcommand{\gant}[2]{\centerline{\includegraphics[#1]{../GanntChart/#2}}}
 \newcommand{\lst}[2]{\lstinputlisting[#1]{../Lst/#2}}
+\newcommand{\src}[2]{\lstinputlisting[#1]{../TacOS/#2}}
+\newcommand{\smp}[2]{\lstinputlisting[#1]{../SampleCode/#2}}
 \newcommand{\photo}[3]{\begin{center}\includegraphics[#1]{../Photo/#2}
 \\#3\end{center}}
+
+%\newcommand{\fig}[2]{\begin{center}\includegraphics[#1]{../Fig/#2}\end{center}}
+%\newcommand{\tbl}[2]{\begin{center}\includegraphics[#1]{../Tbl/#2}\end{center}}
+%\newcommand{\gant}[2]{\begin{center}\includegraphics[#1]{../GanntChart/#2}\end{center}}

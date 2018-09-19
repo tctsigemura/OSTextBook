@@ -1,5 +1,5 @@
 %\documentclass[dvipdfmx]{beamer}
-\documentclass{beamer}                   % lualatex の場合
+\documentclass[unicode]{beamer}                   % lualatex の場合
 \usepackage{mySld}
 
 \begin{document}
@@ -209,7 +209,8 @@
 \subsection{TacOSのスケジューラ}
 \begin{frame}[fragile]
   \frametitle{TacOSのスケジューラ}
-  \lst{language={C}}{sch.cmm}
+  \src{firstline=129,lastline=137,
+    numbers=left,xleftmargin=5mm,firstnumber=1}{kernel/kernel.cmm}
 \end{frame}
 
 %=========================================================================

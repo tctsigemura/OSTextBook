@@ -1,9 +1,9 @@
 %\documentclass[dvipdfmx]{beamer}
-\documentclass{beamer}                   % lualatex の場合
+\documentclass[unicode]{beamer}                   % lualatex の場合
 \usepackage{mySld}
 \begin{document}
-\title[ファイルシステムの概念]
-      {オペレーティングシステム\\第１５章 ファイルシステムの概念}
+\title[FATファイルシステム]
+      {オペレーティングシステム\\第１５章 FATファイルシステム}
 \date{}
 \begin{frame}
   \titlepage
@@ -16,367 +16,149 @@
 %  \frametitle{}
 %\end{frame}
 
-\section{ファイルシステムの概念}
+\section{FATファイルシステム}
 %=========================================================================
 \begin{frame}
-  \frametitle{ファイルシステム}
+  \frametitle{FATファイルシステム}
   \begin{itemize}
-  \item ファイルシステムは二次記憶装置を
+  \item 1980年代からPCのファイルシステムとして利用されてきた．
+  \item 仕様が公開されているので様々なところで利用されている．
     \begin{itemize}
-    \item 管理する．（どのセクタが，どのファイルの一部？）
-    \item 抽象化する．（ハードディスク → ファイル）
-    \item 仮想化する．（１台のハードディスク → 多数のファイル）
+    \item USBメモリ，SDカード，その他メモリカード
+    \item Windows，Linux，macOSはFATファイルシステムをサポート \\
+      → 同じUSBメモリを使用してデータ交換が可能
+    \item デジカメ，音楽プレーヤ，デジタルテレビ，カーナビ．．． \\
+      → デジカメのSDカードをPCで読める．
     \end{itemize}
-  \item ファイルは一次元のバイト列（バイトストリーム） \\
-    オペレーティングシステムはファイルの構造を決めない．
-  \item ファイルは名前を持つ．
-  \item 名前とバイト位置でデータが決まる．\\
-    名前＝ファイル名，バイト位置＝ファイル内オフセット
+  \item ファイル名は半角8文字＋3文字（例：\texttt{IMG\_1234.JPG}）
+  \item FATにはいくつかの種類がある．
+    \vfill
+    \tbl{scale=1.0}{fatVariety.pdf}
+    \vfill
   \end{itemize}
 \end{frame}
 
 %=========================================================================
 \begin{frame}
-  \frametitle{ファイルの名前付け}
-  \fig{scale=0.6}{dirTree-crop.pdf}
-  \begin{itemize}
-  \item ファイルは木構造のディレクトリシステムに格納する．
-  \item ディレクトリは名前とファイル本体のポインタを格納する．
-  \item 階層構造を持った名前(\emph{パス}）でファイルを特定する．
-  \item \emph{絶対パス}はルートディレクトリを起点にする．
-  \item \emph{相対パス}はワーキングディレクトリを起点にする．
-  \end{itemize}
-
-\end{frame}
-
-%=========================================================================
-\begin{frame}
-  \frametitle{ファイルの別名（１）}
-  \emph{別名があると便利な例}（最新のファイルはいつも同じ名前）
+  \frametitle{ボリューム内部の構造}
+  \centering{
+    \begin{minipage}{0.3\columnwidth}
+      \fig{scale=0.8}{hddPartition.pdf}
+    \end{minipage}
+    \begin{minipage}{0.3\columnwidth}
+      \fig{scale=0.8}{fatVolume.pdf}
+    \end{minipage}
+    \begin{minipage}{0.3\columnwidth}
+      \fig{scale=0.8}{fatBPB.pdf}
+    \end{minipage}
+  }
   \vfill
-  ある日
-  \begin{center}
-    \begin{tabular}{l c l}
-      \texttt{2017\_06\_30.log} &   & 2017年6月30日のファイル \\
-      \texttt{2017\_07\_01.log} &   & 2017年7月1日のファイル  \\
-      \texttt{2017\_07\_02.log} &   & 2017年7月2日のファイル  \\
-      \texttt{today.log}        & → & \texttt{2017\_07\_02.log}
-    \end{tabular}
-  \end{center}
-  \vfill
-  次の日
-  \begin{center}
-    \begin{tabular}{l c l}
-      \texttt{2017\_07\_01.log} &   & 2017年7月1日のファイル  \\
-      \texttt{2017\_07\_02.log} &   & 2017年7月2日のファイル  \\
-      \texttt{2017\_07\_03.log} &   & 2017年7月3日のファイル  \\
-      \texttt{today.log}        & → & \texttt{2017\_07\_03.log}
-    \end{tabular}
-  \end{center}
-  \vfill
-\end{frame}
-
-%=========================================================================
-\begin{frame}
-  \frametitle{ファイルの別名（２）}
   \begin{itemize}
-  \item \emph{ハードリンク} \\
-    \begin{itemize}
-    \item ファイルシステム仕組みとしてOSカーネルに組み込む．
-    \item ファイルの本体が複数のディレクトリ・エントリから指される．
-    \item リンクカウントを用いる．
-    \item ディレクトリをリンクするとループ検出が厄介 → 禁止！
-    \end{itemize}
-  \item \emph{シンボリックリンク} \\
-    \begin{itemize}
-    \item ファイルシステム仕組みとしてOSカーネルに組み込む．
-    \item 他ファイルのパスを格納した特別なファイル．
-    \item リンク切れ状態が許される．（Webページのリンクに似ている）
-    \end{itemize}
-  \item \emph{ファイルシステムの外で実装されるリンク} \\
-    \begin{itemize}
-    \item Windowsのショートカット，macOSのエイリアスなど
-    \item ファイルシステム本体が持つリンク機構は一定ではない． \\
-      → 現代のOSは同時に複数のファイルシステムを使用する．\\
-      → アプリに近い側でどのファイルシステムでも共通の仕組みを提供
-    \end{itemize}
-  \end{itemize}
-\end{frame}
-
-%=========================================================================
-\begin{frame}
-  \frametitle{ファイルの別名（３）}
-  \emph{HFS+上のmacOSのエイリアスの例}
-  \lst{numbers=left,xleftmargin=5mm}{aliasOnHFS.txt}
-  \begin{description}
-    \item[3行] 拡張属性付きの通常ファイルとしてエイリアスが存在
-    \item[4行] 拡張属性の名前は\texttt{com.apple.FinderInfo}
-    \item[4行] 拡張属性のサイズは32バイト
-  \end{description}
-  ファイルシステムのより汎用的な機構である拡張属性を利用して，\\
-  \emph{エイリアス}を実装している．
-  \vfill
-\end{frame}
-
-%=========================================================================
-\begin{frame}
-  \frametitle{ファイルの別名（４）}
-  \emph{FAT上のmacOSのエイリアスの例}
-  \lst{numbers=left,xleftmargin=5mm}{aliasOnFAT.txt}
-  \begin{description}
-    \item[4,5行] 拡張属性付きの通常ファイルとしてエイリアスが存在
-    \item[2行]   隠しファイルができている！！
-    \item[6行]   隠しファイルを消してみる．
-    \item[9行]   拡張属性が消えてしまった！！
-  \end{description}
-  FATファイルシステムの規約の範囲で\emph{エイリアス}を実装している．
-  \vfill
-\end{frame}
-
-%=========================================================================
-\begin{frame}
-  \frametitle{ボリュームのマウント}
-  \fig{scale=0.45}{mount-crop.pdf}
-  \begin{itemize}
-  \item 二つ目以降のボリュームの接続方法
-  \item マウント方式
-    \begin{itemize}
-    \item ボリュームを既存のディレクトリに接続する．
-    \item \texttt{/Volumes/NO NAME/hello.c}がUSBメモリのCプログラム
-    \end{itemize}
-  \item ドライブレター方式
-    \begin{itemize}
-    \item ボリュームを区別するドライブレターを用いる．
-    \item \texttt{D:{\bs}hello.c}がUSBメモリのCプログラム
-    \end{itemize}
-  \end{itemize}
-\end{frame}
-
-%=========================================================================
-\begin{frame}
-  \frametitle{ファイルの属性（１）}
-  \begin{itemize}
-  \item \emph{名前}：ファイル名をファイルの属性と考える場合もある．
-  \item \emph{識別子}：ファイル本体の番号など．
-  \item \emph{型（タイプ）}：通常ファイル，ディレクトリ，リンクなど．
-  \item \emph{保護}：\texttt{rwxrwxrwx}など．（後で詳しく）
-  \item \emph{日時}：作成日時，最終変更日時など．
-  \item \emph{所有者}：所有者，グループなど．
-  \item \emph{位置}：ディスク上のどこにファイル本体があるか．\\
-    （データ位置のブロック番号など）
-  \item \emph{サイズ}：ファイルのバイト数．
-  \item \emph{拡張属性}：名前付きの小さな追加データ．\\
-    ファイルシステムで用途を定めていない．
-  \end{itemize}
-\end{frame}
-
-%=========================================================================
-\begin{frame}
-  \frametitle{ファイルの属性（２）}
-  \lst{numbers=left,xleftmargin=5mm}{extendedAttr.txt}
-  \begin{description}
-  \item[1行] 拡張属性付きでファイルの一覧を表示させる．
-  \item[4行] 拡張属性を持つファイルがあることが分かる．
-  \item[5行] 拡張属性の内容を表示してみる．
-  \end{description}
-  この例の拡張属性は，以下のようなものであった．
-  \begin{itemize}
-  \item 属性の名前：\texttt{com.apple.FinderInfo}
-  \item 属性の大きさ：32バイト
-  \item 目的：ファイルがエイリアスであることを表す．（恐らく）
-  \end{itemize}
-\end{frame}
-
-%=========================================================================
-\begin{frame}
-  \frametitle{アクセス制御（１）}
-  ファイルの\emph{保護属性}に基づき，ファイルに誰が何をできるか制御する．
-  \begin{itemize}
-  \item \emph{ビット表現の保護モード}\\
-    \begin{itemize}
-    \item UNIXで使用される\texttt{rwxrwxrwx}のような情報．
-    \item UNIXの場合，「所有者，グループ，その他」のユーザについて\\
-      \begin{itemize}
-      \item[r]：読める（Read），
-      \item[w]：書ける（Write），
-      \item[x]：実行できる（eXecute）
-      \end{itemize}
-      を指定する．
-    \end{itemize}
-  \end{itemize}
-\end{frame}
-
-%=========================================================================
-\begin{frame}
-  \frametitle{アクセス制御（２）}
-  \begin{itemize}
-  \item \emph{ACL（Access Control List）}\\
-    ファイル毎に，ユーザやグループを指定して細かな制御が可能
-
-    \lst{numbers=left}{acl.txt}
-
-    \begin{description}
-    \item[1行] \texttt{a.txt}にACLが無いことを確認した．
-    \item[3,4行] \texttt{chmod}コマンドで\texttt{a.txt}にACL追加した．
-    \item[7,8行] 二行のACLが確認できる．
-    \end{description}
-
-    \begin{itemize}
-    \item リストの先頭から順に評価する．
-    \item 許可・不許可が決まったら評価を完了する．
-    \item ACLで決まらない場合は\texttt{rwx}を使用する．
-    \end{itemize}
-  \end{itemize}
-\end{frame}
-
-%=========================================================================
-\begin{frame}
-  \frametitle{ファイルの種類}
-  \begin{itemize}
-  \item ファイルシステム（OSカーネル）で決まっている種類 \\
-    （通常ファイル・ディレクトリ・リンクなど）
-  \item アプリケーションなどが決めている種類 \\
-    （通常ファイルの拡張子で区別する）
-  \end{itemize}
-  \tbl{scale=0.85}{filenameExtensions.pdf}
-  \texttt{.app}だけはディレクトリの拡張子
-\end{frame}
-
-%=========================================================================
-\begin{frame}
-  \frametitle{ファイルシステムの操作（１）}
-  \emph{ディレクトリ操作}
-  \tbl{scale=0.9}{dirOperations.pdf}
-  \begin{itemize}
-  \item ファイルの作成はcreatシステムコールでもできる．
-  \item ディレクトリの読み出しはライブラリ関数で行う．
-  \item renameシステムコールはファイルの移動もできる．
-  \end{itemize}
-\end{frame}
-
-%=========================================================================
-\begin{frame}
-  \frametitle{ファイルシステムの操作（２）}
-  \emph{ファイル操作}
-  \tbl{scale=0.9}{fileOperations.pdf}
-  \begin{itemize}
-  \item openはファイルの保護属性をチェックする．
-  \item 切り詰めは専用のtruncateシステムコールも使える．
-  \item ファイルの属性の読み書きができるべき．
-  \end{itemize}
-\end{frame}
-
-%=========================================================================
-\begin{frame}[fragile]
-  \frametitle{ファイルシステムの操作（３）}
-  \emph{ファイルの共有とロック}
-\begin{lstlisting}[numbers=none]
-  #include <sys/file.h>
-  #define   LOCK_SH   1    // 共有ロック
-  #define   LOCK_EX   2    // 排他ロック
-  #define   LOCK_NB   4    // ブロックしない
-  #define   LOCK_UN   8    // ロック解除
-  int flock(int fd, int operation);
-\end{lstlisting}
-  \begin{itemize}
-  \item \|LOCK_SH|：\emph{共有ロック（shred lock）}
-  \item \|LOCK_EX|：\emph{排他ロック（exclusive lock）}
-  \item \|LOCK_NB|：ロックできない時，ブロックしないでエラー
-  \item openシステムコールにもロックの機能がある．
-  \end{itemize}
-  \vfill
-
-  \emph{ワーキングディレクトリの変更}
-\begin{lstlisting}[numbers=none]
-  #include <unistd.h>
-  int chdir(const char *path);
-\end{lstlisting}
-
-  \vfill
-\end{frame}
-
-%=========================================================================
-\begin{frame}
-  \frametitle{ファイルシステムの健全性（１）}
-  \emph{一貫性チェック}
-  \begin{itemize}
-  \item 正常終了時にはファイルシステムにアンマウントの印をする．
-  \item OSの起動時に印がなかったら一貫性チェックをする．
-  \item \emph{メタデータ}の矛盾を解消するだけ．
-  \item ファイルが消えたり，データが消えたりは修復できない．
+  \item （ディスク装置全体，または，パーティション） ＝ ボリューム
+  \item パーティションの位置と大きさはMBRのテーブルで決まった．
+  \item ボリュームの内部構造はFATファイルシステムのルールで決まる．
+  \item ボリューム内部のコンポーネントの大きさなどはBPBから分かる．
+  \item FATは大切なデータなので２重化してある．
+  \item データ領域は\emph{クラスタ}と呼ばれるブロック単位で扱う．
   \end{itemize}
   \vfill
 \end{frame}
 
 %=========================================================================
 \begin{frame}
-  \frametitle{ファイルシステムの健全性（２）}
-  \emph{ジャーナリング・ファイルシステム}
-  \fig{scale=.5}{journaling-crop.pdf}
+  \frametitle{BPB（BIOS Parameter Block）}
+  \tbl{scale=0.9}{fatBpbParameter.pdf}
   \begin{itemize}
-  \item データベースのWAL（Write Ahead Logging）のアイデア．
-  \item NTFS，ext3，ext4，HFS+ 等が該当する．
+  \item 論理フォーマット時に決めたパラメータを記録している．
+  \item 値の例は，ボリューム=2GiB，クラスタ=32KiB，FAT16
+  \item ブートプログラムは初代IBM PCの機械語で作成してある．
   \end{itemize}
   \vfill
 \end{frame}
 
 %=========================================================================
 \begin{frame}
-  \frametitle{練習問題（１）}
+  \frametitle{ディレクトリエントリ}
+  \fig{scale=1.0}{fatDirEntry.pdf}
+  \begin{itemize}
+  \item ルートディレクトリやディレクトリファイルに格納される．
+  \item 前のBPBだとルートディレクトリに512個格納される．
+  \item \texttt{FileName}：8文字以内のファイル名\\
+    （0x00：以降未使用，0xe5：削除，0x05：本当は0xe5）
+  \item \texttt{Ext}：3文字以内の拡張子
+  \item \texttt{Atr}：ファイルの属性\\
+    （0x01：read-only，0x02：hidden，0x10：directory．．．）
+  \item \texttt{Time}：ファイルの最終変更時刻
+  \item \texttt{Date}：ファイルの最終変更日
+  \item \texttt{Cls}：データが格納されている先頭クラスタの番号
+  \item \texttt{Size}：ファイルの大きさ（バイト単位）
+  \end{itemize}
+\end{frame}
+
+%=========================================================================
+\begin{frame}
+  \frametitle{FAT（File Allocation Table）}
+  \centering{
+    \begin{minipage}{0.45\columnwidth}
+      \fig{scale=0.9}{fatConcept.pdf}
+    \end{minipage}
+    \begin{minipage}{0.45\columnwidth}
+      \tbl{scale=0.9}{fatClsNum.pdf}
+    \end{minipage}
+  }
+  \vfill
+  \begin{itemize}
+  \item クラスタをファイルに割り当てる表
+  \item FATエントリとクラスタが一対一対応
+  \item FAT16ではFATエントリが16ビット
+  \item \texttt{0x0002}〜\texttt{0xfff6}が普通のクラスタ番号
+  \item \emph{クラスタチェイン}を形成する．
+  \item ディレクトリエントリの\texttt{Cls}がチェインの先頭を指す．
+  \end{itemize}
+\end{frame}
+
+%=========================================================================
+\begin{frame}
+  \frametitle{FATファイルシステムの全体像を示す例}
+  \fig{scale=0.7}{fatFileSystem-crop.pdf}
+\end{frame}
+
+%=========================================================================
+\begin{frame}
+  \frametitle{ディレクトリファイル}
+  \lst{numbers=none}{fatDirDump.txt}
+  \begin{itemize}
+  \item ルートディレクトリ以外のディレクトリは\texttt{Atr=0x10}のファイル
+  \item 上の実行例はmacOSでFAT16ファイルシステム上で実験したもの
+  \item 最初の2エントリーは「\texttt{.}」と「\texttt{..}」を格納している．
+  \end{itemize}
+  \vfill
+\end{frame}
+
+%=========================================================================
+\begin{frame}
+  \frametitle{練習問題}
   \begin{enumerate}
   \item[1.] 次の言葉の意味を説明しなさい．
     \begin{itemize}
-    \item ディレクトリシステム
-    \item パス，絶対パス，相対パス
-    \item ディレクトリ，ファイル
-    \item ハードリンク，シンボリックリンク
-    \item ショートカット，エイリアス
-    \item マウント，ドライブレター
-    \item 拡張属性，ACL
+    \item BPB
+    \item ルートディレクトリ
+    \item クラスタ
+    \item ディレクトリエントリ
+    \item FAT
+    \item クラスタチェイン
+    \item ディレクトリファイル
     \end{itemize}
 
-  \item[2.] 自分のオペレーティングシステムについて調査しなさい．\\
-    （GUIよりCLIのコマンドを用い方がより詳しい観察ができる．）
-    \begin{itemize}
-    \item ショートカット（Windows），エイリアス（macOS）
-    \item ファイルの属性（保護，日時，所有者，サイズ等）
-    \item 拡張属性が使用できるオペレーティングシステムか？
-    \item ACLが使用できるオペレーティングシステムか？
-    \item USBメモリにはどのようなパスで到達できるか？
-    \item ファイルシステムの一貫性をチェックするコマンドは何か？
-    \end{itemize}
-  \end{enumerate}
-\end{frame}
+  \item[2.] ディレクトリファイルのダンプリストを
+    ディレクトリエントリの構造と比較しながら解析しなさい．
 
-%=========================================================================
-\begin{frame}[fragile]
-  \frametitle{練習問題（２）}
-  \begin{enumerate}
-  \item[3.] 自分が使用しているオペレーティングシステムで試してみなさい．
-    \begin{itemize}
-    \item ショートカットやエイリアスを作成し試してみなさい．
-\begin{lstlisting}
-      # macOSの場合の実行例
-      $ echo aaa > a.txt
-      $ open a.txt
-      $ open a.txtのエイリアス      <--- エイリアスはGUIで作る
-      $ cat a.txt
-      $ cat a.txtのエイリアス
-\end{lstlisting} %$
-    \item UNIXやmacOSで実行して結果が異なる理由を考察しなさい．
-\begin{lstlisting}
-      # ハードリンクの場合          # シンボリックリンクの場合
-      $ echo aaa > a.txt          $ echo aaa > a.txt
-      $ echo bbb > b.txt          $ echo bbb > b.txt
-      $ ln a.txt c.txt            $ ln -s a.txt c.txt
-      $ mv a.txt d.txt            $ mv a.txt d.txt
-      $ mv b.txt a.txt            $ mv b.txt a.txt
-      $ cat c.txt                 $ cat c.txt
-\end{lstlisting} %$
-    \item ショートカットやエイリアスの振る舞いを調べる．\\
-      （リンク先ファイルを削除・移動・別ファイルに置換えした場合など）
-    \item ACLの追加・削除とその効果を確認する．
-    \end{itemize}
+  \item[3.] 全体像を示す例の\texttt{ABCDEFGH.TXT}ファイルの
+    第\texttt{0x00002000}バイトが格納されるクラスタの番号を答えなさい．
+
+  \item[4.] 前問と同様に，
+    第\texttt{0x00004000}，\texttt{0x00008000}，\texttt{0x00010000}
+    バイトに付いて答えなさい．
   \end{enumerate}
 \end{frame}
 

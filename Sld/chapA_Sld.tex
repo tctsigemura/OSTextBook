@@ -1,11 +1,11 @@
 %\documentclass[dvipdfmx]{beamer}
-\documentclass{beamer}                   % lualatex の場合
+\documentclass[unicode]{beamer}                   % lualatex の場合
 \usepackage{mySld}
 
 \begin{document}
-\title[メモ管理の実装例]{オペレーティングシステム\\第１０章 メモリ管理の実装例}
+\title[セグメンテーション]
+      {オペレーティングシステム\\第１１章 セグメンテーション}
 \date{}
-
 \begin{frame}
   \titlepage
   \centerline{\url{https://github.com/tctsigemura/OSTextBook}}
@@ -17,90 +17,243 @@
 %  \frametitle{}
 %\end{frame}
 
-\section{メモリ管理の実装例}
+\section{セグメンテーション}
 %=========================================================================
 \begin{frame}
-  \frametitle{メモリ管理の実装例}
-  TacOSのメモリ管理プログラムを実装例とする．
+  \frametitle{リロケーションレジスタ方式（復習）}
+  プロセスの仮想アドレス空間を
+  物理アドレス空間にマッピングする．
+  \vspace{3mm}
+  \fig{scale=0.4}{memorySpaceMapping-crop.pdf}
   \begin{itemize}
-  \item 可変区画方式
-  \item ファーストフィット
-  \item OSがユーザプロセス領域の割当てに使用
-  \item プロセスがヒープ領域を管理するプログラムも同じアルゴリズム
+  \item プロセス毎に独立した仮想アドレスを持てる．
+  \item 仮想アドレス空間はいつも0番地から開始できる．
+  \item 動的なメモリコンパクションができる．
   \end{itemize}
 \end{frame}
 
 %=========================================================================
 \begin{frame}
-  \frametitle{データ構造の初期化}
-  \lst{language={C++}}{memBlk.cmm}
+  \frametitle{リロケーションレジスタ方式の問題点（1/2）}
+  プロセスの仮想アドレス空間は次のような領域から構成された．
+  \vspace{3mm}
+  \fig{scale=0.4}{memoryMapVsClang-crop.pdf}
   \begin{itemize}
-  \item {\tt memInit()}はカーネル起動時に一度だけ実行される．
-  \item 番兵付きのリストで管理する．
+  \item 必要なメモリの見積もりが難しい．\\
+    実行時にヒープ領域やスタック領域が不足する可能性がある．\\
+    実行前に必要なメモリサイズを見積もる必要があり使い勝手が悪い．
   \end{itemize}
 \end{frame}
 
 %=========================================================================
 \begin{frame}
-  \frametitle{初期化直後のデータ構造}
-  \fig{scale=0.6}{mmInit-crop.pdf}
+  \frametitle{リロケーションレジスタ方式の問題点（2/2）}
+  プロセスの仮想アドレス空間は次のような領域から構成された．
+  \vspace{3mm}
+  \fig{scale=0.4}{memoryMapVsClang-crop.pdf}
   \begin{itemize}
-  \item {\tt \_end()}はカーネルサイズにより決まる．
-  \item EOOO より後ろはビデオメモリやIPL ROMがある．
-  \end{itemize}
-\end{frame}
-
-%=========================================================================
-\begin{frame}[fragile]
-  \frametitle{メモリの割付け}
-  右のプログラムでa，b，cを割付けたときのデータ構造
-  \begin{center}
-    \begin{minipage}{0.39\columnwidth}
-    \fig{scale=0.5}{mmAlloc-crop.pdf}
-    \end{minipage}
-    \begin{minipage}{0.59\columnwidth}
-      \begin{lstlisting}
-a = mmAlloc( 1024 );  // 1KiB の領域を割り付ける
-b = mmAlloc( 1024 );  // 1KiB の領域を割り付ける
-c = mmAlloc( 1024 );  // 1KiB の領域を割り付ける
-      \end{lstlisting}
-    \end{minipage}
-  \end{center}
-\end{frame}
-
-%=========================================================================
-\begin{frame}
-  \frametitle{メモリの割付けプログラム}
-  \lst{basicstyle={\tiny\ttfamily},language={C++}}{mmAlloc.cmm}
-\end{frame}
-
-%=========================================================================
-\begin{frame}
-  \frametitle{領域の解放}
-  b，cを開放したときのデータ構造\\\vfill
-  \begin{minipage}{0.49\columnwidth}
-    \fig{scale=0.6}{mmFree1-crop.pdf}
-  \end{minipage}
-  \begin{minipage}{0.49\columnwidth}
-    \fig{scale=0.6}{mmFree2-crop.pdf}
-  \end{minipage}
-\end{frame}
-
-%=========================================================================
-\begin{frame}
-  \frametitle{メモリの解放プログラム（前半）}
-  \lst{language={C++},lastline=15,frame=tlr}{mmFree.cmm}
-  \begin{itemize}
-  \item 領域の本当の先頭アドレスを計算する．
-  \item {\tt MAGIC}を確認する．
-  \item 空き領域リストを辿り，挿入位置を決める．
+  \item 領域の性質応じたメモリ保護ができない．\\
+    \begin{itemize}
+    \item プログラム領域は読み出しと実行だけ許可する．
+    \item データ，ヒープ，スタック領域に読み出しと書き込みだけ許可する．
+    \end{itemize}
   \end{itemize}
 \end{frame}
 
 %=========================================================================
 \begin{frame}
-  \frametitle{メモリの解放プログラム}
-  \lst{language={C++},firstline=16,frame=lrb}{mmFree.cmm}
+  \frametitle{セグメント}
+  プロセスに複数のアドレス空間を持たせる．
+  \vspace{3mm}
+  \fig{scale=0.7}{segment-crop.pdf}
+  \begin{itemize}
+  \item 複数持つことができるアドレス空間＝\emph{セグメント}
+  \item 前の例で「プログラム」，「データ」等をセグメントにする．
+  \item セグメント毎にサイズや保護モード（rwx）を決める．
+  \item セグメント番号とセグメント内アドレスの二次元空間になった．
+  \end{itemize}
+  \emph{仮想アドレス空間内の配置問題が解決！！}
+\end{frame}
+
+%=========================================================================
+\begin{frame}
+  \frametitle{セグメント番号}
+  セグメント番号はどこから供給するのか？
+  \begin{itemize}
+  \item 機械語命令にセグメント番号を持たせる．
+    \vspace{3mm}
+    \fig{scale=0.6}{segmentationInstruction-crop.pdf}
+    プログラムが大きくなる．
+  \item カレントセグメント
+    \fig{scale=0.6}{segmentCall-crop.pdf}
+    \texttt{CALLS}，\texttt{RETS}命令でセグメントが自動的に切り換わる．\\
+    IA-32ではカレントセグメントが複数ある．\\
+    （CS:プログラム，DS:データ，SS:スタックセグメント等）
+  \end{itemize}
+\end{frame}
+
+%=========================================================================
+\begin{frame}
+  \frametitle{セグメンテーション機構（1/3）}
+  \fig{scale=0.5}{segmentation-crop.pdf}
+
+  \begin{itemize}
+  \item CPUはセグメント番号（S）とセグメント内アドレス（A）を出力
+  \item セグメントテーブルを使用して物理アドレスに変換する．
+  \item 本当は，セグメントテーブルはメモリ上に置く．
+  \item セグメントテーブルレジスタはセグメントテーブルのアドレス
+  \end{itemize}
+\end{frame}
+
+%=========================================================================
+\begin{frame}
+  \frametitle{セグメンテーション機構（2/3）}
+  セグメントテーブル
+  \begin{itemize}
+  \item セグメント番号をインデクスにしてSでエントリを選択する．
+  \item B（Base）フィールドはセグメントのベースアドレス
+  \item L（Limit）フィールドはセグメントのサイズ
+  \item BとLはリロケーションレジスタと同じ．
+  \item C（制御）フィールドは以下のビットを含む．
+    \vspace{3mm}
+    \tbl{scale=0.9}{segmentTableAttr.pdf}
+    V=0なら\emph{セグメント不在割込み}を発生 \\
+    D=0ならスワップアウトで書き戻しが不要 \\
+    RWXはそのセグメントに許される操作（\emph{メモリ保護違反割込み}）
+  \end{itemize}
+\end{frame}
+
+%=========================================================================
+\begin{frame}
+  \frametitle{セグメンテーション機構（3/3）}
+  \fig{scale=0.5}{segmentation-crop.pdf}
+
+  物理アドレスへの変換
+  \begin{enumerate}
+  \item[1] セグメントテーブルのエントリを読み出す．
+  \item[2] Cフィールド（V，RWX）をチェックする．
+  \item[3] セグメント内アドレスをチェックする．
+  \item[4] $B[S] + A$ が物理アドレスになる．
+  \end{enumerate}
+\end{frame}
+
+%=========================================================================
+\begin{frame}
+  \frametitle{セグメントテーブルエントリのキャッシング}
+  物理アドレスへの変換
+  \begin{itemize}
+  \item メモリアクセスの度にセグメントテーブルを参照？
+  \item メモリアクセス回数が二倍になる．
+  \item メモリはいつも混み合っている（次のページ）．
+  \item 一度参照したセグメントテーブルエントリはCPUまたはMMUに
+    キャッシュするべきだ．
+  \item IA-32ではカレントセグメントレジスタに裏レジスタがある．
+    \vspace{3mm}
+    \fig{scale=0.5}{segmentIa32-crop.pdf}
+    裏レジスタは自動的にロード，使用される．
+  \end{itemize}
+\end{frame}
+
+%=========================================================================
+\begin{frame}
+  \frametitle{メモリはいつも混み合っている（参考）}
+  \fig{scale=0.41}{hardBlock-crop.pdf}
+
+  \begin{itemize}
+  \item 命令もデータも全てメモリにある．
+  \item CPUもI/O装置もメモリにアクセスする．
+  \item フォン・ノイマン・ボトルネック(Von Neumann bottleneck)
+  \end{itemize}
+\end{frame}
+
+%=========================================================================
+\begin{frame}
+  \frametitle{セグメンテーション機構による仮想記憶}
+  \fig{scale=0.5}{segmentSwapping-crop.pdf}
+  \vspace{3mm}
+  全体がメモリに収まらない大きなプログラムも実行できる．
+  \begin{itemize}
+  \item 例えばセグメント3のサブルーチンを実行したい（\texttt{CALL 3:0}）
+  \item セグメント3はセグメント不在なのでOSに切り換わる．
+  \item メモリに入り切らないのでセグメント1を\emph{スワップアウト}
+  \item メモリの空き領域にセグメント3を\emph{スワップイン}
+  \end{itemize}
+  知らない間にOSが自動的にスワッピングを行う．（仮想記憶！！）
+\end{frame}
+
+%=========================================================================
+\begin{frame}
+  \frametitle{セグメントの共用}
+  プロセス間でセグメントを共用しメモリを節約する．
+  \begin{itemize}
+    \item プログラムや定数等は書き変わらない．（共有可）
+      \begin{itemize}
+      \item プログラム本体
+      \item サブルーチン（ライブラリ）
+      \item 定数表
+      \end{itemize}
+    \item データ，ヒープ，スタック等は書き換わる．（共有不可）\\
+      プロセス毎に別のコピーを持つ必要がある．
+  \end{itemize}
+\end{frame}
+
+%=========================================================================
+\begin{frame}
+%  \frametitle{セグメントの共用}
+  \fig{scale=0.4}{segmentSharing-crop.pdf}
+\end{frame}
+
+%=========================================================================
+\begin{frame}
+  \frametitle{セグメンテーションの利点・欠点（1/2）}
+  \emph{利点}
+  \begin{itemize}
+  \item セグメントには，例えば「C言語ライブラリセグメント」のような，
+    論理的な意味を持たせることができる．
+  \item セグメントの論理的な意味を反映したメモリ保護が可能である．
+  \item プログラムやデータの共用が容易である．
+  \item セグメントの長さは自由に決められるので内部フラグメントが発生しない．
+  \item セグメントの長さは動的に変化させることも可能である．
+  \item セグメント単位のスワッピングを用いて仮想記憶を実現できる．
+  \end{itemize}
+\end{frame}
+
+%=========================================================================
+\begin{frame}
+  \frametitle{セグメンテーションの利点・欠点（2/2）}
+  \emph{欠点}
+  \begin{itemize}
+  \item 物理アドレス空間に外部フラグメントが生じる．
+  \item 外部フラグメントの解消にはメモリコンパクションが必要である．
+  \item 物理メモリ上に連続した領域が必要である．
+  \item 物理メモリより大きいセグメントを作ることができない．
+  \end{itemize}
+
+  これらの欠点を克服するために，
+  ページングを組み合わせたシステムがある．
+  （IA-32，MULTICS）
+\end{frame}
+
+%=========================================================================
+\begin{frame}
+  \frametitle{問題}
+
+  \begin{itemize}
+    \item セグメンテーション機構の図で，
+      セグメントテーブルに適当な値を設定し幾つかの二次元アドレスが
+      変換させる物理アドレスを確かめなさい．
+    \item あるセグメントサイズが大きくなる場合の，
+      セグメントテーブルの変更項目等を指摘しなさい．
+    \item メモリコンパクションの手順を説明しなさい．
+    \item スタックセグメントを意識した
+    \emph{前向きに伸びるセグメント}も利用可能な
+    セグメンテーション機構を設計しなさい．
+    \begin{enumerate}
+    \item[1] セグメントテーブルに必要な変更は？
+    \item[2] 機構に必要な変更は？
+    \item[3] 他に必要な変更は?
+    \end{enumerate}
+  \end{itemize}
 \end{frame}
 
 \end{document}

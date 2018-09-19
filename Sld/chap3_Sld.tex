@@ -1,5 +1,5 @@
 %\documentclass[dvipdfmx]{beamer}
-\documentclass{beamer}                   % lualatex の場合
+\documentclass[unicode]{beamer}                   % lualatex の場合
 \usepackage{mySld}
 
 \begin{document}
@@ -55,7 +55,7 @@
 \section{プロセスの切換え}
 \begin{frame}
   \frametitle{プロセスの切換え}
-  \fig{scale=0.33}{procSwitch-crop.pdf}
+  \fig{scale=0.38}{procSwitch-crop.pdf}
 \end{frame}
 
 %=========================================================================
@@ -72,7 +72,7 @@
 %=========================================================================
 \begin{frame}
   \frametitle{プロセスの切換えの例}
-  \fig{scale=0.33}{procSwitchInst-crop.pdf}
+  \fig{scale=0.34}{procSwitchInst-crop.pdf}
 \end{frame}
 
 %=========================================================================
@@ -123,21 +123,18 @@
 \end{frame}
 
 %=========================================================================
-\begin{frame}[fragile]
-  \frametitle{TaCのPCB（前半）}
-  \lst{language={C},lastline=18,frame=tlr}{pcb.hmm}
-\end{frame}
-
-%=========================================================================
-\begin{frame}[fragile]
-  \frametitle{TaCのPCB（後半）}
-  \lst{language={C},firstline=20,firstnumber=20,frame=lrb}{pcb.hmm}
+\begin{frame}
+  \frametitle{TacOSのPCB（前半）}
+  \src{firstline=56,lastline=67,frame=tlr,xleftmargin=5mm}{kernel/process.hmm}
+  \vspace{-5mm}\src{firstline=68,lastline=76,frame=lr,
+  numbers=left,xleftmargin=5mm,firstnumber=1}{kernel/process.hmm}
 \end{frame}
 
 %=========================================================================
 \begin{frame}
-  \frametitle{TacOSのメモリ配置}
-  \fig{scale=0.4}{tacosMemMap-crop.pdf}
+  \frametitle{TacOSのPCB（後半）}
+  \src{firstline=77,lastline=96,frame=lrb,
+  numbers=left,xleftmargin=5mm,firstnumber=10}{kernel/process.hmm}
 \end{frame}
 
 %=========================================================================
@@ -152,15 +149,42 @@
 \end{frame}
 
 %=========================================================================
-\begin{frame}[fragile]
-  \frametitle{プロセス切換えプログラム（yield()）}
-  \lst{lastline=23,frame=tlr}{dispatch.s}
+\begin{frame}
+  \frametitle{TacOSのメモリ配置}
+  \fig{scale=0.4}{tacosMemMap-crop.pdf}
+\end{frame}
+
+%=========================================================================
+\begin{frame}
+  \frametitle{TacOSのタイマー管理プログラム}
+  \src{firstline=465,lastline=483,
+  numbers=left,xleftmargin=5mm,firstnumber=3}{kernel/kernel.cmm}
 \end{frame}
 
 %=========================================================================
 \begin{frame}[fragile]
-  \frametitle{プロセスの切換えプログラム（dispatch()）}
-  \lst{firstline=24,firstnumber=24,frame=lrb}{dispatch.s}
+  \frametitle{TacOSのコンテキスト保存プログラム（yield()）}
+  \src{firstline=49,lastline=56,frame=tlr,
+  numbers=left,xleftmargin=5mm,firstnumber=1}{kernel/dispatcher.s}
+  \vspace{-5mm}\begin{lstlisting}[frame=lr,xleftmargin=5mm]
+
+        ...
+  \end{lstlisting}
+  \vspace{-5mm}\src{firstline=65,lastline=77,frame=lr,
+  numbers=left,xleftmargin=5mm,firstnumber=17}{kernel/dispatcher.s}
+\end{frame}
+
+%=========================================================================
+\begin{frame}[fragile]
+  \frametitle{TacOSのコンテスト復旧プログラム（dispatch()）}
+  \src{firstline=78,lastline=90,frame=lr,
+    numbers=left,xleftmargin=5mm,firstnumber=1}{kernel/dispatcher.s}
+  \vspace{-5mm}\begin{lstlisting}[frame=lr,xleftmargin=5mm]
+
+        ...
+  \end{lstlisting}
+  \vspace{-5mm}\src{firstline=98,lastline=102,frame=lrb,
+    numbers=left,xleftmargin=5mm,firstnumber=21}{kernel/dispatcher.s}
 \end{frame}
 
 %=========================================================================
@@ -209,13 +233,15 @@
 %=========================================================================
 \begin{frame}[fragile]
   \frametitle{M個のスレッドで合計を計算する（前半）}
-  \lst{language={C},lastline=21,frame=tlr}{threadTest.c}
+  \smp{language={C},lastline=21,frame=tlr,
+    numbers=left,xleftmargin=5mm,firstnumber=1}{pThread/threadTest.c}
 \end{frame}
 
 %=========================================================================
 \begin{frame}[fragile]
   \frametitle{M個のスレッドで合計を計算する（後半）}
-  \lst{language={C},firstline=22,firstnumber=22,frame=lrb}{threadTest.c}
+  \smp{language={C},firstline=22,frame=lrb,
+    numbers=left,xleftmargin=5mm,firstnumber=22}{pThread/threadTest.c}
 \end{frame}
 
 %=========================================================================

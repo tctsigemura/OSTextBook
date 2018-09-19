@@ -1,5 +1,5 @@
 %\documentclass[dvipdfmx]{beamer}
-\documentclass{beamer}                   % lualatex の場合
+\documentclass[unicode]{beamer}                   % lualatex の場合
 \usepackage{mySld}
 
 \begin{document}
@@ -249,14 +249,14 @@
 %=========================================================================
 \begin{frame}
   \frametitle{セマフォの使用例（リーダ・ライタ問題 1/2）}
-  \lst{language={C},lastline=12,frame=tlr}{semReaderWriter.c}
+  \lst{language={C},lastline=10,frame=tlr}{semReaderWriter.c}
   {\bf 排他ロック（exclusive lock）}
 \end{frame}
 
 %=========================================================================
 \begin{frame}
   \frametitle{セマフォの使用例（リーダ・ライタ問題 2/2）}
-  \lst{language={C},firstline=13,frame=lrb}{semReaderWriter.c}
+  \lst{language={C},firstline=11,frame=lrb}{semReaderWriter.c}
   {\bf 共有ロック（shared lock）}
 \end{frame}
 
@@ -264,7 +264,7 @@
 \section{TacOSのセマフォ}
 \begin{frame}
   \frametitle{TacOSのセマフォ構造体（カーネル内）}
-  \lst{language={C}}{sem.hmm}
+  \src{firstline=99,lastline=104}{kernel/process.hmm}
   \begin{itemize}
     \item セマフォは最大30個（TaCのメモリは小さい）
     \item セマフォ構造体の名前は{\tt Sem}
@@ -287,25 +287,35 @@
 %=========================================================================
 \begin{frame}
   \frametitle{TacOSでのセマフォの架空の使用例}
-  \lst{language={C}}{tacosSemUse.cmm}
+  \src{numbers=left,xleftmargin=5mm}{samples/tacosSemUse.cmm}
 \end{frame}
 
 %=========================================================================
 \begin{frame}
   \frametitle{TacOSのセマフォ割当て解放ルーチン（カーネル内）}
-  \lst{language={C}}{tacosNewSem.cmm}
+  \src{firstline=142,lastline=164,
+    numbers=left,xleftmargin=5mm}{kernel/kernel.cmm}
 \end{frame}
 
 %=========================================================================
 \begin{frame}
   \frametitle{TacOSのP操作ルーチン（カーネル内）}
-  \lst{language={C}}{tacosSemP.cmm}
+  \src{firstline=171,lastline=186,
+    numbers=left,xleftmargin=5mm}{kernel/kernel.cmm}
+\end{frame}
+
+%=========================================================================
+\begin{frame}
+  \frametitle{TacOSのPCBリスト操作関数（カーネル内）}
+  \src{firstline=113,lastline=125,
+    numbers=left,xleftmargin=5mm}{kernel/kernel.cmm}
 \end{frame}
 
 %=========================================================================
 \begin{frame}
   \frametitle{TacOSのV操作ルーチン（1/2）（カーネル内）}
-  \lst{language={C},lastline=19,frame=tlr}{tacosSemV.cmm}
+  \src{firstline=188,lastline=208,frame=tlr,
+    numbers=left,xleftmargin=5mm}{kernel/kernel.cmm}
   \begin{itemize}
   \item {\tt iSemV()}は割込禁止で呼び出す．
   \end{itemize}
@@ -314,7 +324,8 @@
 %=========================================================================
 \begin{frame}
   \frametitle{TacOSのV操作ルーチン（2/2）（カーネル内）}
-  \lst{language={C++},firstline=20,frame=lrb}{tacosSemV.cmm}
+  \src{firstline=210,lastline=220,frame=blr,
+    numbers=left,xleftmargin=5mm,firstnumber=23}{kernel/kernel.cmm}
   \begin{itemize}
   \item {\tt iSemV()}を呼び出す前に割込禁止にする．
   \item {\tt iSemV()}がtrueで返ったらプロセスの切換えを試みる．
@@ -326,7 +337,8 @@
 %=========================================================================
 \begin{frame}
   \frametitle{TacOSのCPUフラグ操作関数（カーネル内）}
-  \lst{language=}{setPri.s}
+  \src{firstline=47,lastline=52,
+    numbers=left,xleftmargin=5mm}{util/crt0.s}
   \begin{itemize}
   \item CPUのPSWのフラグに割込禁止ビットがある．
   \item {\tt C--}言語から{\tt setPri()}関数として呼び出せるようにするには，

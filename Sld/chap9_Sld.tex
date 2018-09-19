@@ -1,5 +1,5 @@
 %\documentclass[dvipdfmx]{beamer}
-\documentclass{beamer}                   % lualatex の場合
+\documentclass[unicode]{beamer}                   % lualatex の場合
 \usepackage{mySld}
 
 \begin{document}
@@ -21,8 +21,17 @@
 %=========================================================================
 \begin{frame}
   \frametitle{固定区画方式}
-  \fig{scale=0.45}{fixedPartition-crop.pdf}
+  \begin{minipage}{0.49\columnwidth}
+    \fig{scale=0.45}{fixedPartitionLoad-crop.pdf}
+    \centerline{(a) 区画を選択しプロセスをロード}
+  \end{minipage}
+  \begin{minipage}{0.49\columnwidth}
+    \fig{scale=0.45}{fixedPartitionExec-crop.pdf}
+    \centerline{(b) プロセスを実行}
+  \end{minipage}
+  \vfill
   予めメモリを大小数種類の区画に分割しておく．
+  \vfill
 \end{frame}
 
 %=========================================================================
@@ -44,6 +53,7 @@
 \begin{frame}
   \frametitle{可変区画方式}
   \fig{scale=0.45}{variablePartition-crop.pdf}
+  \vfill
   必要に応じて空き領域から区画を作る．\\
   {\bf 外部フラグメント}が生じる．
 \end{frame}
@@ -52,7 +62,7 @@
 %=========================================================================
 \begin{frame}
   \frametitle{可変区画方式の領域選択方式}
-  \fig{scale=0.4}{firstBestWorstFit-crop.pdf}
+  \fig{scale=0.46}{firstBestWorstFit-crop.pdf}
   \begin{itemize}
   \item ファーストフィット（first-fit）方式：アドレス順にさがす．
   \item ベストフィット（best-fit）方式：最小の領域を選択する．
@@ -65,6 +75,7 @@
 \begin{frame}
   \frametitle{空き領域の管理方式（ビットマップ方式）}
   どこに利用可能な空き領域があるかビットマップで管理する．
+  \vfill
   \fig{scale=0.5}{bitMap-crop.pdf}
   \begin{itemize}
   \item メモリを一定の大きさのブロックに分割する．
@@ -93,7 +104,9 @@
   \frametitle{空き領域の管理方式（リスト方式）}
   空き領域をリストにして管理する．\\
   様々なサイズの空き領域が混在しても良い．
-  \fig{scale=0.5}{memFree-crop.pdf}
+  \vfill
+  \fig{scale=0.6}{memFree-crop.pdf}
+  \vfill
   使用中の領域が解放されると隣接する空き領域と合体させる．
 \end{frame}
 
@@ -107,6 +120,96 @@
     \item ファーストフィットの探索に都合が良い．
     \item 隣接領域との合体にも都合が良い．
   \end{itemize}
+\end{frame}
+
+\section{メモリ管理の実装例}
+%=========================================================================
+\begin{frame}
+  \frametitle{メモリ管理の実装例}
+  TacOSのメモリ管理プログラムを実装例とする．
+  \begin{itemize}
+  \item 可変区画方式
+  \item ファーストフィット
+  \item OSがユーザプロセス領域の割当てに使用
+  \item プロセスがヒープ領域を管理するプログラムも同じアルゴリズム
+  \end{itemize}
+\end{frame}
+
+%=========================================================================
+\begin{frame}
+  \frametitle{データ構造の初期化}
+  \src{firstline=52,lastline=72,numbers=left,xleftmargin=5mm}{mm/mm.cmm}
+  \begin{itemize}
+  \item {\tt memInit()}はカーネル起動時に一度だけ実行される．
+%  \item 番兵付きのリストで管理する．
+  \end{itemize}
+\end{frame}
+
+%=========================================================================
+\begin{frame}
+  \frametitle{初期化直後のデータ構造}
+  \fig{scale=0.6}{mmInit-crop.pdf}
+  \begin{itemize}
+  \item {\tt \_end()}はカーネルサイズにより決まる．
+  \item EOOO より後ろはビデオメモリやIPL ROMがある．
+  \end{itemize}
+\end{frame}
+
+%=========================================================================
+\begin{frame}[fragile]
+  \frametitle{メモリの割付け}
+  右のプログラムでa，b，cを割付けたときのデータ構造
+  \begin{center}
+    \begin{minipage}{0.39\columnwidth}
+    \fig{scale=0.5}{mmAlloc-crop.pdf}
+    \end{minipage}
+    \begin{minipage}{0.59\columnwidth}
+      \begin{lstlisting}
+a = mmAlloc( 1024 );  // 1KiB の領域を割り付ける
+b = mmAlloc( 1024 );  // 1KiB の領域を割り付ける
+c = mmAlloc( 1024 );  // 1KiB の領域を割り付ける
+      \end{lstlisting}
+    \end{minipage}
+  \end{center}
+  \vfill
+\end{frame}
+
+%=========================================================================
+\begin{frame}
+  \frametitle{メモリの割付けプログラム}
+  \src{basicstyle={\tiny\ttfamily},
+    numbers=left,xleftmargin=5mm,firstline=77,lastline=102}{mm/mm.cmm}
+\end{frame}
+
+%=========================================================================
+\begin{frame}
+  \frametitle{領域の解放}
+  b，cを開放したときのデータ構造\\\vfill
+  \begin{minipage}{0.49\columnwidth}
+    \fig{scale=0.6}{mmFree1-crop.pdf}
+  \end{minipage}
+  \begin{minipage}{0.49\columnwidth}
+    \fig{scale=0.6}{mmFree2-crop.pdf}
+  \end{minipage}
+\end{frame}
+
+%=========================================================================
+\begin{frame}
+  \frametitle{メモリの解放プログラム（前半）}
+  \src{firstline=108,lastline=123,frame=tlr,
+    numbers=left,xleftmargin=5mm,firstnumber=1}{mm/mm.cmm}
+  \begin{itemize}
+  \item 領域の本当の先頭アドレスを計算する．
+  \item {\tt MAGIC}を確認する．
+  \item 空き領域リストを辿り，挿入位置を決める．
+  \end{itemize}
+\end{frame}
+
+%=========================================================================
+\begin{frame}
+  \frametitle{メモリの解放プログラム（後半）}
+  \src{firstline=124,lastline=144,frame=lrb,
+    numbers=left,xleftmargin=5mm,firstnumber=17}{mm/mm.cmm}
 \end{frame}
 
 %=========================================================================
