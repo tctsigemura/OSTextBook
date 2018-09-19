@@ -112,9 +112,9 @@
 \end{myfig}
 
 エントリーセクションで
-DI（Disable Interrrupt）命令を実行し割込みを禁止する．
+DI（Disable Interrupt）命令を実行し割込みを禁止する．
 エグジットセクションで
-EI（Enable Interrrupt）命令を実行し割込みを許可する．
+EI（Enable Interrupt）命令を実行し割込みを許可する．
 クリティカルセクションでは，
 CPUが割込みを受付けない\footnote{
   再度，割込みが許可されるまで保留になる．
@@ -314,7 +314,7 @@ CPUが割込みを受付けない\footnote{
   ここで取り上げるカウンタを持つものは\emph{カウンティングセマフォ}と呼ぶ．
   カウンタの値は0以上の整数値である．
 }を持ち，また，プロセスの待ち行列を作ることができる．
-セマフォ型（\|Sempahore|）の変数には，
+セマフォ型（\|Semaphore|）の変数には，
 \emph{P操作（Proberen:try）}と\emph{V操作（Verhogen:raise）}を
 行うことができる．
 カーネルはP操作とV操作を，
@@ -446,9 +446,9 @@ CPUが割込みを受付けない\footnote{
 
   \item [生産者スレッド]
     次回書き込み位置を表す\|in|変数を
-    複数の\|procucerThread|で共有する必要がある．
+    複数の\|producerThread|で共有する必要がある．
     \|in|変数の宣言を4行に移動し，スレッド間の共有変数に変更した．
-    また，\|in|変数を\|procucerThread|間で相互排除するためのセマフォ\|inSem|を
+    また，\|in|変数を\|producerThread|間で相互排除するためのセマフォ\|inSem|を
     5行に追加した．
 
     \|producerThread|では，\|in|変数の参照や書き換えを行う11行と12行が
