@@ -72,6 +72,7 @@ C++やJavaなどを学んだことのある人なら，
 
 \subsection{条件変数}
 モニタの内部に必要に応じて名前付きで宣言する．
+モニタの外部から直接アクセスすることはできない．
 条件変数にはwaitとsignalの二つの操作ができる．
 wait操作を行ったスレッドは\emph{ガードを外して}条件変数の待ち行列に入る．
 signal操作は条件変数の待ち行列から一つのスレッドを選んで実行可能にする．
@@ -442,7 +443,7 @@ Java言語はモニタに似た機能をサポートする言語であるが，
   （リスト\ref{semProducerBuffer1}，リスト\ref{semProducerBuffer2}）を
   実際に実行しなさい．
   メインルーチンを含むソースプログラムは以下から入手できる． \\
-  \url{https://github.com/tctsigemura/OSTextBook/blob/master/SampleCode/SemBoundedBuffer/}
+  \url{\git/SampleCode/SemBoundedBuffer/}
 \item \|signal()|は\emph{手続きの最後でしか使用できないことにすると}，
   \texttt{semBoundedBuffer}
   （リスト\ref{semProducerBuffer1}，リスト\ref{semProducerBuffer2}）は
@@ -450,7 +451,7 @@ Java言語はモニタに似た機能をサポートする言語であるが，
 \item \texttt{MonBoundedBuffer}（リスト\ref{javaMonProducerConsumer}）を
   実際に実行しなさい．
   メインルーチンを含むソースプログラムは以下から入手できる．\\
-  \url{https://github.com/tctsigemura/OSTextBook/blob/master/SampleCode/MonBoundedBuffer/}
+  \url{\git/SampleCode/MonBoundedBuffer/}
 \item リスト\ref{monProducerConsumer}のプログラムと，
   リスト\ref{javaMonProducerConsumer}でコメントに示すように実行順序が異なる．
   Javaのモニタ風機構と従来のモニタのどのような違いによるものか？

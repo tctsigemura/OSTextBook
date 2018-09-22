@@ -117,7 +117,6 @@ ZFSは，
   %使用する．
 
 \item ZPL（ZFS POSIX Layer）は VNODE 操作をZFSのトランザクションに変換する．
-  1つのシステムコールが1つのトランザクションに変換される．
 
 \item DMU（Data Management Unit）は複数のトランザクションをひとまとめにした
   \emph{トランザショングループ}を作る．
@@ -339,9 +338,9 @@ Objsetには最大三つのdnodeを埋め込むことができる．
 \item このdnodeリストがUFSの{\inode}リストに相当する．
 \item dnodeリスト先頭の master node は root ディレクトリの dnode 番号や
   ファイルシステムのバージョン番号などを格納している．
-\item dnodeリストの二番目の dnode は通常ファイルを表現している．
-\item dnodeリストの三番目の dnode はディレクトリファイルを表現している．
-  ディレクトリファイルは\emph{ファイル名とdnode番号の対応表}である．
+\item dnodeリストの二番目の dnode は通常ファイルの例である．
+\item dnodeリストの三番目の dnode はディレクトリファイルの例である．
+  ディレクトリファイルは\emph{ファイル名とdnode番号の対応表}を格納する．
 \item 図ではObjsetはファイルシステム本体だけ管理しているが，
   実際はユーザやグループ毎の記憶領域の使用量を管理するオブジェクトや，
   ファイルシステムでは使用されなくなったが

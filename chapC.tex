@@ -90,7 +90,7 @@ swap-out用のバッキングストアを準備する必要はない．
 プログラムの起動を素早く行うことができる．
 このアイデアを\figref{virtualMemoryWithZMagic}を用いて説明する．
 
-\begin{myfig}{btp}{デマンドページング}{virtualMemoryWithZMagic}
+\begin{myfig}{btp}{デマンドページングとプログラム実行}{virtualMemoryWithZMagic}
   \includegraphics[scale=0.66]{Fig/virtualMemoryWithZMagic-crop.pdf}
 \end{myfig}
 
@@ -107,7 +107,7 @@ swap-out用のバッキングストアを準備する必要はない．
   \item ヘッダの次に，機械語プログラムを格納したセグメントが配置される．
     セグメントの大きさはページサイズの整数倍である．
     \figref{virtualMemoryWithZMagic}は
-    プログラムのサイズが二ページの場合である．
+    プログラムのサイズが2ページの場合である．
   \item プログラムの次に初期化データが配置される．
     初期化データは初期値を明示したグローバル変数を集めた領域である．
   \end{itemize}
@@ -192,7 +192,7 @@ UNIXのforkシステムコールはプロセスのコピー（子プロセス）
 提供されるようになった．
 vforkシステコールを用いる場合，
 子プロセスがexecveするまで親プロセスは待ち状態になり，
-共有のアドレス空間を破壊し合わないような工夫がされた．
+共有したアドレス空間を破壊し合わない工夫がされた．
 その後，\emph{Copy on Write}と呼ばれるアドレス空間のコピーを遅らせる
 技術が用いられるようになり，
 forkシステムコールを用いても無駄なメモリコピーが起こらなくなった．
@@ -479,7 +479,7 @@ swap-outしたページが直後にswap-inされることになり，
   %新しいページを読み込むための
   swap-in/outが繰り返され多くのプロセスがディスクI/O待ちになり，
   システムの性能が急激に低下する．
-  このような状態を\emph{スラッシング}と呼ぶ．
+  この状態を\emph{スラッシング}と呼ぶ．
 \item[フェーズ化現象]
   プログラム実行中，
   時期によりワーキングセットが急激に変化する現象を\emph{フェーズ化現象}と呼ぶ．
@@ -567,7 +567,7 @@ $cnt \leftarrow cnt \div 2$
 \subsection{FIFO（First-In First-Out）アルゴリズム}
 「長くメモリに滞在しているページは役割を終えている」との仮定に基づく．
 特別なハードウェアを用いることなく，ソフトウェアだけで実現できる．
-\figref{pagingFIFO}のようなリストを用いるアルゴリズムである．
+\figref{pagingFIFO}に示すリストを用いるアルゴリズムである．
 
 \begin{myfig}{btp}{FIFOアルゴリズムが用いるリスト}{pagingFIFO}
   \includegraphics[scale=0.66]{Fig/pagingFIFO-crop.pdf}
@@ -600,7 +600,7 @@ Beladyの異常な振る舞いとは，
 \end{figure}
 
 \subsection{Clock アルゴリズム}
-\figref{pagingClock}に示すようなFIFOのリストを環状にしたデータ構造を用いる．
+\figref{pagingClock}に示すFIFOのリストを環状にしたデータ構造を用いる．
 データ構造に加えてページテーブルのRビットも使用する．
 次のようなアルゴリズムである．
 
@@ -631,7 +631,7 @@ Beladyの異常な振る舞いとは，
 ワーキングセットを考慮したClockアルゴリズムである．
 単純でパフォーマンスが良いので，
 広く使用されている\cite{wsClock}．
-\figref{pagingWSClock}に示すような環状リストを用いる．
+\figref{pagingWSClock}に示す環状リストを用いる．
 リストのノードにはフレームが最近アクセスされた時刻が記録してある．
 現在時刻と比較して時刻が古くなっているフレームは，
 ワーキングセットから外れたと判断する．
