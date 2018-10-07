@@ -19,9 +19,12 @@
 
 %------------------------------------------------------------------------------
 % ハイパーリンク設定（印刷用では色使いに注意）
-%\usepackage[unicode=true,colorlinks=true,      % PDF用
-%  linkcolor=blue,urlcolor=blue]{hyperref}      % PDF用
+\ifPDF
+\usepackage[unicode=true,colorlinks=true,
+  linkcolor=blue,urlcolor=blue]{hyperref}      % PDF用
+\else
 \usepackage[unicode=true,hidelinks]{hyperref}  % 印刷用
+\fi
 
 %------------------------------------------------------------------------------
 % 便利マクロ

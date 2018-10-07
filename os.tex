@@ -4,6 +4,18 @@
 %
 %------------------------------------------------------------------------------
 \documentclass[a4paper,11pt,twocolumn]{ltjsbook}     % lualatex の場合
+%----------- 印刷版とPDF版の区別 ----------------------------------------------
+\newif\ifPDF
+%印刷版の場合
+%\PDFfalse
+%PDF版の場合
+\PDFtrue
+\ifPDF
+\newcommand{\pdf}{（PDF版）}
+\else
+\newcommand{\pdf}{}
+\fi
+%------------------------------------------------------------------------------
 \usepackage{mySty}
 \newcommand{\ver}{初版（Ver. 1.0.0）}
 \newcommand{\git}{https://github.com/tctsigemura/OSTextBook/blob/master}
@@ -35,9 +47,18 @@
 \vfill
 
 %------------------------------------------------------------------------------
+\ifPDF
+\newpage
+\setcounter{page}{0}
+\thispagestyle{empty}
+\onecolumn
+~
+\fi
+
+%------------------------------------------------------------------------------
 % 表紙
 \frontmatter
-\title{オペレーティングシステム\\{\ver}}
+\title{オペレーティングシステム{\pdf}\\{\ver}}
 \author{徳山工業高等専門学校\\情報電子工学科\\
 \url{https://github.com/tctsigemura/OSTextBook/}}
 \date{}
@@ -138,7 +159,7 @@ sigemura@tokuyama.ac.jp
 \vfill\vfill\vfill
 \begin{center}
 \fbox{\parbox{11cm}{\large\vspace{0.3cm}
-{\Large\emph{オペレーティングシステム}} \\
+{\Large\emph{オペレーティングシステム{\pdf}}} \\
 \\
 　発行日　２０１８年１０月１５日  {\ver}\\
 　著　者　重村　哲至 \\
@@ -147,7 +168,11 @@ sigemura@tokuyama.ac.jp
 　　　　　0834-29-6304 \\
 　　　　　sigemura@tokuyama.ac.jp \\
   \\
+\ifPDF
+　\texttt{ISBN978-4-9910528-1-1 C3055}
+\else
 　\texttt{ISBN978-4-9910528-0-4 C3055}
+\fi
 \vspace{0.3cm}}}
 \end{center}
 \vfill
