@@ -145,6 +145,10 @@ fatSysクラス自身が持つパスの解析機能とオープン中ファイ�
   この関数は，
   リスト\ref{tacosFatFsSysCall}の\|fatFsSysCall()|関数から呼び出される．
 
+  \lstinputlisting[caption=openシステムコールの本体（sysOpen()）,
+    label=tacosSysOpen,float=btp,numbers=left,
+    firstline=234,lastline=273]{TacOS/fs/fatSys.cmm}
+
   2行はクライアントプロセスのPCB中に，
   ファイルディスクリプタを記録する場所を確保している\footnote{
     プロセス終了時にファイルを自動的にクローズるために，
@@ -160,10 +164,6 @@ fatSysクラス自身が持つパスの解析機能とオープン中ファイ�
   14〜18行ではFileオブジェクトとセクタを格納するバッファを生成している．
   \|malloc()|，\|free()|関数は，
   メモリマネージャサーバのシステムコールを呼び出すスタブルーチンである．
-
-  \lstinputlisting[caption=openシステムコールの本体（sysOpen()）,
-    label=tacosSysOpen,float=btp,numbers=left,
-    firstline=234,lastline=273]{TacOS/fs/fatSys.cmm}
 
   20〜29行ではFileオブジェクトを初期化している．
   21行ではオープンファイルが
@@ -405,6 +405,11 @@ dirAccessクラス，fileクラス，fatSysクラスに提供する（\figref{fs
 
   \end{itemize}
 
+  \lstinputlisting[
+    caption=ファイルのデータセクタを読む（readBlk()）,
+    firstline=195,lastline=213,numbers=left,
+    label=tacosReadBlk,float=btp]{TacOS/fs/blkFile.cmm}
+
 \item \emph{クラスタの読み書き}\\
   例としてクラスタを読む\|readBlk()|をリスト\ref{tacosReadBlk}に示す．
   クラスタ番号とクラスタ内セクタ番号（\|Blk|構造体で表現）を
@@ -421,11 +426,6 @@ dirAccessクラス，fileクラス，fatSysクラスに提供する（\figref{fs
   セクタ番号が決まったら，
   mmcspiクラス（デバイスドライバクラス）の\|readSct()|を用いて
   セクタを\|buf|に読み込む．
-
-  \lstinputlisting[
-    caption=ファイルのデータセクタを読む（readBlk()）,
-    firstline=195,lastline=213,numbers=left,
-    label=tacosReadBlk,float=btp]{TacOS/fs/blkFile.cmm}
 
 \item \emph{クラスタチェインの操作}\\
   FAT上のクラスタチェインを操作する三つの機能を準備している．
@@ -496,10 +496,13 @@ dirAccessクラス，fileクラス，fatSysクラスに提供する（\figref{fs
 \item[\texttt{initMmcSpi()}関数]
   8行はバイスドライバの初期化関数である．
   この関数はファイルシステムサーバの起動時に実行される．
-  10行で割込みハンドラ\|restart()|を割込みベクタに登録している．
+  10行で割込みハンドラ\|restart()|を割込みベクタの8番目
+  （\figref{tacMap}のuSDと表記されている部分）に登録している．
   11行は割込みハンドラとプロセスの間で
   同期を取るために使用する初期値0のセマフォを割当てている．
-  12行ではハードウェアに初期化コマンドを発行している．
+  12行では，
+  I/Oアドレスを指定して16bitデータをI/Oポートに出力する\|out()|関数を用いて，
+  ハードウェアに初期化コマンドを発行している．
   13行ではセマフォを用いてハードウェアの初期化が終わるのを待つ．
   初期化の終了は割込みで通知され3行の割込みハンドラが実行される．
   割込みハンドラは4行でセマフォを待っているプロセスを起こす．
@@ -509,7 +512,6 @@ dirAccessクラス，fileクラス，fatSysクラスに提供する（\figref{fs
   セクタのアドレスはLBA方式で，
   上位16bit（\|h|）と下位16bit（\|l|）とに分けて渡される．
   \|buf|はデータを読み出すバッファである．
-  \|out()|は，I/Oアドレスを指定して16bitデータをI/Oポートに出力する関数である．
   21行でバッファのアドレスを
   SPIホストコントローラのアドレスレジスタ(\|MEM_ADDR|）に書き込む．
   22，23行でLBAをSPIホストコントローラのレジスタに書き込み，
