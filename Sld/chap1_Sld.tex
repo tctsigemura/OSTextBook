@@ -18,6 +18,28 @@
 %\end{frame}
 
 %=========================================================================
+\section{オペレーティングシステムとは}
+\begin{frame}
+  \frametitle{オペレーティングシステムとは}
+  Windows，macOS，Linux，FreeBSD，Android，iOS などのこと．
+  \begin{enumerate}
+  \item[1.] カーネル（OSの本体）
+  \item[2.] ライブラリ（プログラムが使用するサブルーチン，DLL）
+  \item[3.] ユーザインタフェース（GUI，CLI）
+  \item[4.] ユーティリティソフトウエア
+    （ファイル操作，時計，シェル，システム管理 ...）
+  \item[5.] プログラム開発環境
+    （エディタ，コンパイラ，アセンブラ，リンカ，インタプリタ）
+\end{enumerate}
+
+\begin{itemize}
+  \item \emph{広義}では上に列挙した全てのこと．
+  \item \emph{狭義}では「カーネル」だけを指す．
+\end{itemize}
+この科目では，主に「カーネル」の仕組みを学ぶ．
+\end{frame}
+
+%=========================================================================
 \section{オペレーティングシステムの役割}
 \subsection{拡張マシンとしてのオペレーティングシステム}
 \begin{frame}
@@ -175,6 +197,45 @@
 \begin{frame}
   \frametitle{オペレーティングシステムの系統図}
   \fig{scale=0.32}{tree-crop.pdf}
+\end{frame}
+
+%=========================================================================
+\begin{frame}
+  \frametitle{練習問題（１）}
+  次の言葉の意味を説明しなさい．
+  \begin{itemize}
+    \item オペレーティングシステム
+    \item カーネル
+    \item 拡張マシン
+    \item 抽象化
+    \item 仮想化
+    \item 時分割多重
+    \item 空間分割多重
+    \item プロセス
+    \item バッチモニタ
+    \item 実行モード
+    \item 記憶保護
+    \item 仮想記憶
+    \item マルチプログラミング
+    \item タイムシェアリング
+  \end{itemize}
+  \vfill
+\end{frame}
+
+%=========================================================================
+\begin{frame}
+  \frametitle{練習問題（２）}
+  \begin{itemize}
+    \item 抽象化の例をいくつか挙げなさい．
+      \vfill
+    \item 仮想化の例をいくつか挙げなさい．
+      \vfill
+    \item 自分が使用しているパソコンのOSは何？
+      \vfill
+    \item 自分が使用しているスマホのOSは何？
+      \vfill
+  \end{itemize}
+  \vfill
 \end{frame}
 
 \end{document}
