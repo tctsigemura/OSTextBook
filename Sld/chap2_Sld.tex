@@ -58,6 +58,27 @@
 \end{frame}
 
 %=========================================================================
+\section{割込み}
+\begin{frame}
+  \frametitle{割込み}
+  ユーザ・プロセスからカーネルに切り換わる唯一の方法
+  \begin{enumerate}
+    \item[1.] I/O完了・タイマー \\
+      ホストコントローラ，ネットワークアダプタ，タイマー等の
+      コマンド完了など
+    \item[2.] システムコール \\
+      ユーザ／プロセスが\emph{SVC（Supervisor Call）命令}を実行
+    \item[3.] 保護違反 \\
+      特権違反，メモリ保護違反
+    \item[4.] ソフトウェアのエラー \\
+      オーバーフロー，ゼロ除算など
+    \item[5.] ハードウエアのエラー \\
+      故障，電源異状
+  \end{enumerate}
+  \vfill
+\end{frame}
+
+%=========================================================================
 \section{オペレーティングシステムの構造}
 \begin{frame}
   \frametitle{オペレーティングシステムの構造}
@@ -81,33 +102,6 @@
 \begin{frame}
   \frametitle{マイクロカーネル（micro-kernel）}
   \fig{scale=0.5}{microkernel-crop.pdf}
-\end{frame}
-
-%=========================================================================
-\section{TaC}
-\begin{frame}
-  \frametitle{TaC7とTaC}
-  \begin{minipage}{0.58\columnwidth}
-    \photo{scale=0.27}{TeC7.jpg}{(a) TeC7の写真}
-  \end{minipage}
-  \begin{minipage}{0.38\columnwidth}
-    \photo{scale=0.22}{TaC.jpg}{(b) TaCとしての使用例}
-  \end{minipage}
-\vfill
-TeC7は，TacOSを書き込んだマイクロSDカードを装着すると，
-簡単なPC（TaC）として使用できる．
-\end{frame}
-
-%=========================================================================
-\begin{frame}
-  \frametitle{TaCのハードウェア}
-  \fig{scale=0.49}{tacBlock-crop.pdf}
-\end{frame}
-
-%=========================================================================
-\begin{frame}
-  \frametitle{TacOSの構造}
-  \fig{scale=0.49}{tacosOrganization-crop.pdf}
 \end{frame}
 
 %=========================================================================
@@ -140,4 +134,32 @@ TeC7は，TacOSを書き込んだマイクロSDカードを装着すると，
   \item ソフトウェアの新しい流通手法
   \end{itemize}
 \end{frame}
+
+%=========================================================================
+\section{TaC}
+\begin{frame}
+  \frametitle{TaC7とTaC}
+  \begin{minipage}{0.58\columnwidth}
+    \photo{scale=0.27}{TeC7.jpg}{(a) TeC7の写真}
+  \end{minipage}
+  \begin{minipage}{0.38\columnwidth}
+    \photo{scale=0.22}{TaC.jpg}{(b) TaCとしての使用例}
+  \end{minipage}
+\vfill
+TeC7は，TacOSを書き込んだマイクロSDカードを装着すると，
+簡単なPC（TaC）として使用できる．
+\end{frame}
+
+%=========================================================================
+\begin{frame}
+  \frametitle{TaCのハードウェア}
+  \fig{scale=0.49}{tacBlock-crop.pdf}
+\end{frame}
+
+%=========================================================================
+\begin{frame}
+  \frametitle{TacOSの構造}
+  \fig{scale=0.49}{tacosOrganization-crop.pdf}
+\end{frame}
+
 \end{document}
