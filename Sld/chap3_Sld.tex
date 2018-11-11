@@ -23,6 +23,7 @@
   \fig{scale=0.7}{virtualCPU-crop.pdf}
   \begin{itemize}
     \item 時分割多重：CPUが実行するプロセスを次々切換える。
+    \item コンテキストスイッチ：CPUが実行するプロセスを切換えること。
     \item ディスパッチ：プロセスにCPUを割り付ける。（実行開始）
     \item ディスパッチャ：ディスパッチするプログラムのこと。
   \end{itemize}
@@ -32,12 +33,20 @@
 \begin{frame}
   \frametitle{CPUの構造（参考）}
   \fig{scale=0.6}{cpuBlock-crop.pdf}
+  \begin{itemize}
+    \item コンテキスト ＝ PSW + CPUレジスタ
+    \item コンテキストを保存・ロードして次のプロセスに
+    \item コンテキストスイッチ
+  \end{itemize}
 \end{frame}
 
 %=========================================================================
 \begin{frame}
   \frametitle{プロセスの構造（参考）}
   \fig{scale=0.5}{procOrganization-crop.pdf}
+  \begin{itemize}
+    \item 仮想CPUにコンテキストを保存
+  \end{itemize}
 \end{frame}
 
 %=========================================================================
@@ -52,9 +61,24 @@
 \end{frame}
 
 %=========================================================================
-\section{プロセスの切換え}
+\section{プロセスの切換え（コンテキストスイッチ）}
 \begin{frame}
-  \frametitle{プロセスの切換え}
+  \frametitle{プロセスの切換えの原因}
+  \begin{itemize}
+    \item イベント\\
+      プロセス自ら「システムコールを発行する」Blockする \\
+      他のプロセスから「\emph{干渉}を受け」Blockする    \\
+      他のプロセスから「\emph{干渉}を受け」Completeする
+      \vfill
+    \item タイムスライシング\\
+      \emph{クオンタムタイム}を使い切ったプロセスはPreemptionする
+  \end{itemize}
+  \vfill
+\end{frame}
+
+%=========================================================================
+\begin{frame}
+  \frametitle{プロセスの切換え手順}
   \fig{scale=0.38}{procSwitch-crop.pdf}
 \end{frame}
 
@@ -77,6 +101,18 @@
 
 %=========================================================================
 \section{PCB（Process Control Block）}
+\begin{frame}
+  \frametitle{PCB（Process Control Block）}
+  \begin{itemize}
+    \item プロセスを表現するカーネル内データ構造
+    \item プロセス毎に存在する
+    \item カーネル内のプロセステーブルに格納される
+  \end{itemize}
+  \fig{scale=0.35}{procOrganization-crop.pdf}
+  \vfill
+\end{frame}
+
+%=========================================================================
 \begin{frame}
   \frametitle{PCBの内容}
 \begin{itemize}
@@ -101,24 +137,30 @@
 \begin{frame}
   \frametitle{PCBのリスト}
   \fig{scale=0.4}{procQueue-crop.pdf}
+  \begin{itemize}
+    \item Ready状態PCBのリスト = 実行可能列（優先順位順にソート）
+    \item イベント毎のWaiting状態PCBのリスト = イベント待ち行列
+  \end{itemize}
+  \vfill
 \end{frame}
 
 %=========================================================================
 \section{TacOSのCPU仮想化}
 \begin{frame}
-  \frametitle{TacOSのPCB}
+  \frametitle{TacOSのCPU仮想化（第１９章）}
+  TacOSのPCB
   \begin{itemize}
-    \item 仮想CPU（SP）
-    \item プロセス番号（pid）
-    \item 状態(stat）
-    \item 優先度（nice, enice）
-    \item プロセステーブルのインデクス（idx）
-    \item イベント用カウンタとセマフォ(evtCnt，evtSem）
-    \item プロセスのアドレス空間（memBase，memLen）
-    \item プロセスの親子関係の情報（parent，exitStat）
-    \item オープン中のファイル一覧（fds[]）
-    \item PCBリストの管理（prev，next）
-    \item スタックオーバーフローの検知（magic）
+    \item 仮想CPU（\texttt{sp}）
+    \item プロセス番号（\texttt{pid}）
+    \item 状態(\texttt{stat}）
+    \item 優先度（\texttt{nice}, \texttt{enice}）
+    \item プロセステーブルのインデクス（\texttt{idx}）
+    \item イベント用カウンタとセマフォ(\texttt{evtCnt，evtSem}）
+    \item プロセスのアドレス空間（\texttt{memBase}，\texttt{memLen}）
+    \item プロセスの親子関係の情報（\texttt{parent}，\texttt{exitStat}）
+    \item オープン中のファイル一覧（\texttt{fds[]}）
+    \item PCBリストの管理（\texttt{prev}，\texttt{next}）
+    \item スタックオーバーフローの検知（\texttt{magic}）
   \end{itemize}
 \end{frame}
 
@@ -141,11 +183,13 @@
 \begin{frame}
   \frametitle{TacOSの実行可能列}
   \begin{itemize}
-    \item {\tt yield}
-    \item {\tt dispatch}
-    \item 実行可能列
+    \item PCBの双方向環状リスト
+    \item 優先度順にソート（\texttt{curProc}は実行中のプロセス）
+    \item 末尾に\texttt{idle}プロセスが常駐 \\
+      \vfill
       \fig{scale=0.5}{tacosReadyQueue-crop.pdf}
   \end{itemize}
+  \vfill
 \end{frame}
 
 %=========================================================================
@@ -190,67 +234,187 @@
 %=========================================================================
 \section{スレッド（Thread）}
 \begin{frame}
-  \frametitle{マルチプログラミングを用いないWebサーバ}
+  \frametitle{スレッド（Thread）}
+  \begin{itemize}
+    \item CPUの仮想化によりマルチプログラミングが可能になった．
+    \item プロセスが並行（Concurrent）に実行できる．
+    \item プロセスは\emph{一つ}の仮想CPUを持っている．
+    \item プロセスはコンピュータを仮想化したもの．
+      \begin{itemize}
+      \item CPUが一つしかないコンピュータを仮想化している．
+      \item CPUを複数持つSMPを仮想化するには不十分．
+      \end{itemize}
+    \item 一つのプロセスが複数の仮想CPUをもつモデルを導入する．
+    \item プロセスが処理の流れ\emph{スレッド}を複数持つことができる．
+  \end{itemize}
+  \vfill
+\end{frame}
+
+%=========================================================================
+\begin{frame}
+  \frametitle{スレッドの役割（１）}
+  マルチプログラミングを用いないWebサーバ \\
+  \vfill
   \fig{scale=0.6}{singleProcSingleClient-crop.pdf}
+  \vfill
+  \begin{itemize}
+  \item 処理は順番に処理される．
+  \item 前の処理が終わるまでクライアントは待たされる．
+  \end{itemize}
+  \vfill
 \end{frame}
 
 %=========================================================================
 \begin{frame}
-  \frametitle{マルチプログラミングを用いないWebサーバ}
+  \frametitle{スレッドの役割（２）}
+  マルチプログラミングを用いないWebサーバ \\
+  \vfill
   \fig{scale=0.6}{singleProcMultiClient-crop.pdf}
+  \vfill
+  \begin{itemize}
+  \item 工夫すると並列して処理することも可能
+  \item しかし，プログラミングが難しい．
+  \end{itemize}
+  \vfill
 \end{frame}
 
 %=========================================================================
 \begin{frame}
-  \frametitle{マルチプログラミングを用いるWebサーバ}
+  \frametitle{スレッドの役割（３）}
+  マルチプログラミングを用いるWebサーバ（プロセス版） \\
+  \vfill
   \fig{scale=0.6}{multiProc-crop.pdf}
+  \vfill
+  \begin{itemize}
+  \item クライアント毎にプロセスを起動（\texttt{fork()}）する．
+  \item プログラミングは易しい．
+  \item しかし，処理が重い．
+  \end{itemize}
+  \vfill
 \end{frame}
 
 %=========================================================================
 \begin{frame}
-  \frametitle{マルチプログラミングを用いるWebサーバ}
+  \frametitle{スレッドの役割（４）}
+  マルチプログラミングを用いるWebサーバ（スレッド版） \\
+  \vfill
   \fig{scale=0.6}{multiThread-crop.pdf}
+  \vfill
+  \begin{itemize}
+  \item クライアント毎にスレッドを起動する．
+  \item プロセスの起動より10〜100倍速い．
+  \item スレッド間は情報を共有しやすい．
+  \item プログラミングは少し難しい．
+  \end{itemize}
+  \vfill
 \end{frame}
 
 %=========================================================================
 \begin{frame}
-  \frametitle{ユーザスレッドとカーネルスレッド}
-  \fig{scale=0.5}{kernelThread-crop.pdf}
+  \frametitle{スレッドの形式（１） --カーネルスレッド--}
+  \vfill
+  \fig{scale=0.45}{kernelThread-crop.pdf}
+  \vfill
+  \begin{itemize}
+  \item プロセスが複数の仮想CPUを持つ．
+  \end{itemize}
+  \vfill
 \end{frame}
 
 %=========================================================================
 \begin{frame}
-  \frametitle{ユーザスレッドとカーネルスレッド}
-  \fig{scale=0.5}{userThread-crop.pdf}
+  \frametitle{スレッドの形式（２）--ユーザスレッド--}
+  \vfill
+  \fig{scale=0.45}{userThread-crop.pdf}
+  \vfill
+  \begin{itemize}
+  \item ユーザプログラム（ライブラリ）の工夫でスレッドを実現する．
+  \item 並行（Parallel）実行はできない．
+  \item どれかのスレッドがブロックすると全スレッドが停止する．
+  \end{itemize}
+  \vfill
 \end{frame}
 
 %=========================================================================
 \begin{frame}
-  \frametitle{M個のスレッドで手分けをして合計を計算する様子}
+  \frametitle{スレッドの形式（３）--スレッドモデル--}
+  上記の２方式を組み合わせた３種類のスレッドモデルがある．
+  \vfill
+  \begin{itemize}
+  \item \emph{One-to-One Model}   \\
+    一つのユーザスレッドを一つのカーネルスレッドで実行する．
+  \item \emph{Many-to-One Model}  \\
+    複数のユーザスレッドを一つのカーネルスレッドで実行する．
+  \item \emph{Many-to-Many Model} \\
+    複数のユーザスレッドを複数のカーネルスレッドで実行する．
+  \end{itemize}
+  \vfill
+\end{frame}
+
+%=========================================================================
+\begin{frame}
+  \frametitle{スレッドの使用例（１）}
+  M個のスレッドで手分けをして合計を計算する様子 \\
+  （複数のカーネルスレッド（CPU）で手分けすることで短時間で処理が終わるはず）
+  \vfill
   \fig{scale=0.6}{threadedSum-crop.pdf}
 \end{frame}
 
 %=========================================================================
 \begin{frame}[fragile]
-  \frametitle{M個のスレッドで合計を計算する（前半）}
+  \frametitle{スレッドの使用例（２）}
+  M個のスレッドで合計を計算するプログラム \\
+  \vfill
   \smp{language={C},lastline=21,frame=tlr,
     numbers=left,xleftmargin=5mm,firstnumber=1}{pThread/threadTest.c}
 \end{frame}
 
 %=========================================================================
 \begin{frame}[fragile]
-  \frametitle{M個のスレッドで合計を計算する（後半）}
+  \frametitle{スレッドの使用例（３）}
   \smp{language={C},firstline=22,frame=lrb,
     numbers=left,xleftmargin=5mm,firstnumber=22}{pThread/threadTest.c}
 \end{frame}
 
 %=========================================================================
 \begin{frame}[fragile]
-  \frametitle{M個のスレッドで合計を計算する（後半）}
+  \frametitle{スレッドの使用例（４）}
+  実行時間の計測結果 \\
+  \vfill
   \tbl{scale=0.7}{threadTimeTbl.pdf}
+  \vfill
   \tbl{scale=0.8}{threadTimeGrph.pdf}
+  \vfill
   ６コアのMac Proで計測\\
   （Hyper-Threadingのお陰で６コアと１２コアの中間的な振舞）
+  \vfill
+\end{frame}
+
+%=========================================================================
+\begin{frame}[fragile]
+  \frametitle{練習問題}
+  \begin{itemize}
+  \item 次の言葉の意味を説明しなさい．
+    \begin{itemize}
+    \item 時分割多重
+    \item コンテキストスイッチ
+    \item Dispatch（ディスパッチ）
+    \item Preemption（プリエンプション）
+    \item プロセスの状態
+    \item プロセスの状態遷移
+    \item RETI命令
+    \item PCB
+    \item 待ち行列
+    \item 実行可能列
+    \item スレッド
+    \item カーネルスレッド
+    \item ユーザスレッド
+    \item One-to-One Model
+    \item Many-to-One Model
+    \item Many-to-Many Model
+    \end{itemize}
+  \item POSIXスレッドについて調査しなさい．
+  \end{itemize}
 \end{frame}
 
 \end{document}
