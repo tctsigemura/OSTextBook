@@ -68,7 +68,9 @@
     \item イベント\\
       プロセス自ら「システムコールを発行する」Blockする \\
       他のプロセスから「\emph{干渉}を受け」Blockする    \\
-      他のプロセスから「\emph{干渉}を受け」Completeする
+      他のプロセスから「\emph{干渉}を受け」Preemptionする \\
+      他のプロセスから「\emph{干渉}を受け」Completeする \\
+      i/O完了やタイマ完了のイベントによりCompleteする
       \vfill
     \item タイムスライシング\\
       \emph{クオンタムタイム}を使い切ったプロセスはPreemptionする
