@@ -33,7 +33,7 @@
 %=========================================================================
 \section{システムごとの目標}
 \begin{frame}
-  \frametitle{スケジューリングの目標}
+  \frametitle{システムごとの目標}
   \tbl{scale=1.0}{schedulingObjective.pdf}
 \end{frame}
 
@@ -41,20 +41,19 @@
 \section{プロセスの振舞}
 \begin{frame}
   \frametitle{CPUバウンドプロセス}
+  動画圧縮の例\\
+  \vfill
   \fig{scale=0.7}{cpuBound-crop.pdf}
-  \begin{itemize}
-    \item 動画圧縮の例
-    \item I/Oバウンドプロセス（エクセル）
-  \end{itemize}
+  \vfill
 \end{frame}
 
 %=========================================================================
 \begin{frame}
   \frametitle{I/Oバウンドプロセス}
+  スプレッドシートの例\\
+  \vfill
   \fig{scale=0.7}{ioBound-crop.pdf}
-  \begin{itemize}
-    \item スプレッドシートの例
-  \end{itemize}
+  \vfill
 \end{frame}
 
 %=========================================================================
@@ -62,6 +61,12 @@
 \subsection{FCFS}
 \begin{frame}
   \frametitle{FCFSスケジューリング（１）}
+  FCFS（First-Come, First-Served）
+  \vfill
+  \begin{itemize}
+    \item プリエンプションしないスケジューリング方式
+  \end{itemize}
+  \vfill
   \small\begin{tabular}{c c c}
     プロセス & 到着時刻 & CPUバースト時間(ms) \\
     \hline
@@ -69,16 +74,24 @@
     $P_2$    & 0 & 20 \\
     $P_3$    & 0 & 10 \\
   \end{tabular}
+  \vfill
   \gant{scale=0.8}{fcfs1.pdf}
+  \vfill
   \begin{itemize}
     \item $P_1$，$P_2$，$P_3$の順に実行
     \item 平均ターンアラウンド時間（$(100+120+130) / 3 = 117$ ms）
+    \item 最悪の平均ターンアラウンド時間を選択することもある．
   \end{itemize}
+  \vfill
 \end{frame}
 
 %=========================================================================
 \begin{frame}
   \frametitle{FCFSスケジューリング（２）}
+  \begin{itemize}
+    \item 平均ターンアラウンド時間は 到着順により大きく変化する．
+  \end{itemize}
+  \vfill
   \small\begin{tabular}{c c c}
     プロセス & 到着時刻 & CPUバースト時間(ms) \\
     \hline
@@ -86,17 +99,26 @@
     $P_2$    & 0 & 20 \\
     $P_3$    & 0 & 10 \\
   \end{tabular}
+  \vfill
   \gant{scale=0.8}{fcfs2.pdf}
+  \vfill
   \begin{itemize}
     \item $P_2$，$P_3$，$P_1$の順に実行
     \item 平均ターンアラウンド時間（$(20+30+130) / 3 = 60$ ms）
   \end{itemize}
+  \vfill
 \end{frame}
 
 %=========================================================================
 \subsection{SJF}
 \begin{frame}
   \frametitle{SJFスケジューリング}
+  SJF（Shortest-Job-First）
+  \vfill
+  \begin{itemize}
+    \item プリエンプションしないスケジューリング方式
+  \end{itemize}
+  \vfill
   \small\begin{tabular}{c c c}
     プロセス & 到着時刻 & CPUバースト時間(ms) \\
     \hline
@@ -104,16 +126,23 @@
     $P_2$    & 0 & 20 \\
     $P_3$    & 0 & 10 \\
   \end{tabular}
+  \vfill
   \gant{scale=0.8}{sjf1.pdf}
+  \vfill
   \begin{itemize}
     \item 平均ターンアラウンド時間（$(10+30+130) / 3 = 57$ ms）
   \end{itemize}
+  \vfill
 \end{frame}
 
 %=========================================================================
 \subsection{SRTF}
 \begin{frame}
-  \frametitle{SJFスケジューリング（比較のため）}
+  \frametitle{SRTFスケジューリング（１）}
+  SRTF（Shortest-Remaining-Time-First）
+  \vfill
+  比較のためのSJFスケジューリングの例
+  \vfill
   \small\begin{tabular}{c c c}
     プロセス & 到着時刻 & CPUバースト時間(ms) \\
     \hline
@@ -121,17 +150,24 @@
     $P_2$    & 10 & 40 \\
     $P_3$    & 60 & 30 \\
   \end{tabular}
+  \vfill
   \gant{scale=0.8}{sjf2.pdf}
+  \vfill
   \begin{itemize}
     \item SJFはプリエンプションなし
     \item 平均ターンアラウンド時間\\
       （$((60-0)+(90-10)+(130-60))/3=70$ ms）
   \end{itemize}
+  \vfill
 \end{frame}
 
 %=========================================================================
 \begin{frame}
-  \frametitle{SRTFスケジューリング}
+  \frametitle{SRTFスケジューリング（２）}
+  SRTF（Shortest-Remaining-Time-First）
+  \vfill
+  前のSJFと同じプロセスのをSRTFでスケジューリング
+  \vfill
   \small\begin{tabular}{c c c}
     プロセス & 到着時刻 & CPUバースト時間(ms) \\
     \hline
@@ -139,18 +175,25 @@
     $P_2$    & 10 & 40 \\
     $P_3$    & 60 & 30 \\
   \end{tabular}
+  \vfill
   \gant{scale=0.8}{srtf1.pdf}
+  \vfill
   \begin{itemize}
     \item SRTFはプリエンプションあり
     \item 平均ターンアラウンド時間\\
       （$((130-0)+(50-10)+(90-60))/3=67$ ms）
   \end{itemize}
+  \vfill
 \end{frame}
 
 %=========================================================================
 \subsection{RR}
 \begin{frame}
   \frametitle{RRスケジューリング（１）}
+  RR（Round-Robin)
+  \vfill
+  クォンタムタイムまでプリエンプションしない．
+  \vfill
   \small\begin{tabular}{c c c}
     プロセス & 到着時刻 & CPUバースト時間(ms) \\
     \hline
@@ -158,17 +201,21 @@
     $P_2$    & 10 & 40 \\
     $P_3$    & 60 & 30 \\
   \end{tabular}
+  \vfill
   \gant{scale=0.8}{rr1.pdf}
+  \vfill
   \begin{itemize}
     \item クォンタムタイム＝10ms
     \item 平均ターンアラウンド時間\\
       （$((120-0)+(90-10)+(130-60))/3=90$）
   \end{itemize}
+  \vfill
 \end{frame}
 
 %=========================================================================
 \begin{frame}
   \frametitle{RRスケジューリング（２）}
+  \vfill
   \small\begin{tabular}{c c c}
     プロセス & 到着時刻 & CPUバースト時間(ms) \\
     \hline
@@ -176,52 +223,121 @@
     $P_2$    & 10 & 40 \\
     $P_3$    & 60 & 30 \\
   \end{tabular}
+  \vfill
   \gant{scale=0.8}{rr2.pdf}
+  \vfill
   \begin{itemize}
     \item クォンタムタイム＝50ms
     \item 平均ターンアラウンド時間\\
       （$((100-0)+(90-10)+(130-60))/3=83$ ms）
   \end{itemize}
+  \vfill
 \end{frame}
 
 %=========================================================================
 \subsection{優先度順}
 \begin{frame}
   \frametitle{優先度順スケジューリング}
+  Priority
+  \vfill
   \begin{itemize}
-    \item 静的・動的
-    \item スタベーション
-    \item エージング
+  \item 実行可能列を優先度順でソートしておく．
   \end{itemize}
+  \vfill
+  \fig{scale=0.35}{procQueue-crop.pdf}
+  \vfill
+  \begin{itemize}
+    \item 静的優先度／動的優先度
+    \item スタベーション（starvation）：飢餓
+    \item エージング（aging）：老化，熟成
+  \end{itemize}
+  \vfill
 \end{frame}
 
 %=========================================================================
 \subsection{FB}
 \begin{frame}
   \frametitle{FBスケジューリング}
-  \fig{scale=0.4}{multilevelFeedbackQueue-crop.pdf}
+  FB（Multilevel Feedback Queue）\\
+  \vfill
+  \fig{scale=0.38}{multilevelFeedbackQueue-crop.pdf}
+  \vfill
   \begin{itemize}
     \item エージング
   \end{itemize}
+  \vfill
 \end{frame}
 
 %=========================================================================
-\subsection{TacOSのスケジューラ}
+\subsection{TacOSのスケジューラ（第１９章 19.6）}
 \begin{frame}[fragile]
   \frametitle{TacOSのスケジューラ}
   \src{firstline=129,lastline=137,
     numbers=left,xleftmargin=5mm,firstnumber=1}{kernel/kernel.cmm}
+  \vfill
 \end{frame}
 
 %=========================================================================
 \begin{frame}
   \frametitle{TacOSの実行可能列（参考）}
   \begin{itemize}
-    \item {\tt yield}
-    \item {\tt dispatch}
-    \item 実行可能列
-      \fig{scale=0.5}{tacosReadyQueue-crop.pdf}
+  \item {\tt yield()}
+  \item {\tt dispatch()}
+    \vfill
+  \item 実行可能列
+    \fig{scale=0.5}{tacosReadyQueue-crop.pdf}
   \end{itemize}
+  \vfill
+\end{frame}
+
+%=========================================================================
+\begin{frame}
+  \frametitle{練習問題（１）}
+  \begin{itemize}
+  \item 次の言葉の意味を説明しなさい．
+    \begin{itemize}
+    \item スループット
+    \item ターンアラウンド時間・レスポンス時間
+    \item ハードリアルタイム・ソフトリアルタイム
+    \item CPUバウンドプロセス・I/Oバウンドプロセス
+    \item FCFSスケジューリング・SJFスケジューリング
+    \item SRTFスケジューリング・RRスケジューリング
+    \item 優先度順スケジューリング・FBケジューリング
+    \item クォンタム時間
+    \item スタベーション
+    \item エージング
+    \end{itemize}
+  \end{itemize}
+  \vfill
+\end{frame}
+
+%=========================================================================
+\begin{frame}
+  \frametitle{練習問題（２）}
+  \begin{itemize}
+  \item 次の三つのプロセスの実行順をガントチャートで示しなさい．
+    また，平均ターンアラウンド時間を計算しなさい．
+    \vfill
+    \begin{center}
+      \begin{tabular}{c c c}
+        \emph{プロセス名} & \emph{到着時刻(ms)} &
+        \emph{CPUバースト時間(ms)} \\\hline
+        $P_1$  & 0  & 70 \\
+        $P_2$  & 10 & 50 \\
+        $P_3$  & 20 & 30
+      \end{tabular}
+    \end{center}
+    \vfill
+    \begin{itemize}
+    \item FCFSでスケジューリングした場合
+    \item SJFでスケジューリングした場合
+    \item SRTFでスケジューリングした場合
+    \item RR（但しクォンタム時間は20ms）でスケジューリングした場合
+    \item RR（但しクォンタム時間は40ms）でスケジューリングした場合
+    \item RR（但しクォンタム時間は60ms）でスケジューリングした場合
+    \end{itemize}
+  \end{itemize}
+  \vfill
 \end{frame}
 
 \end{document}

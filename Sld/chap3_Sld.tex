@@ -420,3 +420,28 @@
 \end{frame}
 
 \end{document}
+
+%=========================================================================
+\begin{frame}[fragile]
+  \frametitle{まとめ}
+  \begin{itemize}
+  \item 時分割多重によるCPUの仮想化
+    \begin{itemize}
+    \item プロセス毎にCPUコンテキストを持つ（仮想CPU）
+    \item プロセスはいくつかの状態を持つ（Ready/Running/Wating）
+    \item 実行できない状態のプロセスにはCPUを割り当てない．
+    \item プロセスの状態はイベントやタイムスライシングにより変化する．
+    \item プロセスを切換えることをコンテキストスイッチと言う．
+    \item PCBはプロセスを表現する重要なカーネル内データ構造である．
+    \item プロセスに複数のスレッドを導入するとプロセスがSMPになる．
+    \item スレッドにはカーネルスレッド，ユーザスレッドがある．
+    \end{itemize}
+  \item TacOSのCPU仮想化
+    \begin{itemize}
+    \item PCB，メモリ配置
+    \item コンテキスト保存プログラム（yield()）
+    \item コンテキスト復旧プログラム（dispatch()）
+    \end{itemize}
+  \end{itemize}
+\end{frame}
+
