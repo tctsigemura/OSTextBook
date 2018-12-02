@@ -147,93 +147,6 @@
 \end{frame}
 
 %=========================================================================
-\section{TacOSのCPU仮想化}
-\begin{frame}
-  \frametitle{TacOSのCPU仮想化（第１９章）}
-  TacOSのPCB
-  \begin{itemize}
-    \item 仮想CPU（\texttt{sp}）
-    \item プロセス番号（\texttt{pid}）
-    \item 状態(\texttt{stat}）
-    \item 優先度（\texttt{nice}, \texttt{enice}）
-    \item プロセステーブルのインデクス（\texttt{idx}）
-    \item イベント用カウンタとセマフォ(\texttt{evtCnt，evtSem}）
-    \item プロセスのアドレス空間（\texttt{memBase}，\texttt{memLen}）
-    \item プロセスの親子関係の情報（\texttt{parent}，\texttt{exitStat}）
-    \item オープン中のファイル一覧（\texttt{fds[]}）
-    \item PCBリストの管理（\texttt{prev}，\texttt{next}）
-    \item スタックオーバーフローの検知（\texttt{magic}）
-  \end{itemize}
-\end{frame}
-
-%=========================================================================
-\begin{frame}
-  \frametitle{TacOSのPCB（前半）}
-  \src{firstline=56,lastline=67,frame=tlr,xleftmargin=5mm}{kernel/process.hmm}
-  \vspace{-5mm}\src{firstline=68,lastline=76,frame=lr,
-  numbers=left,xleftmargin=5mm,firstnumber=1}{kernel/process.hmm}
-\end{frame}
-
-%=========================================================================
-\begin{frame}
-  \frametitle{TacOSのPCB（後半）}
-  \src{firstline=77,lastline=96,frame=lrb,
-  numbers=left,xleftmargin=5mm,firstnumber=10}{kernel/process.hmm}
-\end{frame}
-
-%=========================================================================
-\begin{frame}
-  \frametitle{TacOSの実行可能列}
-  \begin{itemize}
-    \item PCBの双方向環状リスト
-    \item 優先度順にソート（\texttt{curProc}は実行中のプロセス）
-    \item 末尾に\texttt{idle}プロセスが常駐 \\
-      \vfill
-      \fig{scale=0.5}{tacosReadyQueue-crop.pdf}
-  \end{itemize}
-  \vfill
-\end{frame}
-
-%=========================================================================
-\begin{frame}
-  \frametitle{TacOSのメモリ配置}
-  \fig{scale=0.4}{tacosMemMap-crop.pdf}
-\end{frame}
-
-%=========================================================================
-\begin{frame}
-  \frametitle{TacOSのタイマー管理プログラム}
-  \src{firstline=465,lastline=483,
-  numbers=left,xleftmargin=5mm,firstnumber=3}{kernel/kernel.cmm}
-\end{frame}
-
-%=========================================================================
-\begin{frame}[fragile]
-  \frametitle{TacOSのコンテキスト保存プログラム（yield()）}
-  \src{firstline=49,lastline=56,frame=tlr,
-  numbers=left,xleftmargin=5mm,firstnumber=1}{kernel/dispatcher.s}
-  \vspace{-5mm}\begin{lstlisting}[frame=lr,xleftmargin=5mm]
-
-        ...
-  \end{lstlisting}
-  \vspace{-5mm}\src{firstline=65,lastline=77,frame=lr,
-  numbers=left,xleftmargin=5mm,firstnumber=17}{kernel/dispatcher.s}
-\end{frame}
-
-%=========================================================================
-\begin{frame}[fragile]
-  \frametitle{TacOSのコンテスト復旧プログラム（dispatch()）}
-  \src{firstline=78,lastline=90,frame=lr,
-    numbers=left,xleftmargin=5mm,firstnumber=1}{kernel/dispatcher.s}
-  \vspace{-5mm}\begin{lstlisting}[frame=lr,xleftmargin=5mm]
-
-        ...
-  \end{lstlisting}
-  \vspace{-5mm}\src{firstline=98,lastline=102,frame=lrb,
-    numbers=left,xleftmargin=5mm,firstnumber=21}{kernel/dispatcher.s}
-\end{frame}
-
-%=========================================================================
 \section{スレッド（Thread）}
 \begin{frame}
   \frametitle{スレッド（Thread）}
@@ -363,23 +276,25 @@
 \end{frame}
 
 %=========================================================================
-\begin{frame}[fragile]
+\begin{frame}
   \frametitle{スレッドの使用例（２）}
   M個のスレッドで合計を計算するプログラム \\
   \vfill
   \smp{language={C},lastline=21,frame=tlr,
     numbers=left,xleftmargin=5mm,firstnumber=1}{pThread/threadTest.c}
+  \vfill
 \end{frame}
 
 %=========================================================================
-\begin{frame}[fragile]
+\begin{frame}
   \frametitle{スレッドの使用例（３）}
   \smp{language={C},firstline=22,frame=lrb,
     numbers=left,xleftmargin=5mm,firstnumber=22}{pThread/threadTest.c}
+  \vfill
 \end{frame}
 
 %=========================================================================
-\begin{frame}[fragile]
+\begin{frame}
   \frametitle{スレッドの使用例（４）}
   実行時間の計測結果 \\
   \vfill
@@ -389,6 +304,117 @@
   \vfill
   ６コアのMac Proで計測\\
   （Hyper-Threadingのお陰で６コアと１２コアの中間的な振舞）
+  \vfill
+\end{frame}
+
+%=========================================================================
+\section{TacOSのCPU仮想化}
+\begin{frame}
+  \frametitle{実装例}
+  \vfill
+  \begin{center}
+    \textbf{\LARGE 第１９章} \\
+    \textbf{\Huge TacOSのCPU仮想化}
+  \end{center}
+  \vfill
+\end{frame}
+
+%=========================================================================
+\begin{frame}
+  \frametitle{TacOSのPCB}
+  \begin{itemize}
+    \item 仮想CPU（\texttt{sp}）
+    \item プロセス番号（\texttt{pid}）
+    \item 状態(\texttt{stat}）
+    \item 優先度（\texttt{nice}, \texttt{enice}）
+    \item プロセステーブルのインデクス（\texttt{idx}）
+    \item イベント用カウンタとセマフォ(\texttt{evtCnt，evtSem}）
+    \item プロセスのアドレス空間（\texttt{memBase}，\texttt{memLen}）
+    \item プロセスの親子関係の情報（\texttt{parent}，\texttt{exitStat}）
+    \item オープン中のファイル一覧（\texttt{fds[]}）
+    \item PCBリストの管理（\texttt{prev}，\texttt{next}）
+    \item スタックオーバーフローの検知（\texttt{magic}）
+  \end{itemize}
+  \vfill
+\end{frame}
+
+%=========================================================================
+\begin{frame}
+  \frametitle{TacOSのPCB（前半）}
+  \src{firstline=56,lastline=67,frame=tlr,xleftmargin=5mm}{kernel/process.hmm}
+  \vspace{-5mm}\src{firstline=68,lastline=76,frame=lr,
+  numbers=left,xleftmargin=5mm,firstnumber=1}{kernel/process.hmm}
+  \vfill
+\end{frame}
+
+%=========================================================================
+\begin{frame}
+  \frametitle{TacOSのPCB（後半）}
+  \src{firstline=77,lastline=96,frame=lrb,
+  numbers=left,xleftmargin=5mm,firstnumber=10}{kernel/process.hmm}
+  \vfill
+\end{frame}
+
+%=========================================================================
+\begin{frame}
+  \frametitle{TacOSの実行可能列}
+  \begin{itemize}
+    \item PCBの双方向環状リスト
+    \item 優先度順にソート（\texttt{curProc}は実行中のプロセス）
+    \item 末尾に\texttt{idle}プロセスが常駐 \\
+      \vfill
+      \fig{scale=0.5}{tacosReadyQueue-crop.pdf}
+  \end{itemize}
+  \vfill
+\end{frame}
+
+%=========================================================================
+\begin{frame}
+  \frametitle{TacOSのメモリ配置}
+  \fig{scale=0.4}{tacosMemMap-crop.pdf}
+\end{frame}
+
+%=========================================================================
+\begin{frame}
+  \frametitle{TacOSのタイマー管理プログラム}
+  \src{firstline=465,lastline=483,
+  numbers=left,xleftmargin=5mm,firstnumber=3}{kernel/kernel.cmm}
+\end{frame}
+
+%=========================================================================
+\begin{frame}[fragile]
+  \frametitle{TacOSのコンテキスト保存プログラム（yield()）}
+  \src{firstline=49,lastline=56,frame=tlr,
+  numbers=left,xleftmargin=5mm,firstnumber=1}{kernel/dispatcher.s}
+  \vspace{-5mm}\begin{lstlisting}[frame=lr,xleftmargin=5mm]
+
+        ...
+  \end{lstlisting}
+  \vspace{-5mm}\src{firstline=65,lastline=77,frame=lr,
+  numbers=left,xleftmargin=5mm,firstnumber=17}{kernel/dispatcher.s}
+\end{frame}
+
+%=========================================================================
+\begin{frame}[fragile]
+  \frametitle{TacOSのコンテスト復旧プログラム（dispatch()）}
+  \src{firstline=78,lastline=90,frame=lr,
+    numbers=left,xleftmargin=5mm,firstnumber=1}{kernel/dispatcher.s}
+  \vspace{-5mm}\begin{lstlisting}[frame=lr,xleftmargin=5mm]
+
+        ...
+  \end{lstlisting}
+  \vspace{-5mm}\src{firstline=98,lastline=102,frame=lrb,
+    numbers=left,xleftmargin=5mm,firstnumber=21}{kernel/dispatcher.s}
+\end{frame}
+
+%=========================================================================
+\section{練習問題}
+\begin{frame}
+  \frametitle{練習問題}
+  \vfill
+  \begin{center}
+    \textbf{\Huge 練習問題}
+  \end{center}
   \vfill
 \end{frame}
 
