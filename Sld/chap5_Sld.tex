@@ -41,31 +41,42 @@
 \section{クリティカルセクション（Critical Section）}
 \begin{frame}
   \frametitle{クリティカルセクション（Critical Section）}
-  同時に複数のプロセス（スレッド）が実行すると競合が発生する部分\\
-  （クリティカルリージョン（Critical Region）とも呼ぶ）
+  複数のプロセス（スレッド）が同時に実行すると\emph{競合}が発生する！！\\
+  （クリティカルリージョン（Critical Region）とも呼ぶ）\\
+  例えば共有変数を変更する処理は\emph{クリティカルセクション}である．\\
+  （前の例で「（1）から（3）」と「（a）から（c）」）\\
+  クリティカルセクションには複数のスレッドが入ってはならない．
+  \vfill
+  クリティカルセクションの競合問題を効率よく解決するには，
   \begin{enumerate}
-  \item 二つ以上のプロセス（スレッド）が同時にクリティカルセクションに入らない．
-  \item クリティカルセクションに入っているプロセス（スレッド）がない時は，
-    待たされることなくクリティカルセクションに入ることができる．
-  \item クリティカルセクションに入るために永遠に待たされることがない．
+  \item[(1)] 二つ以上のスレッドが同時に入らない．
+  \item[(2)] 入っているスレッドがない時は，すぐに入れる．
+  \item[(3)] 入るためにスレッドが永遠に待たされることがない．
   \end{enumerate}
+  \vfill
 \end{frame}
 
 %=========================================================================
-\section{相互排他（mutual exclusion）}
+\section{相互排除（mutual exclusion）}
 \begin{frame}
-  \frametitle{相互排他（mutual exclusion）}
+  \frametitle{相互排除（mutual exclusion）}
+  複数のスレッドが同時にクリティカルセクションに入らない制御！！\\
+  （排他制御，相互排他も呼ぶ）\\
+  \vfill
+  相互排除を行うプログラムの部分のことを次のように呼ぶ．
   \begin{itemize}
   \item エントリーセクション（Entry Section）\\
     クリティカルセクションに入る手続き
   \item エグジットセクション（Exit Section）\\
     クリティカルセクションを出る手続き
   \end{itemize}
+  \vfill
 \end{frame}
 
 %=========================================================================
 \begin{frame}
   \frametitle{割込み禁止}
+  シングルプロセッサシステムで相互排除に使用できる．
   \lst{language=}{disableInterrupt.txt}
   \begin{itemize}
   \item エントリーセクション（Entry Section）\\
@@ -73,16 +84,23 @@
   \item エグジットセクション（Exit Section）\\
     割り込み禁止の場合はEI命令
   \end{itemize}
+  \vfill
+  DI命令，EI命令は特権命令なのでカーネル内だけで可能．\\
+  長時間の割り込み禁止はNGなので注意が必要．
+  \vfill
 \end{frame}
 
 %=========================================================================
 \begin{frame}
-  \frametitle{ハードウェア構成}
+  \frametitle{SMPのハードウェア構成を思い出す}
   \fig{scale=0.41}{hardBlock-crop.pdf}
   \begin{itemize}
-    \item SMP（Symmetric Multiprocessing）
-    \item CPUはメモリを共有する
+%    \item SMP（Symmetric Multiprocessing）
+    \item SMPでは割り込み禁止だけでは相互排除できない．
+    \item CPUはメモリ（バス）を共有する（バスの利用は順番に行う）
+    \item 割り込みは機械語命令の途中では発生しない．
   \end{itemize}
+  \vfill
 \end{frame}
 
 %=========================================================================
@@ -91,18 +109,23 @@
   TS（Test and Set）命令はSMPシステムでの相互排除に使用できる．\\
   「TS  R, M」は以下を{\bf アトミック（atomic）}に実行する．
   \begin{enumerate}
-  \item バスをロックする
-  \item $R \leftarrow [M]$
-  \item {\tt if (R==0) } $z \leftarrow 1$ {\tt else} $z \leftarrow 0$
-  \item $[M] \leftarrow 1$
-  \item バスのロックを解除する
+  \item[1.] バスをロックする
+  \item[2.] $R \leftarrow [M]$
+  \item[3.] {\tt if (R==0) } $Zero \leftarrow 1$ {\tt else} $Zero \leftarrow 0$
+  \item[4.] $[M] \leftarrow 1$
+  \item[5.] バスのロックを解除する
   \end{enumerate}
+  \vfill
 \end{frame}
 
 %=========================================================================
 \begin{frame}
   \frametitle{専用命令（TS命令の使用例）}
   \lst{language=}{testAndSet.s}
+  \begin{itemize}
+  \item \emph{ビジーウェイティング（Busy Waiting）}の一種．
+  \end{itemize}
+  \vfill
 \end{frame}
 
 %=========================================================================
@@ -111,20 +134,26 @@
   SW（Swap）命令もSMPシステムでの相互排除に使用できる．\\
   「SW  R, M」は以下を{\bf アトミック（atomic）}に実行する．
   \begin{enumerate}
-  \item バスをロックする
-  \item $T \leftarrow [M]$
-  \item $[M] \leftarrow R$
-  \item $R \leftarrow T$
-  \item バスのロックを解除する
+  \item[1.] バスをロックする
+  \item[2.] $T \leftarrow [M]$
+  \item[3.] $[M] \leftarrow R$
+  \item[4.] $R \leftarrow T$
+  \item[5.] バスのロックを解除する
   \end{enumerate}
   ここで $T$ はCPU内部の一時的なレジスタ\\
   （$T$ レジスタの存在はプログラムから見えない）
+  \vfill
+  \begin{itemize}
+  \item 次の例も\emph{ビジーウェイティング（Busy Waiting）}の一種．
+  \end{itemize}
+  \vfill
 \end{frame}
 
 %=========================================================================
 \begin{frame}
   \frametitle{専用命令（SW命令の使用例）}
   \lst{language=}{swap.s}
+  \vfill
 \end{frame}
 
 %=========================================================================
@@ -133,21 +162,23 @@
   CAS（Compare And Swap）命令もSMPシステムでの相互排除に使用できる．
   「CAS  R0, R1, M」は，以下を{\bf アトミック（atomic）}に実行する．
   \begin{enumerate}
-  \item バスをロックする
-  \item $T \leftarrow [M]$
-  \item {\tt if ($T==R0$) \{} $[M] \leftarrow R1;~ z \leftarrow 1;$
-    {\tt \} else \{} $R0 \leftarrow T;~  z \leftarrow 0;$ {\tt \}}
-  \item バスのロックを解除する
+  \item[1.] バスをロックする
+  \item[2.] $T \leftarrow [M]$
+  \item[3.] {\tt if ($T==R0$) \{} $[M] \leftarrow R1;~ Zero \leftarrow 1;$
+    {\tt \} \\ else \{} $R0 \leftarrow T;~  Zero \leftarrow 0;$ {\tt \}}
+  \item[4.] バスのロックを解除する
   \end{enumerate}
-  \vspace{1em}
+  \vfill
   \lst{language=}{cas.txt}
   {\bf ロックフリー（Lock-free）}なアルゴリズム
+  \vfill
 \end{frame}
 
 %=========================================================================
 \begin{frame}
-  \frametitle{Peterson のアルゴリズム}
+  \frametitle{フラグを用いる方法（Peterson のアルゴリズム）}
   \lst{language=}{peterson.txt}
+  \vfill
 \end{frame}
 
 %=========================================================================
@@ -161,64 +192,67 @@
   \item システムコール等でユーザプロセスに提供
   \item サブルーチンとしてサービスモジュール等に提供
   \end{itemize}
-
-{\bf セマフォ（Semaphore：腕木式信号機）}の元々の意味はこれ！
-
-\fig{scale=0.35}{semaphore-crop.pdf}
+  \vfill
+  \emph{セマフォ（Semaphore：腕木式信号機）}の元々の意味はこれ！ \\
+  \fig{scale=0.33}{semaphore-crop.pdf}
+  \vfill
 \end{frame}
 
 %=========================================================================
 \begin{frame}
   \frametitle{セマフォ（Semaphore）}
   \begin{itemize}
-  \item セマフォはデータ構造（{\color{red} セマフォ型}，セマフォ構造体）
+  \item セマフォはデータ構造（{\color{red} セマフォ型}，セマフォ構造体）\\
+    例えばC言語で：「\texttt{typedef struct \{ ... \} Semaphore;}」
   \item カウンタは0以上の整数値（0は{\color{red} 赤信号}の意味）
   \item プロセスの待ち行列を作ることができる．
-  \item セマフォ型の変数に{\bf P操作}と{\bf V操作}ができる．
-  \item {\bf P操作（{\it Proberen}:try）}
-  \item {\bf V操作（{\it Verhogen}:raise）}
-  \item ユーザプロセスには{\bf P，Vシステムコール}が提供される
-  \item サービスモジュールやデバイスドライバには{\bf P，Vサブルーチン}
+  \item セマフォ型の変数に\emph{P操作}と\emph{V操作}ができる．
+  \item \emph{P操作（{\it Proberen}:try）}
+  \item \emph{V操作（{\it Verhogen}:raise）}
+  \item ユーザプロセスには\emph{P，Vシステムコール}が提供される
+  \item サービスモジュールやデバイスドライバには\emph{P，Vサブルーチン}
   \end{itemize}
-
-セマフォはプロセス（スレッド）の状態を{\bf 待ち(Waiting）状態}に変える．
-{\bf ビジーウェイティング（Busy Waiting）では無い}のでCPUを無駄遣いすることはない．
+  \vfill
+  セマフォはプロセス（スレッド）の状態を\emph{待ち(Waiting）状態}に変える．
+    \emph{ビジーウェイティング（Busy Waiting）では無い}ので
+    CPUを無駄遣いすることはない．
 \end{frame}
 
 %=========================================================================
 \begin{frame}
   \frametitle{セマフォ（Semaphore）のP操作}
-  {\bf P操作（P(S)）}
+  \emph{P操作（P(S)）}
   \begin{enumerate}
-  \item セマフォ（S）の値が1以上ならセマフォの値を1減らす．
-  \item 値が0ならプロセス（スレッド）を待ち（Waiting）状態にし，
-  \item セマフォの待ち行列に追加する．
+  \item[1.] セマフォ（S）の値が1以上ならセマフォの値を1減らす．
+  \item[2.] 値が0ならプロセス（スレッド）を待ち（Waiting）状態にし，
+  \item[3.] セマフォの待ち行列に追加する．
   \end{enumerate}
   クリティカルセクションのエントリーセクション等で使用できる．
-
   \begin{center}
     \begin{minipage}{0.6\columnwidth}
       \lst{language={C}}{semP.c}
     \end{minipage}
   \end{center}
+  \vfill
 \end{frame}
 
 %=========================================================================
 \begin{frame}
   \frametitle{セマフォ（Semaphore）のV操作}
-  {\bf V操作（V(S)）}
+  \emph{V操作（V(S)）}
   \begin{enumerate}
-  \item 待っているプロセス（スレッド）が無い場合は，セマフォ（S）の値を1増やす．
-  \item セマフォ（S）の待ち行列にプロセス（スレッド）がある場合は，
+  \item[1.] 待っているプロセス（スレッド）が無い場合は，
+    セマフォ（S）の値を1増やす．
+  \item[2.] セマフォ（S）の待ち行列にプロセス（スレッド）がある場合は，
     それらの一つを起床させる．
   \end{enumerate}
   クリティカルセクションのエグジットセクション等で使用できる．
-
   \begin{center}
     \begin{minipage}{0.6\columnwidth}
       \lst{language={C}}{semV.c}
     \end{minipage}
   \end{center}
+  \vfill
 \end{frame}
 
 %=========================================================================
@@ -230,41 +264,125 @@
 
 %=========================================================================
 \begin{frame}
+  \frametitle{生産者・消費者問題}
+  セマフォの使用例として
+  \fig{scale=0.50}{producerConsumer-crop.pdf}
+  \begin{itemize}
+  \item 生産者スレッドはデータをバッファに書き込む．
+  \item 消費者スレッドはデータをバッファから読む．
+  \item バッファが溢れないように両者で歩調を合わせる必要がある．
+  \end{itemize}
+  \vfill
+\end{frame}
+
+%=========================================================================
+\begin{frame}
   \frametitle{セマフォの使用例（生産者・消費者問題）}
   \lst{language={C}}{semProducerConsumer.c}
 \end{frame}
 
 %=========================================================================
 \begin{frame}
+  \frametitle{複数生産者・複数消費者問題}
+  セマフォの使用例として
+  \fig{scale=0.50}{producersConsumers-crop.pdf}
+  \begin{itemize}
+  \item 生産者スレッド同士で相互排除が必要．
+  \item 消費者スレッド同士でも相互排除が必要．
+  \end{itemize}
+  \vfill
+\end{frame}
+
+%=========================================================================
+\begin{frame}
   \frametitle{セマフォの使用例（複数生産者・複数消費者問題 1/2）}
-  \lst{language={C},lastline=17,frame=tlr}{semMultiProducerConsumer.c}
+  \lst{language={C},lastline=16,frame=tlr}{semMultiProducerConsumer.c}
+  \begin{itemize}
+  \item 複数の生産者スレッドが\texttt{producerThread()}を実行する．
+  \item \texttt{in}変数は生産者スレッド間の共有変数になった．
+  \item \texttt{in}変数の使用で相互排除するために\texttt{inSem}を準備した．
+  \end{itemize}
+  \vfill
 \end{frame}
 
 %=========================================================================
 \begin{frame}
   \frametitle{セマフォの使用例（複数生産者・複数消費者問題 2/2）}
-  \lst{language={C},firstline=18,frame=lrb}{semMultiProducerConsumer.c}
+  \lst{language={C},firstline=17,frame=lrb}{semMultiProducerConsumer.c}
+  \begin{itemize}
+  \item 複数の消費者スレッドが\texttt{consumerThread()}を実行する．
+  \item \texttt{out}変数は消費者スレッド間の共有変数になった．
+  \item \texttt{out}変数の使用で相互排除するために\texttt{outSem}を準備した．
+  \end{itemize}
+  \vfill
+\end{frame}
+
+%=========================================================================
+\begin{frame}
+  \frametitle{リーダ・ライタ問題}
+  次の場合，単にロックするより\emph{並行性（concurrency）}を高くできる．
+  \vfill
+  \fig{scale=0.55}{readersWriters-crop.pdf}
+  \begin{itemize}
+  \item ライタスレッドはデータ読んでを変更して書き込む．
+  \item データ変更中は他のスレッドはデータにアクセスしてはならない．\\
+    （\emph{排他ロック（exclusive lock）}
+      \vfill
+  \item リーダスレッドはデータを変更しない．
+  \item 複数のリーダスレッドが同時にデータにアクセスしても良い．\\
+    しかし，ライタはアクセスできない．\\
+    （\emph{共有ロック（shared lock）}）
+  \end{itemize}
+  \vfill
 \end{frame}
 
 %=========================================================================
 \begin{frame}
   \frametitle{セマフォの使用例（リーダ・ライタ問題 1/2）}
+  データと\emph{ライタスレッド}部分
+  \vfill
   \lst{language={C},lastline=10,frame=tlr}{semReaderWriter.c}
-  {\bf 排他ロック（exclusive lock）}
+  \vfill
+  \begin{itemize}
+  \item 複数のライタスレッドが\texttt{writerThread()}を実行する．
+  \item \texttt{rwSem=1}は，普通の相互排除と同じ．
+  \item ライタスレッドは，\emph{排他ロック（exclusive lock）}を用いる．
+  \end{itemize}
+  \vfill
+  次ページのスライドが\emph{リーダスレッド}部分
+  \vfill
 \end{frame}
 
 %=========================================================================
 \begin{frame}
   \frametitle{セマフォの使用例（リーダ・ライタ問題 2/2）}
   \lst{language={C},firstline=11,frame=lrb}{semReaderWriter.c}
-  {\bf 共有ロック（shared lock）}
+  \begin{itemize}
+  \item 複数のリーダスレッドが\texttt{readerThread()}を実行する．
+  \item \texttt{cnt}は，クリティカルセクション中のリーダスレッド数．
+  \item \texttt{cntSem=1}は\texttt{cnt}の相互排除に用いる．
+  \item リーダスレッドは，\emph{共有ロック（shared lock）}を用いる．
+  \end{itemize}
+  \vfill
 \end{frame}
 
 %=========================================================================
 \section{TacOSのセマフォ}
 \begin{frame}
+  \frametitle{実装例}
+  \vfill
+  \begin{center}
+    \textbf{\LARGE 第２０章} \\
+    \textbf{\Huge TacOSのセマフォ}
+  \end{center}
+  \vfill
+\end{frame}
+
+%=========================================================================
+\begin{frame}
   \frametitle{TacOSのセマフォ構造体（カーネル内）}
   \src{firstline=99,lastline=104}{kernel/process.hmm}
+  \vfill
   \begin{itemize}
     \item セマフォは最大30個（TaCのメモリは小さい）
     \item セマフォ構造体の名前は{\tt Sem}
@@ -272,6 +390,7 @@
     \item {\tt queue}に，
       このセマフォを待っているプロセスの待ち行列を作る．
   \end{itemize}
+  \vfill
 \end{frame}
 
 %=========================================================================
@@ -282,12 +401,14 @@
     \item TacOSでは，セマフォを{\tt semTbl}のインデクスで識別する．
     \item Sem構造体（\#0，\#1，\#29）は，未使用，待ちあり，待ちなしの例
   \end{itemize}
+  \vfill
 \end{frame}
 
 %=========================================================================
 \begin{frame}
   \frametitle{TacOSでのセマフォの架空の使用例}
   \src{numbers=left,xleftmargin=5mm}{samples/tacosSemUse.cmm}
+  \vfill
 \end{frame}
 
 %=========================================================================
@@ -295,6 +416,7 @@
   \frametitle{TacOSのセマフォ割当て解放ルーチン（カーネル内）}
   \src{firstline=142,lastline=164,
     numbers=left,xleftmargin=5mm}{kernel/kernel.cmm}
+  \vfill
 \end{frame}
 
 %=========================================================================
@@ -302,6 +424,7 @@
   \frametitle{TacOSのP操作ルーチン（カーネル内）}
   \src{firstline=171,lastline=186,
     numbers=left,xleftmargin=5mm}{kernel/kernel.cmm}
+  \vfill
 \end{frame}
 
 %=========================================================================
@@ -309,6 +432,7 @@
   \frametitle{TacOSのPCBリスト操作関数（カーネル内）}
   \src{firstline=113,lastline=125,
     numbers=left,xleftmargin=5mm}{kernel/kernel.cmm}
+  \vfill
 \end{frame}
 
 %=========================================================================
@@ -316,9 +440,11 @@
   \frametitle{TacOSのV操作ルーチン（1/2）（カーネル内）}
   \src{firstline=188,lastline=208,frame=tlr,
     numbers=left,xleftmargin=5mm}{kernel/kernel.cmm}
+  \vfill
   \begin{itemize}
   \item {\tt iSemV()}は割込禁止で呼び出す．
   \end{itemize}
+  \vfill
 \end{frame}
 
 %=========================================================================
@@ -350,6 +476,72 @@
   \item 関数の返り値は，{\tt G0}レジスタに入れて返す．
   \item {\tt reti}命令はスタックからフラグとPCを一度に取り出す．
   \end{itemize}
+\end{frame}
+
+%=========================================================================
+\section{練習問題}
+\begin{frame}
+  \frametitle{練習問題}
+  \vfill
+  \begin{center}
+    \textbf{\Huge 練習問題}
+  \end{center}
+  \vfill
+\end{frame}
+
+%=========================================================================
+\begin{frame}
+  \frametitle{練習問題（１）}
+  \begin{itemize}
+  \item 次の言葉の意味を説明しなさい．
+    \begin{itemize}
+    \item 競合
+    \item クリティカルセクション
+    \item 相互排除
+    \item ビジーウェイティング
+    \item ロックフリーなアルゴリズム
+    \item セマフォ
+    \item 相互排除問題
+    \item 生産者と消費者問題
+    \item リーダライタ問題
+    \end{itemize}
+  \end{itemize}
+  \vfill
+\end{frame}
+
+%=========================================================================
+\begin{frame}
+  \frametitle{練習問題（２）}
+  \begin{itemize}
+  \item なぜ割込みを禁止することで相互排除ができるか？
+  \item 割込み禁止による相互排除がマルチプロセッサシステムでは
+    不十分な理由は？
+  \item 割込み禁止による相互排除はクリティカルセクションの三つの条件を
+    満たしているか？
+  \item CPUが割込み禁止になっている間に発生した割込みはどのように
+    扱われるか？
+  \item DI命令やEI命令が特権命令でなかったら，どのような不都合が生じるか？
+  \item シングルプロセッサシステムにおいて，
+    機械語命令は\emph{アトミック（atomic）}と言えるか？
+  \item マルチプロセッサシステムにおいて，
+    機械語命令は\emph{アトミック（atomic）}と言えるか？
+  \end{itemize}
+  \vfill
+\end{frame}
+
+%=========================================================================
+\begin{frame}
+  \frametitle{練習問題（３）}
+  \begin{itemize}
+  \item TS命令とSW命令に共通な特長は何か？
+  \item TS命令を用いたビジーウェイティングは
+    シングルプロセッサシステムでも使用できるか？
+  \item セマフォを相互排除に使用する手順を説明しなさい．
+  \item 生産者と消費者の問題において，
+    二つのセマフォはどのような値に初期化されたか？\\
+    二つのセマフォは何の役割を持っていたか？
+  \end{itemize}
+  \vfill
 \end{frame}
 
 \end{document}
