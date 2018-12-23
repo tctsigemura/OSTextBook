@@ -52,6 +52,26 @@
 
 %=========================================================================
 \begin{frame}
+  \frametitle{UNIXの共有メモリシステムコール等（前半）}
+  \lst{firstline=2,lastline=13,numbers=none,xleftmargin=5mm}
+      {ipcUnixSharedMemory.txt}
+  \begin{itemize}
+  \item ftok()は，pathとidから一意なkey値を生成する．
+  \item shmget()は，key値で識別されるメモリセグメントIDを返す．
+  \item shmget()は，メモリセグメントを作ることもできる．
+  \item flagは，rwxrwxrwxとIPC\_CREAT等のフラグ
+  \end{itemize}
+\end{frame}
+
+%=========================================================================
+\begin{frame}
+  \frametitle{UNIXの共有メモリシステムコール等（後半）}
+  \lst{firstline=15,numbers=none,xleftmargin=5mm}
+      {ipcUnixSharedMemory.txt}
+\end{frame}
+
+%=========================================================================
+\begin{frame}
   \frametitle{UNIXの共有メモリサーバ例（前半）}
   \smp{lastline=20,frame=tlr,numbers=left,xleftmargin=5mm}
       {UnixSharedMemory/ipcUnixSharedMemoryServer.c}
@@ -105,13 +125,15 @@
   \frametitle{通信相手の指定方式（Naming）}
   \begin{center}
     \fig{scale=0.6}{ipcDirect-crop.pdf}
-    直接指定方式
+    \emph{直接指定方式}
+  \end{center}
+  \begin{center}
     \fig{scale=0.6}{ipcIndirect-crop.pdf}
-    間接指定方式
+    \emph{間接指定方式}
   \end{center}
   \begin{itemize}
-  \item 直接指定方式でもANYを用いることで多対多通信が可能．
-  \item 間接指定方式は自然に多対多通信が可能
+  \item \emph{直接指定方式}でもANYを用いることで多対多通信が可能．
+  \item \emph{間接指定方式}は自然に多対多通信が可能
   \end{itemize}
 \end{frame}
 
@@ -139,6 +161,26 @@
   \item メッセージ形式＝タグあり
   \item 同期方式／非同期方式どちらも可能
   \end{itemize}
+\end{frame}
+
+%=========================================================================
+\begin{frame}
+  \frametitle{UNIXのメッセージ通信システムコールなど（前半）}
+  \lst{firstline=2,lastline=13,numbers=none,xleftmargin=5mm}
+      {ipcUnixMessage.txt}
+  \begin{itemize}
+  \item mtypeがタグの役割を持つ．
+  \item keyは共有メモリで紹介したものと同じ（ftok()関数で作る)．
+  \item 「メッセージキュー」＝「リンク」
+  \item msgsnd()，msgrcv()でmsgflgにIPC\_NOWAITを指定すると\emph{非同期}．
+  \end{itemize}
+\end{frame}
+
+%=========================================================================
+\begin{frame}
+  \frametitle{UNIXのメッセージ通信システムコールなど（後半）}
+  \lst{firstline=15,numbers=none,xleftmargin=5mm}
+      {ipcUnixMessage.txt}
 \end{frame}
 
 %=========================================================================
@@ -172,19 +214,34 @@
 \end{frame}
 
 %=========================================================================
+\section{TacOSのメッセージ通信}
+\begin{frame}
+  \frametitle{実装例}
+  \vfill
+  \begin{center}
+    \textbf{\LARGE 第２１章} \\
+    \textbf{\Huge TacOSのメッセージ通信}
+  \end{center}
+  \vfill
+\end{frame}
+
+%=========================================================================
 \section{TacOSのメッセージ通信機構}
 \begin{frame}
   \frametitle{TacOSのメッセージ通信機構}
   クライアント・サーバモデルに特化したプロセス間通信機構を提供する．
+  \vfill
   \fig{scale=0.6}{tacosMessage-crop.pdf}
+  \vfill
   \begin{enumerate}
-  \item サーバプロセスが{\bf リンク}を所有し通信を待ち受ける．
-  \item クライアントプロセスは{\tt sndrec()}関数でメッセージを送信する．
-  \item サーバプロセスは{\tt receive()}関数を用いてメッセージを受信する．
-  \item サーバプロセスはメッセージの内容に合った処理を行う．
-  \item サーバプロセスは処理結果を{\tt send()}関数を用いて返信する．
-  \item {\tt sndrec()}関数が完了しクライアントは処理結果を受取る．
+  \item[1.] サーバプロセスが{\bf リンク}を所有し通信を待ち受ける．
+  \item[2.] クライアントプロセスは{\tt sndrec()}関数でメッセージを送信する．
+  \item[3.] サーバプロセスは{\tt receive()}関数を用いてメッセージを受信する．
+  \item[4.] サーバプロセスはメッセージの内容に合った処理を行う．
+  \item[5.] サーバプロセスは処理結果を{\tt send()}関数を用いて返信する．
+  \item[6.] {\tt sndrec()}関数が完了しクライアントは処理結果を受取る．
   \end{enumerate}
+  \vfill
 \end{frame}
 
 %=========================================================================
@@ -267,6 +324,64 @@
 \end{frame}
 
 %=========================================================================
+\section{練習問題}
+\begin{frame}
+  \frametitle{練習問題}
+  \vfill
+  \begin{center}
+    \textbf{\Huge 練習問題}
+  \end{center}
+  \vfill
+\end{frame}
+
+%=========================================================================
+\begin{frame}
+  \frametitle{練習問題（１）}
+  \begin{itemize}
+  \item 次の言葉の意味を説明しなさい．
+    \begin{itemize}
+    \item 共有メモリ
+    \item メッセージ通信
+    \item 直接指定方式
+    \item 間接指定方式
+    \item バッファリング
+    \item 同期方式
+    \item 非同期方式
+    \item ランデブー方式
+    \item メッセージのタグ
+    \end{itemize}
+  \end{itemize}
+  \vfill
+\end{frame}
+
+%=========================================================================
+\begin{frame}
+  \frametitle{練習問題（２）}
+  \begin{itemize}
+  \item プロセス間の共有メモリとスレッド間の共有変数の違いは何か？
+  \item UNIXの共有メモリ使用例を実際に実行し動作確認しなさい．
+  \item 動作確認したプログラムでは，
+    サーバプログラムは共有メモリが変更されたことを確認しないで，
+    一定の時間間隔で共有メモリの内容を表示している．
+    \begin{itemize}
+    \item どのような不都合が予想されるか？
+    \item クライアントとサーバで同期をする方法はあるか？
+    \end{itemize}
+  \item メッセージ通信でバッファを大きくすることのメリットは何か？
+  \item UNIXのメッセージ通信プログラム例を実際に実行し動作確認しなさい．
+  \item UNIXのメッセージ通信プログラム例は
+    生産者と消費者の問題の解になっている．
+    複数生産者と複数消費者の問題の解にもなっているか？
+  \item UNIXのメッセージ通信プログラム例が
+    複数生産者と複数消費者の問題の解にもなっているか，
+    動作確認する手順を説明しなさい．
+  \end{itemize}
+  \vfill
+\end{frame}
+
+\end{document}
+
+%=========================================================================
 \begin{frame}
   \frametitle{TaC7とTaC（参考）}
   \begin{minipage}{0.58\columnwidth}
@@ -309,4 +424,5 @@ TeC7は，TacOSを書き込んだマイクロSDカードを装着すると，
   \frametitle{オペレーティングシステムの構造（参考）}
   \fig{scale=0.49}{osOrganization-crop.pdf}
 \end{frame}
+
 \end{document}
