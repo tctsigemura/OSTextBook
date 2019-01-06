@@ -149,7 +149,7 @@
     \begin{itemize}
     \item 非同期方式（ノンブロッキング）
     \item 同期方式（ブロッキング）
-    \item ランデブー方式
+    \item ランデブー方式（クライアント・サーバモデルに特化）
     \end{itemize}
   \end{itemize}
 
@@ -229,7 +229,8 @@
 \section{TacOSのメッセージ通信機構}
 \begin{frame}
   \frametitle{TacOSのメッセージ通信機構}
-  クライアント・サーバモデルに特化したプロセス間通信機構を提供する．
+  クライアント・サーバモデルに特化した\emph{ランデブー方式}の
+  プロセス間通信機構を提供する．
   \vfill
   \fig{scale=0.6}{tacosMessage-crop.pdf}
   \vfill
