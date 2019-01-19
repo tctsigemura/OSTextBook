@@ -4,13 +4,13 @@ import java.util.concurrent.Semaphore;          // セマフォ型を利用可�
 public class SemBoundedBuffer {
     private Semaphore guard = new Semaphore(1); // ガード用のセマフォ
     private Semaphore next = new Semaphore(0);  // signal時ブロック用セマフォ
-    private int nextCont = 0;                   // signal時ブロック・スレッド数
+    private int nextCount = 0;                  // signal時ブロック・スレッド数
     private class Condition {                   // 内部クラス'条件変数型'を定義
 	Semaphore sem = new Semaphore(0);       // 条件変数待ち用セマフォ sem
 	int count = 0;                          // 条件変数を待つスレッドの数
 	void await() {                          // 条件変数を待つメソッド
 	    count++;                            // この条件変数待ちスレッドの数
-	    if (nextCont>0) {                   // 起床後にawait()した場合なら
+	    if (nextCount>0) {                  // 起床後にawait()した場合なら
 		next.release();                 //   signal()したスレッドを起床
 	    } else {                            // 起こすスレッドがないなら
 		guard.release();                //   ガードを外してからブロック
@@ -20,15 +20,15 @@ public class SemBoundedBuffer {
 	}
 	void signal() {                         // 条件変数で待つスレッドを起床
 	    if (count>0) {                      // 待っているスレッドがあれば
-		nextCont++;                     //   signal途中のスレッド数
+		nextCount++;                    //   signal途中のスレッド数
 		sem.release();                  //   待ちスレッドを起こす
 		next.acquireUninterruptibly();  //   起きたスレッドを先に実行
-		nextCont--;                     //   signal完了
+		nextCount--;                    //   signal完了
 	    }
 	}
     }
     private void exitProc() {                   // 手続きの出口処理
-	if (nextCont>0) {                       // signalされた後なら
+	if (nextCount>0) {                      // signalされた後なら
 	    next.release();                     //   signalしたスレッドを起床
 	} else {                                // そうでなければ
 	    guard.release();                    //   ガードを外す

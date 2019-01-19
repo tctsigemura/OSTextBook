@@ -106,7 +106,7 @@ signal操作は条件変数の待ち行列から一つのスレッドを選ん�
 
   \begin{itemize}
   \item P操作とV操作の使用はプログラマまかせ．
-  \item 間違うとタイミング異存の発見の難しいバグになる．
+  \item 間違うとタイミング依存の発見の難しいバグになる．
   \end{itemize}
 \end{frame}
 
@@ -230,6 +230,75 @@ signal操作は条件変数の待ち行列から一つのスレッドを選ん�
   \item 条件変数は一つしかないので，利用方法に工夫が必要
   \item {\tt remove()}最後の行の実行順序がモニタと異なる．
   \end{itemize}
+\end{frame}
+
+%=========================================================================
+\section{練習問題}
+\begin{frame}
+  \frametitle{練習問題}
+  \vfill
+  \begin{center}
+    \textbf{\Huge 練習問題}
+  \end{center}
+  \vfill
+\end{frame}
+
+%=========================================================================
+\begin{frame}
+  \frametitle{練習問題（１）}
+  \begin{itemize}
+  \item 次の言葉の意味を説明しなさい．
+    \begin{itemize}
+    \item 抽象データ型
+    \item モニタ
+    \item ガード
+    \item 資源
+    \item 手続き（操作，メソッド）
+    \item 条件変数
+    \item 初期化プログラム
+    \end{itemize}
+  \end{itemize}
+  \vfill
+\end{frame}
+
+%=========================================================================
+\begin{frame}
+  \frametitle{練習問題（２）}
+  \begin{itemize}
+  \item \emph{抽象データ型}の定義を調べなさい．
+  \item 「モニタによるキューの実現（仮想言語版）」は，
+    \texttt{cnt}なしでも記述できるか？
+  \item 「モニタによるキューの実現（仮想言語版）」において，
+    キューが空のとき一つのスレッドが\texttt{remove()}を実行した．
+    その後，別のスレッドが\texttt{append()}を実行した．
+    この時の\texttt{append()}，\texttt{remove()}内の
+    プログラムが実行される順を答えなさい．
+  \item モニタによるキューの実現（仮想言語版）は，
+    複数生産者と複数消費者問題の解に使用できるか？
+  \item Java風仮想言語のモニタを用いてリーダ・ライタ問題の解を示しなさい．
+  \item Java風仮想言語のモニタを用いてセマフォを記述しなさい．
+  \end{itemize}
+  \vfill
+\end{frame}
+
+%=========================================================================
+\begin{frame}
+  \frametitle{練習問題（３）}
+  \begin{itemize}
+  \item \texttt{semBoundedBuffer}を実際に実行しなさい．\\
+    （メインルーチンを含むソースプログラムの入手先は教科書参照）
+  \item \texttt{signal()}は\emph{手続きの最後でしか使用できないことにすると}，
+    \texttt{semBoundedBuffer}はどのように簡略化できるか．
+  \item \texttt{MonBoundedBuffer}を実際に実行しなさい．\\
+    （メインルーチンを含むソースプログラムの入手先は教科書参照）
+  \item 「モニタによるキューの実現（仮想言語版）」と，
+    「Javaのモニタ風機構による生産者と消費者問題の解」では，
+    プログラム中のコメントで示したように実行順序が異なる．
+    Javaのモニタ風機構と従来のモニタのどのような違いによるものか？
+  \item その他に従来のモニタとJavaのモニタ風機構の違いは何があるか？
+  \item モニタの signal と、セマフォのV操作の違いは何があるか？
+  \end{itemize}
+  \vfill
 \end{frame}
 
 \end{document}
