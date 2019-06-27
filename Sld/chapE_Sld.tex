@@ -82,14 +82,14 @@
   \begin{itemize}
   \item \emph{ハードリンク} \\
     \begin{itemize}
-    \item ファイルシステム仕組みとしてOSカーネルに組み込む．
-    \item ファイルの本体が複数のディレクトリ・エントリから指される．
+    \item ファイルシステムの仕組みとしてOSカーネルに組み込む．
+    \item ファイル本体が複数のディレクトリ・エントリから指される．
     \item リンクカウントを用いる．
     \item ディレクトリをリンクするとループ検出が厄介 → 禁止！
     \end{itemize}
   \item \emph{シンボリックリンク} \\
     \begin{itemize}
-    \item ファイルシステム仕組みとしてOSカーネルに組み込む．
+    \item ファイルシステムの仕組みとしてOSカーネルに組み込む．
     \item 他ファイルのパスを格納した特別なファイル．
     \item リンク切れ状態が許される．（Webページのリンクに似ている）
     \end{itemize}
@@ -171,7 +171,7 @@
   \item \emph{日時}：作成日時，最終変更日時など．
   \item \emph{所有者}：所有者，グループなど．
   \item \emph{位置}：ディスク上のどこにファイル本体があるか．\\
-    （データ位置のブロック番号など）
+    （データを格納したブロック（セクタ）の番号など）
   \item \emph{サイズ}：ファイルのバイト数．
   \item \emph{拡張属性}：名前付きの小さな追加データ．\\
     ファイルシステムで用途を定めていない．
@@ -182,22 +182,30 @@
 \begin{frame}
   \frametitle{ファイルの属性（２）}
   \lst{numbers=left,xleftmargin=5mm}{extendedAttr.txt}
+  \vspace{-0.2cm}
+  \begin{minipage}{0.71\columnwidth}
   \begin{description}
-  \item[1行] 拡張属性付きでファイルの一覧を表示させる．
-  \item[4行] 拡張属性を持つファイルがあることが分かる．
+  \item[1行] 拡張属性付きでファイル一覧を表示．
+  \item[4行] 拡張属性付きのファイルがある．
   \item[5行] 拡張属性の内容を表示してみる．
   \end{description}
   この例の拡張属性は，以下のようなものであった．
   \begin{itemize}
   \item 属性の名前：\texttt{com.apple.FinderInfo}
   \item 属性の大きさ：32バイト
-  \item 目的：ファイルがエイリアスであることを表す．（恐らく）
+  \item 意味：ファイルがエイリアスである．\\
+    （ファイル本体がエイリアスのデータ）
   \end{itemize}
+  \end{minipage}
+  \begin{minipage}{0.27\columnwidth}
+    \photo{scale=0.3}{alias.png}{}
+  \end{minipage}
 \end{frame}
 
 %=========================================================================
 \begin{frame}
   \frametitle{アクセス制御（１）}
+  \begin{minipage}{0.54\columnwidth}
   ファイルの\emph{保護属性}に基づき，ファイルに誰が何をできるか制御する．
   \begin{itemize}
   \item \emph{ビット表現の保護モード}\\
@@ -212,6 +220,10 @@
       を指定する．
     \end{itemize}
   \end{itemize}
+  \end{minipage}
+  \begin{minipage}{0.44\columnwidth}
+    \photo{scale=0.45}{extendedAttrs.png}{}
+  \end{minipage}
 \end{frame}
 
 %=========================================================================
