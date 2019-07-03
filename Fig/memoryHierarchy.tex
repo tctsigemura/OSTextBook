@@ -6,9 +6,9 @@
 \begin{document}
 
 \begin{tikzpicture}[y=.6cm]
-  \coordinate (pt1) at (-2,0);
+  \coordinate (pt1) at (-2.5,0);
   \coordinate (pt2) at (0,4);
-  \coordinate (pt3) at (+2,0);
+  \coordinate (pt3) at (+2.5,0);
 
   \path [name path=left upward line] (pt1)--(pt2);
   \path [name path=right downward line] (pt2)--(pt3);
@@ -34,20 +34,20 @@
     (ptl1)--(ptr1);
 
   \draw (0, 1) node [anchor=south] {\scriptsize 主記憶(GiB,10ns)};
-  \draw (0, 0) node [anchor=south] {\footnotesize ２次記憶(TiB,ms)};
+  \draw (0, 0) node [anchor=south] {\footnotesize 二次記憶(TiB,10μ〜10ms)};
 
-  \draw [>=stealth,<->] (-2.1, 0) -- 
+  \draw [>=stealth,<->] (-2.6, 0) -- 
         node [near start, anchor=south, sloped]{\scriptsize 大容量}
         node [near end, anchor=south, sloped]{\scriptsize 高速}
-        (-2.1, 4);
+        (-2.6, 4);
 
-  \draw [>=stealth,<->] (+2.1, 4) -- 
+  \draw [>=stealth,<->] (+2.6, 4) -- 
         node [anchor=south, sloped]{\scriptsize 揮発性}
-        (+2.1, 1);
+        (+2.6, 1);
 
-  \draw [>=stealth,<->] (+2.1, 1) -- 
+  \draw [>=stealth,<->] (+2.6, 1) -- 
         node [anchor=south, sloped]{\tiny 不揮発性}
-        (+2.1, 0);
+        (+2.6, 0);
 
 \end{tikzpicture}
 
