@@ -65,7 +65,7 @@ OS Textbook
 
 付録A　TaCに関する資料
 
-付録B　TaOSのファイルフォーマット
+付録B　TacOSのファイルフォーマット
 
 参考文献
 
