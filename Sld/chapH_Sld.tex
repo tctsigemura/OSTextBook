@@ -1,5 +1,5 @@
 %\documentclass[dvipdfmx]{beamer}
-\documentclass[unicode]{beamer}                   % lualatex の場合
+\documentclass[handout]{beamer}                   % lualatex の場合
 \usepackage{mySld}
 \newcommand{\inode}{\texttt{i-node}}
 \begin{document}
@@ -20,34 +20,35 @@
 \section{ZFS}
 %=========================================================================
 \begin{frame}
-  \frametitle{ZFSの特徴（１）}
-  2005年にサン・マイクロがOpenSolarisに実装して公開し，
-  オープンソースで開発が続いているファイルシステム．
-  FreeBSD，Linux等に移植されSolaris以外のOSでも使用できるようになっている．
-  大きな主記憶と，高速なマルチプロセッサシステムを前提に設計されている．
-
+  \frametitle{ZFSの特徴}
   \begin{itemize}
-  \item \emph{COW（Copy On Write）}でデータやメタデータを
-    ハードディスク（以下ではデバイス）に書き込む．
-    デバイスのブロックを上書きすることが無い．
-  \item 一連の書き込み終了時点にUberblockを書き込むと変更が反映される．
-  \item Uberblockの書き込み前なら変更前の完全な状態，
-    Uberblockの書き込み後なら変更後の完全な状態になり，
-    変更途中の不完全な状態になることはない．
-  \item チェックサムにより高い信頼性が確保されている．
-    ファイルシステムのメタデータだけでなく，
-    全てのデータ（ブロック）のチェックサムが，
-    そのブロックを管理する1階層上のデータ構造に記録されている．（次ページの図）
+  \item 2005年にサン・マイクロがOpenSolarisに実装して公開
+  \item オープンソースで開発が続いている（FreeBSD等でも使用可）
+  \item 大きな主記憶，高速マルチプロセッサが前提（8GiB，64bit CPU）
+  \item \emph{COW（Copy On Write）}でデバイスに書き込む．\\
+    （デバイスのブロックを上書きしないので前状態を維持）
+  \item Uberblockを書き込みと同時に新しい状態になる．\\
+    （Uberblockはファイルシステム管理データの根）
+  \item チェックサムにより高い信頼性を確保（次ページ）
+  \item 一瞬で\emph{スナップショット}や\emph{クローン}を作成 \\
+    （COW の手法を使用し違いの出たブロックだけコピーし変更）
+  \item ボリュームの代わりにストレージプールを使用（後のページ）
+  \item ファイルサイズ等の制約が事実上無い（$Zetta = 2^{70}$ ）\\
+    （ファイルサイズ$2^{64}B$， ストレージプールサイズ$2^{70}B$バイト）
+  \item ミラーやRAID-Z等が装備され信頼性・可用性が向上
+  \item データ圧縮，重複除去機能があり（ディスクI/Oを少なくする）
   \end{itemize}
   \vfill
 \end{frame}
 
 %=========================================================================
 \begin{frame}
-  \frametitle{\inode 全ブロックにわたるチェックサム}
+  \frametitle{全ブロックにわたるチェックサム}
   \fig{scale=0.5}{zfsCheckSum-crop.pdf}
+  \vfill
   \begin{itemize}
     \item ブロックポインタがチェックサムを持つ．
+    \item メタデータだけでなく普通のデータにもチェックサムあり．
     \item チェックサムの不整合が見つかった場合，
       データの2重化（ミラー）がされていれば，
       自動的にミラーからデータを修復する．
@@ -56,30 +57,10 @@
 \end{frame}
 
 %=========================================================================
-\begin{frame}
-  \frametitle{ZFSの特徴（２）}
-  \begin{itemize}
-  \item \emph{スナップショット}や\emph{クローン}の作成が一瞬で完了する．
-    その後は COW の手法を使用し，
-    コピーとオリジナルに違いが出た時点で，
-    違いが出たブロックとそれの親だけのコピーが作られる．
-    デバイスの容量も無駄にならない．（前の図で最上位だけコピーするイメージ）
-  \item ボリュームの代わりにストレージプールと呼ばれる
-    ソフトウェアの層をデバイスとファイルシステムの間にはさんでいる．
-    （次々ページ）
-  \item ファイルサイズ等の制約が事実上無くなった．
-    ファイルサイズは最大$2^{64}$バイト，
-    ストレージプールサイズは最大$2^{70}$バイト（$Zetta = 2^{70}$ ）
-  \item ストレージプールは，
-    ミラーやRAID-Z等によりデバイスの故障に対する信頼性・可用性を向上する．
-  \end{itemize}
-  \vfill
-\end{frame}
-
-%=========================================================================
 \begin{frame}[fragile]
-  \frametitle{従来の方式}
+  \frametitle{従来の方式のボリューム}
   \fig{scale=0.6}{zfsVolume-crop.pdf}
+  \vfill
   \begin{itemize}
   \item ファイルシステムの初期化以前にボリュームを決定し，
   \item 後でサイズの変更などはできない．
@@ -89,45 +70,26 @@
   
 %=========================================================================
 \begin{frame}[fragile]
-  \frametitle{ストレージプール}
+  \frametitle{ZFSのストレージプール}
   \fig{scale=0.6}{zfsPool-crop.pdf}
+  \vfill
   \begin{itemize}
   \item ストレージプールは沢山のデバイスを収容する．
-  \item ZFSからの要求に応じてデータブロックを割り付ける．
+  \item ファイルシステムからの要求に応じてブロックを割り付ける．
   \item C言語プログラムの\|malloc()|や\|free()|に似ている．
-  \item ストレージプールに後でデバイスを追加することも可能できる．
+  \item ストレージプールに後でデバイスを追加することも可能．
   \end{itemize}
   \vfill
 \end{frame}
   
 %=========================================================================
-\begin{frame}
-  \frametitle{ZFSの特徴（３）}
-  \begin{itemize}
-  \item 仮想記憶のページキャッシュと統合されていない．
-  \item CPUやメモリの利用率が高い．
-    64ビットCPUでないとZFSに十分なメモリを提供できない．
-    （FreeNASでは最低8GiBのメモリ）
-  \end{itemize}
-  \vfill
-\end{frame}
-
-%=========================================================================
 \begin{frame}[fragile]
   \frametitle{ZFSのソフトウェア構成（１）}
-  \fig{scale=0.45}{zfsSoftModule-crop.pdf}
+  \fig{scale=0.40}{zfsSoftModule-crop.pdf}
+  \vfill
   \begin{enumerate}
   \item[1.] システムコールは，OSカーネル本体がVNODE操作に変換する．
   \item[2.] ZPLは VNODE 操作をZFSのトランザクションに変換する．
-  \end{enumerate}  
-  \vfill
-\end{frame}
-
-%=========================================================================
-\begin{frame}[fragile]
-  \frametitle{ZFSのソフトウェア構成（２）}
-  \fig{scale=0.45}{zfsSoftModule-crop.pdf}
-  \begin{enumerate}
   \item[3.] DMUは複数トランザクションを
     \emph{トランザショングループ}にする．
   \item[4.] SPAは，DMUがトランザクショングループをキャッシュに書込み終わると，
@@ -138,8 +100,9 @@
 
 %=========================================================================
 \begin{frame}[fragile]
-  \frametitle{ZFSのソフトウェア構成（３）}
+  \frametitle{ZFSのソフトウェア構成（２）}
   \fig{scale=0.45}{zfsTranscation-crop.pdf}
+  \vfill
   \begin{enumerate}
   \item[3.] DMUは複数トランザクションを
     \emph{トランザショングループ}にする．
@@ -162,6 +125,7 @@
     \fig{scale=0.6}{zfsVolumeLabel.pdf}
   \end{minipage}
   }
+  \vfill
   \begin{itemize}
   \item デバイス（ディスク）の4箇所に同じボリュームラベルを書く．
   \item ボリュームラベルには128個のUberblockを格納できる．
@@ -175,8 +139,9 @@
 \begin{frame}[fragile]
   \frametitle{ストレージプールの更新（１）}
   \fig{scale=0.45,clip,trim=0 290 0 0}{zfsCommit-crop.pdf}
+  \vfill
   \begin{enumerate}
-    \item[1.] Uberblock起点の木構造でブロックは記録されている．
+    \item[1.] Uberblockを起点とする木構造でブロックが記録されている．
     \item[2.] 変更するには，新しいブロックを確保し内容を書き込む（COW）．
   \end{enumerate}
   \vfill
@@ -186,6 +151,7 @@
 \begin{frame}[fragile]
   \frametitle{ストレージプールの更新（２）}
   \fig{scale=0.45,clip,trim=0 0 0 288}{zfsCommit-crop.pdf}
+  \vfill
   \begin{enumerate}
     \item[3.] メタデータブロックもCOWで更新する．
     \item[4.] Uberblockを新しい領域に書き込む．\\
@@ -220,33 +186,14 @@
 
 %=========================================================================
 \begin{frame}[fragile]
-  \frametitle{Dnode（１）}
-  ストレージプール内のあらゆるオブジェクトを表現する
-  512バイトのデータ構造である．
+  \frametitle{Dnode（基本）}
+  あらゆるオブジェクトを表現する512バイトのデータ構造である．
   USFの\texttt{i-node}に似ているが，
-  ファイルやディレクトリだけでなく，ファイルシステムなども表現する．
-  \begin{minipage}{0.49\columnwidth}
-    \fig{scale=0.55}{zfsDnodeDirect-crop.pdf}
-    \centerline{(a) 直接の場合}
-  \end{minipage}
-  \begin{minipage}{0.49\columnwidth}
-    \fig{scale=0.55}{zfsDnodeIndirect-crop.pdf}
-    \centerline{(b) 間接の場合}
-  \end{minipage}
+  ファイル，ディレクトリだけでなく，ファイルシステム，
+  スナップショット，クローンなども表現する．
   \vfill
-\end{frame}
-
-%=========================================================================
-\begin{frame}[fragile]
-  \frametitle{Dnode（２）}
-  \begin{minipage}{0.49\columnwidth}
-    \fig{scale=0.55}{zfsDnodeDirect-crop.pdf}
-    \centerline{(a) 直接の場合}
-  \end{minipage}
-  \begin{minipage}{0.49\columnwidth}
-    \fig{scale=0.55}{zfsDnodeIndirect-crop.pdf}
-    \centerline{(b) 間接の場合}
-  \end{minipage}
+  \centerline{\fig{scale=0.55}{zfsDnodeDirect-crop.pdf}}
+  \vfill
   \begin{itemize}
   \item dnodeは三つ以内のブロックポインタを格納することができる．
   \item dnodeは表現するオブジェクトに応じたデータを格納する領域を持っている．
@@ -257,34 +204,12 @@
 
 %=========================================================================
 \begin{frame}[fragile]
-  \frametitle{Dnode（３）}
-  \begin{minipage}{0.49\columnwidth}
-    \fig{scale=0.55}{zfsDnodeDirect-crop.pdf}
-    \centerline{(a) 直接の場合}
-  \end{minipage}
-  \begin{minipage}{0.49\columnwidth}
-    \fig{scale=0.55}{zfsDnodeIndirect-crop.pdf}
-    \centerline{(b) 間接の場合}
-  \end{minipage}
-  \begin{itemize}
-  \item データの大きさが128KiB以内の場合は直接参照（図の(a)）
-  \item 大きさが128KiBを超える場合は間接ブロック（図の(b)）
-  \end{itemize}
+  \frametitle{Dnode（データが大きい場合）}
+  \centerline{\fig{scale=0.55}{zfsDnodeIndirect-crop.pdf}}
   \vfill
-\end{frame}
-
-%=========================================================================
-\begin{frame}[fragile]
-  \frametitle{Dnode（４）}
-  \begin{minipage}{0.49\columnwidth}
-    \fig{scale=0.55}{zfsDnodeDirect-crop.pdf}
-    \centerline{(a) 直接の場合}
-  \end{minipage}
-  \begin{minipage}{0.49\columnwidth}
-    \fig{scale=0.55}{zfsDnodeIndirect-crop.pdf}
-    \centerline{(b) 間接の場合}
-  \end{minipage}
   \begin{itemize}
+  \item データの大きさが128KiB以内の場合は直接参照（前ページの図）
+  \item 大きさが128KiBを超える場合は間接ブロック（上の図)）
   \item 128KiBの間接ブロックはブロックポインタを最大1Ki個格納できる．
   \item $128KiB \times 1Ki = 128MiB$より大きなデーを表現する時は，
     多重の間接ブロック（最大6レベル）を用いる．（$2^{64}$バイト以上）
@@ -301,7 +226,7 @@
 
 %=========================================================================
 \begin{frame}[fragile]
-  \frametitle{ストレージプールの全体像（MOS layer）}
+  \frametitle{MOS （Meta Object Set） layer}
   \fig{scale=0.4,clip,trim=0 250 0 0}{zfsStructure-crop.pdf}
   \begin{itemize}
   \item Objsetはdnodeの配列を管理する．
