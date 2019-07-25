@@ -1,5 +1,5 @@
 %\documentclass[dvipdfmx]{beamer}
-\documentclass[unicode]{beamer}                   % lualatex の場合
+\documentclass[handout]{beamer}                   % lualatex の場合
 \usepackage{mySld}
 \newcommand{\inode}{\texttt{i-node}}
 \begin{document}
@@ -25,7 +25,13 @@
   \item UFS（UNIX File System）
   \item 1979年にリリースされたVersion 7 UNIX のファイルシステムと \\
     それを改良した多くのファイルシステムを UFS と呼ぶ．
-  \item 第１５章で「UNIXの場合」＝「UFSの場合」だった．
+  \item 第１４章で「UNIXの場合」＝「UFSの場合」だった．
+    \begin{itemize}
+    \item 木構造のディレクトリシステム
+    \item ハードリンク，シンボリックリンク
+    \item ボリュームのマウント，ファイルの属性
+    \item ファイル操作のシステムコール，．．．
+    \end{itemize}
   \item 多くのファイルシステムがUFSに準拠している．
     \begin{itemize}
     \item Windows の NTFS
@@ -41,8 +47,9 @@
   \frametitle{ボリューム内部の配置}
   \fig{scale=0.9}{ufsVolume.pdf}
   \begin{itemize}
-  \item セクタ512B，ブロック16セクタ，\inode 128B
+  \item セクタ512B，ブロック16セクタ
   \item \inode がファイルを表現する（\inode ＝ ファイル？）
+  \item \inode のサイズ＝128B
   \end{itemize}
   \vfill
 \end{frame}
