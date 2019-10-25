@@ -1,5 +1,5 @@
 %\documentclass[dvipdfmx]{beamer}
-\documentclass[handout]{beamer}                   % lualatex の場合
+\documentclass[unicode,handout]{beamer}                   % lualatex の場合
 \usepackage{mySld}
 
 \begin{document}
@@ -63,14 +63,14 @@
 %=========================================================================
 \section{プロセスの切換え（コンテキストスイッチ）}
 \begin{frame}
-  \frametitle{プロセスの切換えの原因}
+  \frametitle{プロセス切換えの原因}
   \begin{itemize}
     \item イベント\\
       プロセス自ら「システムコールを発行する」Blockする \\
       他のプロセスから「\emph{干渉}を受け」Blockする    \\
       他のプロセスから「\emph{干渉}を受け」Preemptionする \\
       他のプロセスから「\emph{干渉}を受け」Completeする \\
-      i/O完了やタイマ完了のイベントによりCompleteする
+      I/O完了やタイマ完了のイベントによりCompleteする
       \vfill
     \item タイムスライシング\\
       \emph{クオンタムタイム}を使い切ったプロセスはPreemptionする
@@ -189,6 +189,7 @@
   \begin{itemize}
   \item 工夫すると並列して処理することも可能
   \item しかし，プログラミングが難しい．
+  \item しかし，SMPが活かせない．
   \end{itemize}
   \vfill
 \end{frame}
@@ -203,7 +204,7 @@
   \begin{itemize}
   \item クライアント毎にプロセスを起動（\texttt{fork()}）する．
   \item プログラミングは易しい．
-  \item しかし，処理が重い．
+  \item しかし，処理が重いし，プロセス間の情報共有の効率が悪い．
   \end{itemize}
   \vfill
 \end{frame}
