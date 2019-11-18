@@ -258,11 +258,11 @@
   \vfill
   \begin{itemize}
   \item \emph{One-to-One Model}   \\
-    一つのユーザスレッドを一つのカーネルスレッドで実行する．
+    一つのスレッドを一つのカーネルスレッドで実行する．
   \item \emph{Many-to-One Model}  \\
-    複数のユーザスレッドを一つのカーネルスレッドで実行する．
+    複数のスレッドを一つのカーネルスレッドで実行する．
   \item \emph{Many-to-Many Model} \\
-    複数のユーザスレッドを複数のカーネルスレッドで実行する．
+    複数のスレッドを複数のカーネルスレッドで実行する．
   \end{itemize}
   \vfill
 \end{frame}
@@ -380,6 +380,36 @@
   \frametitle{TacOSのタイマー管理プログラム}
   \src{firstline=465,lastline=483,
   numbers=left,xleftmargin=5mm,firstnumber=3}{kernel/kernel.cmm}
+\end{frame}
+
+%=========================================================================
+\begin{frame}[fragile]
+  \frametitle{参考(普通の関数)}
+  \begin{minipage}{0.50\columnwidth}
+    \|C--|言語の\|void|型関数
+    \smp{%firstline=465,lastline=483,firstnumber=3,
+        numbers=left,xleftmargin=5mm}{cmm/stdfunc.cmm}
+  \end{minipage}
+  \hfill
+  \begin{minipage}{0.38\columnwidth}
+    \smp{%firstline=465,lastline=483,firstnumber=3,
+        numbers=left,xleftmargin=5mm}{cmm/stdfunc.s}
+  \end{minipage}
+\end{frame}
+
+%=========================================================================
+\begin{frame}[fragile]
+  \frametitle{参考(interrupt 関数)}
+  \begin{minipage}{0.50\columnwidth}
+    \|C--|言語の\|interrupt|型関数
+    \smp{%firstline=465,lastline=483,firstnumber=3,
+        numbers=left,xleftmargin=5mm}{cmm/interrupt.cmm}
+  \end{minipage}
+  \hfill
+  \begin{minipage}{0.38\columnwidth}
+    \smp{%firstline=465,lastline=483,firstnumber=3,
+        numbers=left,xleftmargin=5mm}{cmm/interrupt.s}
+  \end{minipage}
 \end{frame}
 
 %=========================================================================
