@@ -9,10 +9,9 @@ PDFS =  chap1_Sld.pdf chap2_Sld.pdf chap3_Sld.pdf chap4_Sld.pdf \
 
 %.pdf : %.tex *.sty
 	lualatex $*.tex
-	open $*.pdf
+#	open $*.pdf
 
 all : ${PDFS}
 
 clean :
 	rm -f *.log *.aux *.dvi *.out *.toc *.vrb *.snm *.nav *~
-

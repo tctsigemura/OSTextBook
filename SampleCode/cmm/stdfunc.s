@@ -1,0 +1,17 @@
+.sFunc	PUSH	FP
+	LD	FP,SP
+	PUSH	G3
+	CALL	__stkChk
+	LD	G3,#0
+.L1
+	CMP	G3,#10
+	JGE	.L2
+	CALL	.func
+	LD	G0,G3
+	ADD	G0,#1
+	LD	G3,G0
+	JMP	.L1
+.L2
+	POP	G3
+	POP	FP
+	RET

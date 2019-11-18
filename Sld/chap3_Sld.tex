@@ -1,5 +1,5 @@
 %\documentclass[dvipdfmx]{beamer}
-\documentclass[handout]{beamer}                   % lualatex の場合
+\documentclass[unicode,handout]{beamer}                   % lualatex の場合
 \usepackage{mySld}
 
 \begin{document}
@@ -63,14 +63,14 @@
 %=========================================================================
 \section{プロセスの切換え（コンテキストスイッチ）}
 \begin{frame}
-  \frametitle{プロセスの切換えの原因}
+  \frametitle{プロセス切換えの原因}
   \begin{itemize}
     \item イベント\\
       プロセス自ら「システムコールを発行する」Blockする \\
       他のプロセスから「\emph{干渉}を受け」Blockする    \\
       他のプロセスから「\emph{干渉}を受け」Preemptionする \\
       他のプロセスから「\emph{干渉}を受け」Completeする \\
-      i/O完了やタイマ完了のイベントによりCompleteする
+      I/O完了やタイマ完了のイベントによりCompleteする
       \vfill
     \item タイムスライシング\\
       \emph{クオンタムタイム}を使い切ったプロセスはPreemptionする
@@ -189,6 +189,7 @@
   \begin{itemize}
   \item 工夫すると並列して処理することも可能
   \item しかし，プログラミングが難しい．
+  \item しかし，SMPが活かせない．
   \end{itemize}
   \vfill
 \end{frame}
@@ -203,7 +204,7 @@
   \begin{itemize}
   \item クライアント毎にプロセスを起動（\texttt{fork()}）する．
   \item プログラミングは易しい．
-  \item しかし，処理が重い．
+  \item しかし，処理が重いし，プロセス間の情報共有の効率が悪い．
   \end{itemize}
   \vfill
 \end{frame}
@@ -257,11 +258,11 @@
   \vfill
   \begin{itemize}
   \item \emph{One-to-One Model}   \\
-    一つのユーザスレッドを一つのカーネルスレッドで実行する．
+    一つのスレッドを一つのカーネルスレッドで実行する．
   \item \emph{Many-to-One Model}  \\
-    複数のユーザスレッドを一つのカーネルスレッドで実行する．
+    複数のスレッドを一つのカーネルスレッドで実行する．
   \item \emph{Many-to-Many Model} \\
-    複数のユーザスレッドを複数のカーネルスレッドで実行する．
+    複数のスレッドを複数のカーネルスレッドで実行する．
   \end{itemize}
   \vfill
 \end{frame}
@@ -379,6 +380,36 @@
   \frametitle{TacOSのタイマー管理プログラム}
   \src{firstline=465,lastline=483,
   numbers=left,xleftmargin=5mm,firstnumber=3}{kernel/kernel.cmm}
+\end{frame}
+
+%=========================================================================
+\begin{frame}[fragile]
+  \frametitle{参考(普通の関数)}
+  \begin{minipage}{0.50\columnwidth}
+    \|C--|言語の\|void|型関数
+    \smp{%firstline=465,lastline=483,firstnumber=3,
+        numbers=left,xleftmargin=5mm}{cmm/stdfunc.cmm}
+  \end{minipage}
+  \hfill
+  \begin{minipage}{0.38\columnwidth}
+    \smp{%firstline=465,lastline=483,firstnumber=3,
+        numbers=left,xleftmargin=5mm}{cmm/stdfunc.s}
+  \end{minipage}
+\end{frame}
+
+%=========================================================================
+\begin{frame}[fragile]
+  \frametitle{参考(interrupt 関数)}
+  \begin{minipage}{0.50\columnwidth}
+    \|C--|言語の\|interrupt|型関数
+    \smp{%firstline=465,lastline=483,firstnumber=3,
+        numbers=left,xleftmargin=5mm}{cmm/interrupt.cmm}
+  \end{minipage}
+  \hfill
+  \begin{minipage}{0.38\columnwidth}
+    \smp{%firstline=465,lastline=483,firstnumber=3,
+        numbers=left,xleftmargin=5mm}{cmm/interrupt.s}
+  \end{minipage}
 \end{frame}
 
 %=========================================================================
