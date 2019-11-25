@@ -1,7 +1,6 @@
 .sFunc	PUSH	FP
 	LD	FP,SP
 	PUSH	G3
-	CALL	__stkChk
 	LD	G3,#0
 .L1
 	CMP	G3,#10
