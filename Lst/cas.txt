@@ -1,6 +1,6 @@
 // 口座 account に足し込む			// 口座 account から差し引く
- 	LD	G0,account				LD	G0,account
-L1	LD	G1,G0     			L2	LD	G1,G0
+L1 	LD	G0,account			L2	LD	G0,account
+	LD	G1,G0     				LD	G1,G0
 	ADD	G1,receipt				SUB	G1,payment
 	CAS	G0,G1,account				CAS	G0,G1,account
 	JNZ	L1					JNZ	L2
