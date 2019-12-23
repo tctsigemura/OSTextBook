@@ -15,7 +15,7 @@ while (turn==0 && flag[1]==true)		while(turn==1 && flag[0]==true)
 ...						...
 
 // エグジットセクション				// エグジットセクション
-flag[0] = false;				flag[1] = flase;
+flag[0] = false;				flag[1] = false;
 
 // 非クリティカルセクション			// 非クリティカルセクション
 ...						...

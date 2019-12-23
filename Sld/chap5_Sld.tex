@@ -326,11 +326,11 @@
   \begin{itemize}
   \item ライタスレッドはデータ読んでを変更して書き込む．
   \item データ変更中は他のスレッドはデータにアクセスしてはならない．\\
-    （\emph{排他ロック（exclusive lock）}
+    （\emph{排他ロック（exclusive lock）}）
       \vfill
   \item リーダスレッドはデータを変更しない．
   \item 複数のリーダスレッドが同時にデータにアクセスしても良い．\\
-    しかし，ライタはアクセスできない．\\
+    \textbf{しかし，}その間，ライタスレッドはデータにアクセスできない．\\
     （\emph{共有ロック（shared lock）}）
   \end{itemize}
   \vfill
@@ -373,7 +373,9 @@
   \vfill
   \begin{center}
     \textbf{\LARGE 第２０章} \\
-    \textbf{\Huge TacOSのセマフォ}
+    \textbf{\Huge TacOSのセマフォ}\\
+    \vfill
+    \fig{scale=0.40}{tacosOrganization-crop.pdf}
   \end{center}
   \vfill
 \end{frame}
