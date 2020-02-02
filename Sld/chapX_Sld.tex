@@ -1,0 +1,71 @@
+%\documentclass[dvipdfmx]{beamer}
+\documentclass[unicode,handout]{beamer}                   % lualatex の場合
+\usepackage{mySld}
+
+\begin{document}
+\title[デッドロック]
+      {オペレーティングシステム\\番外 デッドロック}
+\date{}
+\begin{frame}
+  \titlepage
+  \centerline{\url{https://github.com/tctsigemura/OSTextBook}}
+\end{frame}
+
+%=========================================================================
+%\begin{frame}
+%  \frametitle
+%  \tableofcontents
+%\end{frame}
+
+%=========================================================================
+\section{概要}
+\begin{frame}
+  \frametitle{デッドロック（deadlock）とは}
+  資源を確保したい複数のプロセス（スレッド）があるとき． \\
+  資源が解放されるのを待ち合う状態．
+  \vfill
+  \fig{scale=0.6}{deadlock-crop.pdf}
+  \vfill
+\end{frame}
+
+%=========================================================================
+\begin{frame}
+  \frametitle{デッドロックが発生する条件}
+  デッドロックが発生するための必要条件
+  \begin{enumerate}
+    \item[(1)] 相互排除（資源が排他的に利用される）
+    \item[(2)] 確保待ち（資源を確保した状態で待つ）
+    \item[(3)] 横取り不可（使用中の資源を横取りできない）
+    \item[(4)] 循環待ち（待ちがループしている）
+  \end{enumerate}
+  (1)，(3)は資源の種類によってはどうしようもない．
+  \vfill
+  プリンタは，相互排除，横取り不可な資源の例．
+  \vfill
+  \fig{scale=0.6}{deadlockPrinter-crop.pdf}
+  \vfill
+\end{frame}
+
+%=========================================================================
+\section{防止}
+\begin{frame}
+  \frametitle{デッドロックの発生を防止する方法（１）}
+  前出の(2)，(4)のどちらかを防止すればデッドロックは発生しない．\\
+  \textbf{資源の一括確保（P\_AND）}  … (2)確保待ちにしない．
+  \vfill
+  \fig{scale=0.6}{deadlockPrevention1-crop.pdf}
+  \vfill
+  資源の利用率が悪くなる．
+\end{frame}
+
+%=========================================================================
+\begin{frame}
+  \frametitle{デッドロックの発生を防止する方法（２）}
+  \textbf{資源の確保順序に制約}  … (4)循環待ちにしない．
+  \vfill
+  \fig{scale=0.6}{deadlockPrevention2-crop.pdf}
+  \vfill
+  不公平が生じるかも（順番付けできない例「食事する哲学者問題」）．
+\end{frame}
+
+\end{document}
