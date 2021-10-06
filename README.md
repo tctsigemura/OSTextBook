@@ -6,7 +6,7 @@ OS Textbook
 コメントなどよろしくお願いいたします．
 
 刷物（表紙カラー，本文モノクロ）は
-[販売ページ](https://www.seichoku.com/user_data/booksale.php?id=238778394)
+[販売ページ](https://www.seichoku.com/item/DS2002214)
 から入手できます。
 
 (os.pdf が本文，Sld/chap?_Sld.pdf が授業用のスライドです．)
