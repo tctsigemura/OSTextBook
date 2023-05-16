@@ -23,6 +23,7 @@
   \frametitle{ページング}
   ページングは以下のようなメモリ管理方式である．
   \begin{itemize}
+  \item メモリを一様なページに分割し，ページ単位で管理する．
   \item メモリより広い仮想アドレス空間を使用できる．
   \item 外部フラグメンテーションを生じない．
   \item メモリコンパクションが不要である．
@@ -99,7 +100,8 @@
         \item スタック領域も\texttt{rw-}にする．
       \end{itemize}
       領域サイズはページの倍数ではない．\\
-      フラグメント部分のアクセスは不正だが検知できない．
+      フラグメント部分のアクセスは不正だが検知できない．\\
+      フラグメントサイズの平均はページサイズの1/2．
     \end{itemize}
   \end{minipage}
 \end{frame}
@@ -263,7 +265,7 @@
   \fig{scale=0.33}{pagingMultiLevel-crop.pdf}
   \begin{itemize}
   \item 一段目のページテーブルサイズ4KiB = フレームサイズ
-  \item ニ段目のページテーブルの区画サイズ4KiB = フレームサイズ
+  \item 二段目のページテーブルの区画サイズ4KiB = フレームサイズ
   \end{itemize}
 \end{frame}
 
