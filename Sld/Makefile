@@ -19,7 +19,10 @@ SLDS =  chap1_Sld.pdf chap2_Sld.pdf chap3_Sld.pdf chap4_Sld.pdf \
 %_Sld.pdf : %_Sld.tex *.sty
 	lualatex $*_Sld.tex
 
-all : ${SLDS} ${HNDS} # 中間ファイル *_Sld.pdf を消さないように
+all : all_Hnd.pdf
 
+all_Hnd.pdf : ${SLDS} ${HNDS} # 中間ファイル *_Sld.pdf を消さないように
+	gs -q -dNOPAUSE -dBATCH -sDEVICE=pdfwrite -sOutputFile=all_Hnd.pdf \
+	${HNDS}
 clean :
 	rm -f *.log *.aux *.dvi *.out *.toc *.vrb *.snm *.nav *~
