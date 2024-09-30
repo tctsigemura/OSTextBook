@@ -13,7 +13,7 @@ int main() {
     perror("ftok");
     exit(1);
   }
-  if ((msqid=msgget(key,0644))==-1) {         // ipcUnixMessageReader が作った
+  if ((msqid=msgget(key,0644))==-1) {         // ipcUnixMessageWriter が作った
     perror("msgget");                         //  メッセージキューを取得
     exit(1);
   }
