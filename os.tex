@@ -6,10 +6,12 @@
 \documentclass[a4paper,11pt,twocolumn]{ltjsbook}     % lualatex の場合
 %----------- 印刷版とPDF版の区別 ----------------------------------------------
 \newif\ifPDF
+
 %印刷版の場合
 %\PDFfalse
 %PDF版の場合
 \PDFtrue
+
 \ifPDF
 \newcommand{\pdf}{（PDF版）}
 \else
@@ -18,7 +20,7 @@
 %------------------------------------------------------------------------------
 \usepackage{mySty}
 \newcommand{\edition}{初版}
-\newcommand{\ver}{Ver. 1.0.11}
+\newcommand{\ver}{Ver. 1.0.12}
 \newcommand{\git}{https://github.com/tctsigemura/OSTextBook/tree/v1.0.0}
 %\newcommand{\git}{https://github.com/tctsigemura/OSTextBook/blob/master}
 %------------------------------------------------------------------------------
@@ -73,7 +75,7 @@
 ~
 \vfill
 \begin{flushleft}
-Copyright \copyright ~~ 2018 - 2022 by \\
+Copyright \copyright ~~ 2018 - 2024 by \\
 Dept. of Computer Science and Electronic Engineering, \\
 Tokuyama College of Technology, JAPAN
 \end{flushleft}
@@ -165,7 +167,8 @@ sigemura@tokuyama.kosen-ac.jp
 \\
 　発行日　２０１８年１０月１５日  {\edition} \\
 %　　　　　２０２１年１０月０４日  {\ver}\\
-　　　　　２０２２年１０月１２日  {\ver}\\
+%　　　　　２０２２年１０月１２日  {\ver}\\
+　　　　　２０２４年９月３０日  {\ver}\\
 　著　者　重村　哲至 \\
 　発　行　徳山工業高等専門学校　情報電子工学科 \\
 　　　　　〒745-8585 山口県周南市学園台3538 \\
