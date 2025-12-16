@@ -229,6 +229,17 @@
 
 %=========================================================================
 \begin{frame}
+  \frametitle{PCBのリスト（参考）}
+  \fig{scale=0.4}{procQueue-crop.pdf}
+  \begin{itemize}
+    \item Ready状態PCBのリスト = 実行可能列（優先順位順にソート）
+    \item イベント毎（{\color{red} セマフォ毎}）の待ち行列
+  \end{itemize}
+  \vfill
+\end{frame}
+
+%=========================================================================
+\begin{frame}
   \frametitle{セマフォ（Semaphore）のP操作}
   \emph{P操作（P(S)）}
   \begin{enumerate}
