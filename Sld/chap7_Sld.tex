@@ -133,14 +133,14 @@ signal操作は条件変数の待ち行列から一つのスレッドを選ん�
 
   \begin{itemize}
   \item {\tt wait()}はスレッドを状態変数の待ち行列に入れる．
-  \item {\tt signal()}は状態変数の待ちスレッドを起こす．
+  \item {\tt signal()}は状態変数の待ちスレッドを一つ起こす．
   \item {\tt signal()}で起床したスレッドは{\bf ただちに}実行される．
   \end{itemize}
 \end{frame}
 
 %=========================================================================
 \begin{frame}
-  \frametitle{モニタによる生産者と消費者問題の解（仮想言語）}
+  \frametitle{モニタによる複数生産者と複数消費者問題の解\\（仮想言語）}
   \lst{numbers=left,xleftmargin=5mm}{BoundedBufferMain.jama}
 
   \begin{itemize}
@@ -205,7 +205,7 @@ signal操作は条件変数の待ち行列から一つのスレッドを選ん�
 %=========================================================================
 \section{Javaのモニタ風機構による生産者と消費者問題の解（前半）}
 \begin{frame}
-  \frametitle{Javaによる生産者と消費者問題の解（前半）}
+  \frametitle{Javaによる複数生産者と複数消費者問題の解（前半）}
   \smp{language={Java},lastline=15,frame=tlr,
     numbers=left,xleftmargin=5mm,firstnumber=1}
       {MonBoundedBuffer/MonBoundedBuffer.java}
@@ -214,19 +214,20 @@ signal操作は条件変数の待ち行列から一つのスレッドを選ん�
   \item 資源には{\tt private}を明示
   \item 初期化はコンストラクタにより実現
   \item Javaの{\tt wait()}はtry-catch構文で使用する必要がある．
+  \item {\bf 手続き}は{\tt synchronized}修飾したメソッド
   \end{itemize}
 \end{frame}
 
 %=========================================================================
 \begin{frame}
-  \frametitle{Javaによる生産者と消費者問題の解（後半）}
+  \frametitle{Javaによる複数生産者と複数消費者問題の解（後半）}
   \smp{language={Java},firstline=16,frame=rlb,
     numbers=left,xleftmargin=5mm,firstnumber=16}
       {MonBoundedBuffer/MonBoundedBuffer.java}
 
   \begin{itemize}
-  \item {\bf 手続き}は{\tt synchronized}修飾したメソッド
   \item Javaの{\tt wait()}は別の理由でも終了するので{\tt while}の中で使用
+  \item Javaの{\tt notify()}は待ちスレッドを一つ起こす．
   \item 条件変数は一つしかないので，利用方法に工夫が必要
   \item {\tt remove()}最後の行の実行順序がモニタと異なる．
   \end{itemize}
