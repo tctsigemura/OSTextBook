@@ -38,6 +38,15 @@
 \end{frame}
 
 %=========================================================================
+\begin{frame}
+  \frametitle{プロセスの構造とカーネルスレッド（参考）}
+  \fig{scale=0.6}{kernelThread-crop.pdf}
+  \begin{itemize}
+    \item 仮想CPUにスレッドのコンテキストを保存
+  \end{itemize}
+\end{frame}
+
+%=========================================================================
 \section{クリティカルセクション（Critical Section）}
 \begin{frame}
   \frametitle{クリティカルセクション（Critical Section）}
@@ -216,6 +225,17 @@
   セマフォはプロセス（スレッド）の状態を\emph{待ち(Waiting）状態}に変える．
     \emph{ビジーウェイティング（Busy Waiting）では無い}ので
     CPUを無駄遣いすることはない．
+\end{frame}
+
+%=========================================================================
+\begin{frame}
+  \frametitle{PCBのリスト（参考）}
+  \fig{scale=0.4}{procQueue-crop.pdf}
+  \begin{itemize}
+    \item Ready状態PCBのリスト = 実行可能列（優先順位順にソート）
+    \item イベント毎（{\color{red} セマフォ毎}）の待ち行列
+  \end{itemize}
+  \vfill
 \end{frame}
 
 %=========================================================================
@@ -480,6 +500,11 @@
   \end{itemize}
 \end{frame}
 
+\end{document}
+
+
+
+
 %=========================================================================
 \section{練習問題}
 \begin{frame}
@@ -546,4 +571,3 @@
   \vfill
 \end{frame}
 
-\end{document}
