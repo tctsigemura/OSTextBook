@@ -324,6 +324,19 @@
 
 %=========================================================================
 \begin{frame}
+  \frametitle{TaCのPSWとCPUレジスタ}
+  \begin{itemize}
+    \item スタックポインタは，カーネル用(SSP)とユーザ用(USP)の２本
+    \item フレームポインタ(FP)は，\texttt{C--}言語が特殊用途に使用
+  \end{itemize}
+  \begin{center}
+    \tbl{scale=0.6}{TaC7a-instruction-p1-3-crop.pdf}
+  \end{center}
+  \vfill
+\end{frame}
+
+%=========================================================================
+\begin{frame}
   \frametitle{TacOSのPCB}
   \begin{itemize}
     \item 仮想CPU（\texttt{sp}）
